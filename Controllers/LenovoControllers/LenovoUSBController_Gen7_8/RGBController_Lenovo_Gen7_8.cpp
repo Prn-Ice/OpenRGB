@@ -256,6 +256,10 @@ LenovoRGBController_Gen7_8::LenovoRGBController_Gen7_8(LenovoGen7And8USBControll
         description = "Lenovo Legion 7 Generation 7";
         break;
 
+    case LEGION_SLIM_7GEN8:
+        description = "Lenovo Legion Slim 7 Generation 8";
+        break;
+
     case LEGION_7GEN8:
         description = "Lenovo Legion 7 Generation 8";
         break;
