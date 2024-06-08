@@ -1,3 +1,16 @@
+/*---------------------------------------------------------*\
+| RazerControllerDetect.cpp                                 |
+|                                                           |
+|   Detector for Razer devices                              |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                22 Jan 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-only                   |
+\*---------------------------------------------------------*/
+
+#include <unordered_set>
+#include <hidapi/hidapi.h>
 #include "Detector.h"
 #include "LogManager.h"
 #include "RazerController.h"
@@ -8,10 +21,6 @@
 #include "RGBController_Razer.h"
 #include "RGBController_RazerAddressable.h"
 #include "RGBController_RazerKraken.h"
-
-#include <hidapi/hidapi.h>
-
-#include <unordered_set>
 
 /******************************************************************************************\
 *                                                                                          *
@@ -68,18 +77,14 @@ void DetectRazerARGBControllers(hid_device_info* info, const std::string& name)
     | main info list.                                                                                   |
     \*-------------------------------------------------------------------------------------------------*/
      hid_device* dev_interface_0 = nullptr;
-#ifdef _WIN32
      hid_device* dev_interface_1 = nullptr;
-#endif
      hid_device_info* info_full = hid_enumerate(RAZER_VID, RAZER_CHROMA_ADDRESSABLE_RGB_CONTROLLER_PID);
      hid_device_info* info_temp = info_full;
     /*--------------------------------------------------------------------------------------------*\
     | Keep track of paths so they can be added to used_paths only if both interfaces can be found. |
     \*--------------------------------------------------------------------------------------------*/
      std::string dev_interface_0_path;
-#ifdef _WIN32
      std::string dev_interface_1_path;
-#endif
 
      while(info_temp)
      {
@@ -96,19 +101,13 @@ void DetectRazerARGBControllers(hid_device_info* info, const std::string& name)
                  dev_interface_0 = hid_open_path(info_temp->path);
                  dev_interface_0_path = info_temp->path;
              }
-#ifdef _WIN32
              else if(info_temp->interface_number == 1)
              {
                  dev_interface_1 = hid_open_path(info_temp->path);
                  dev_interface_1_path = info_temp->path;
              }
-#endif
          }
-#ifdef _WIN32
          if(dev_interface_0 && dev_interface_1)
-#else
-         if(dev_interface_0)
-#endif
          {
              break;
          }
@@ -117,31 +116,19 @@ void DetectRazerARGBControllers(hid_device_info* info, const std::string& name)
 
      hid_free_enumeration(info_full);
 
-#ifdef _WIN32
      if(dev_interface_0 && dev_interface_1)
-#else
-     if(dev_interface_0)
-#endif
      {
-#ifdef _WIN32
          RazerController* controller                    = new RazerController(dev_interface_0, dev_interface_1, info->path, info->product_id, name);
-#else
-         RazerController* controller                    = new RazerController(dev_interface_0, dev_interface_0, info->path, info->product_id, name);
-#endif
          RGBController_RazerAddressable* rgb_controller = new RGBController_RazerAddressable(controller);
          ResourceManager::get()->RegisterRGBController(rgb_controller);
          used_paths.insert(dev_interface_0_path);
-#ifdef _WIN32
          used_paths.insert(dev_interface_1_path);
-#endif
      }
      else
      {
          // Not all of them could be opened, do some cleanup
          hid_close(dev_interface_0);
-#ifdef _WIN32
          hid_close(dev_interface_1);
-#endif
      }
 }
 

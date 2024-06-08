@@ -298,6 +298,7 @@
 #define ASUS_TUF_RX_7900XTX_O24G_GAMING                 0x0506
 #define ASUS_ROG_STRIX_LC_RX_6950XT_O16G_GAMING         0x05E9
 #define ASUS_TUF_RTX_4060TI_O8G_GAMING                  0x88F6
+#define ASUS_ROG_STRIX_RTX_4060TI_O8G_GAMING            0x88FB
 #define ASUS_TUF_RTX_4070_12G_GAMING                    0x88DE
 #define ASUS_TUF_RTX_4070_O12G_GAMING                   0x88DF
 #define ASUS_TUF_RTX_4070_O12G_GAMING_2                 0x88EB
@@ -619,6 +620,7 @@
 #define MSI_RTX2070S_GAMING_X_TRIO_SUB_DEV              0xC726
 #define MSI_RTX2080_GAMING_TRIO_SUB_DEV                 0x372E
 #define MSI_RTX2080_GAMING_X_TRIO_SUB_DEV               0x3726
+#define MSI_RTX2080_GAMING_X_TRIO_SUB_DEV_2             0x3727
 #define MSI_RTX2080_SEA_HAWK_EK_X_SUB_DEV               0x3728
 #define MSI_RTX2080_DUKE_OC_SUB_DEV                     0x3721
 #define MSI_RTX2080S_GAMING_X_TRIO_SUB_DEV              0xC724
@@ -771,6 +773,7 @@
 #define ZOTAC_RTX3070_AMP_SUB_DEV                       0x8617
 #define ZOTAC_RTX3080_12G_LHR_TRINITY_SUB_DEV           0xB612
 #define ZOTAC_RTX3080_TRINITY_SUB_DEV                   0x1612
+#define ZOTAC_RTX3080_AMP_LHR_SUB_DEV                   0x3612
 #define ZOTAC_RTX3080TI_AMP_SUB_DEV                     0x2612
 #define ZOTAC_RTX3090_AMP_SUB_DEV                       0x1619
 #define ZOTAC_RTX3090_TRINITY_SUB_DEV                   0x1613
