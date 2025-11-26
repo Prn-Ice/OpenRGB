@@ -1,20 +1,26 @@
-/*-----------------------------------------*\
-|  RGBController_SonyDualSense.h            |
-|                                           |
-|  Controller for Sony DualSense            |
-|                                           |
-|  by flora             01/07/2022          |
-\*-----------------------------------------*/
-#include <CRC.h>
-#include <cstring>
-#include <hidapi/hidapi.h>
-#include "SonyDualSenseController.h"
+/*---------------------------------------------------------*\
+| SonyDualSenseController.cpp                               |
+|                                                           |
+|   Driver for Sony DualSense                               |
+|                                                           |
+|   Flora Aubry                                 01 Jul 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-SonyDualSenseController::SonyDualSenseController(hid_device * device_handle, const char * device_path, bool is_bluetooth)
+#include <cstring>
+#include <CRC.h>
+#include <hidapi.h>
+#include "SonyDualSenseController.h"
+#include "StringUtils.h"
+
+SonyDualSenseController::SonyDualSenseController(hid_device * device_handle, const char * device_path, bool is_bluetooth, std::string dev_name)
 {
-    dev = device_handle;
-    location = device_path;
-    this->is_bluetooth = is_bluetooth;
+    dev                 = device_handle;
+    location            = device_path;
+    name                = dev_name;
+    this->is_bluetooth  = is_bluetooth;
 }
 
 SonyDualSenseController::~SonyDualSenseController()
@@ -27,19 +33,22 @@ std::string SonyDualSenseController::GetLocation()
     return("HID: " + location);
 }
 
+std::string SonyDualSenseController::GetName()
+{
+    return(name);
+}
+
 std::string SonyDualSenseController::GetSerialString()
 {
     wchar_t serial_string[128];
     int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
     if(ret != 0)
     {
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void SonyDualSenseController::SetColors(std::vector<RGBColor> colors, unsigned char brightness, unsigned char mode_value)

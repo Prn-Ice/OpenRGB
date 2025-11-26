@@ -6,13 +6,13 @@
 |   Nic W (midgetspy)                           13 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define CM_RGBC_NUM_LEDS 4
@@ -37,6 +37,7 @@
 
 #define CM_RGBC_SPEED_NONE                      0x05
 #define CM_RGBC_BRIGHTNESS_OFF                  0x03
+#define HID_MAX_STR                             255
 
 /*-------------------------------------------------*\
 | OP OPCODES                                        |
@@ -123,7 +124,6 @@ public:
 
 private:
     std::string         device_name;
-    std::string         serial;
     std::string         location;
     hid_device*         dev;
 

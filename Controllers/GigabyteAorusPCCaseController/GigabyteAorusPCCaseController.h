@@ -6,13 +6,13 @@
 |   Denis Nazarov (nenderus)                    10 Feb 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 struct aorus_pc_case_mode_config
@@ -48,10 +48,11 @@ enum
 class GigabyteAorusPCCaseController
 {
 public:
-    GigabyteAorusPCCaseController(hid_device* dev_handle, const char* path);
+    GigabyteAorusPCCaseController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~GigabyteAorusPCCaseController();
 
     std::string     GetDeviceLocation();
+    std::string     GetNameString();
     std::string     GetSerialString();
 
     void            SendColor(uint8_t red, uint8_t green, uint8_t blue);
@@ -63,4 +64,5 @@ public:
 private:
     hid_device*     dev;
     std::string     location;
+    std::string     name;
 };

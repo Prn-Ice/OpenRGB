@@ -6,7 +6,7 @@
 |   Tam D (too.manyhobbies)                     30 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -16,7 +16,7 @@
 class CMKeyboardV1Controller : public CMKeyboardAbstractController
 {
 public:
-    CMKeyboardV1Controller(hid_device* dev_handle, hid_device_info* dev_info);
+    CMKeyboardV1Controller(hid_device* dev_handle, hid_device_info* dev_info, std::string dev_name);
     ~CMKeyboardV1Controller();
 
     /*---------------------------------------------------------*\

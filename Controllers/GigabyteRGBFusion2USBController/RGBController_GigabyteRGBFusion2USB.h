@@ -5,23 +5,29 @@
 |   motherboard                                             |
 |                                                           |
 |   jackun                                      08 Jan 2020 |
+|   megadjc                                     31 Jul 2025 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <map>
-#include <vector>
 #include "RGBController.h"
+#include "GigabyteFusion2USB_Devices.h"
 #include "GigabyteRGBFusion2USBController.h"
+#include "SettingsManager.h"
 
-#define RGBFusion2_Digital_LEDS_Min         0;
-#define RGBFusion2_Digital_LEDS_Max         1024;
-#define RGBFUSION2_BRIGHTNESS_MIN           0;
-#define RGBFUSION2_BRIGHTNESS_MAX           100;
-#define RGBFusion2_Digital_Direct_Offset    (HDR_D_LED1_RGB - HDR_D_LED1);
+#define RGBFUSION2_DIGITAL_LEDS_MIN         0
+#define RGBFUSION2_DIGITAL_LEDS_MAX         1024
+#define RGBFUSION2_BRIGHTNESS_MIN           0
+#define RGBFUSION2_BRIGHTNESS_MAX           255
+#define RGBFUSION2_SPEED_MIN                9
+#define RGBFUSION2_SPEED_MID                4
+#define RGBFUSION2_SPEED_MAX                0
+
+#define GET_JSON_VAL_ELSE_OFF(obj, key) obj.contains(key) ? obj.at(key).get<std::string>() : std::string("OFF")
 
 template<typename K, typename V>
 static std::map<V, K> reverse_map(const std::map<K, V>& map)
@@ -36,46 +42,47 @@ static std::map<V, K> reverse_map(const std::map<K, V>& map)
     return reversed_map;
 }
 
-typedef std::map< std::string, int > FwdLedHeaders;
-typedef std::map< int, std::string > RvrseLedHeaders;
-
-struct LedPort
-{
-    std::string name;
-    int         header;
-    int         count;
-};
-
-typedef std::map< std::string, std::string >            MBName;
-typedef std::map< std::string, std::vector<LedPort> >   ZoneLeds;
-typedef std::map< std::string, ZoneLeds>                KnownLayout;
-
 class RGBController_RGBFusion2USB: public RGBController
 {
 public:
     RGBController_RGBFusion2USB(RGBFusion2USBController* controller_ptr, std::string _detector_name);
     ~RGBController_RGBFusion2USB();
 
-    void        SetupZones();
+    void                        SetupZones();
 
-    void        ResizeZone(int zone, int new_size);
+    void                        ResizeZone(int zone, int new_size);
 
-    void        DeviceUpdateLEDs();
-    void        UpdateZoneLEDs(int zone);
-    void        UpdateSingleLED(int led);
+    void                        DeviceUpdateLEDs();
+    void                        UpdateZoneLEDs(int zone);
+    void                        UpdateSingleLED(int led);
 
-    void        DeviceUpdateMode();
+    void                        DeviceUpdateMode();
 
 private:
-    MBName                      MBName2Layout;
-    bool                        custom_layout;
     std::string                 detector_name;
 
     RGBFusion2USBController*    controller;
-    IT8297Report                report;
-    ZoneLeds                    layout;
+    int                         device_num;
+    RGBColor                    null_color      = 0;
+    /*---------------------------------------------------------*\
+    | The intial value of device_index should point to the      |
+    |   layout for the generic_device                           |
+    \*---------------------------------------------------------*/
+    uint32_t                    device_index    = 0;
 
-    void        Load_Device_Config();
-    void        Init_Controller();
-    int         GetLED_Zone(int led_idx);
+    void                        Init_Controller();
+    int                         GetLED_Zone(int led_idx);
+
+    nlohmann::json              WriteCalJsonFrom(
+                                    const EncodedCalibration& src);
+    void                        FillMissingWith(
+                                    nlohmann::json& dst,
+                                    const EncodedCalibration& fb);
+    nlohmann::json              BuildCustomLayoutJson(
+                                    const gb_fusion2_device* layout,
+                                    const RvrseLedHeaders& reverseLookup);
+    void                        LoadCustomLayoutFromJson(
+                                    const nlohmann::json& json_custom,
+                                    const FwdLedHeaders& forwardLookup,
+                                    gb_fusion2_device* layout);
 };

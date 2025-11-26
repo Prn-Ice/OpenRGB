@@ -6,14 +6,14 @@
 |   Tam D (too.manyhobbies)                     30 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cmath>
 #include "CMKeyboardV1Controller.h"
 #include "LogManager.h"
 
-CMKeyboardV1Controller::CMKeyboardV1Controller(hid_device* dev_handle, hid_device_info* dev_info) : CMKeyboardAbstractController(dev_handle, dev_info)
+CMKeyboardV1Controller::CMKeyboardV1Controller(hid_device* dev_handle, hid_device_info* dev_info, std::string dev_name) : CMKeyboardAbstractController(dev_handle, dev_info, dev_name)
 {
     m_sFirmwareVersion = _GetFirmwareVersion();
 }

@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                28 Feb 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
@@ -205,6 +205,14 @@ std::string RazerKrakenController::razer_get_serial()
     {
         strncpy(&serial_string[0], (const char*)&response_report.arguments[0], 22);
         serial_string[22] = '\0';
+    }
+
+    for(size_t i = 0; i < 22; i++)
+    {
+        if(serial_string[i] < 30 || serial_string[i] > 126)
+        {
+            serial_string[i] = ' ';
+        }
     }
 
     std::string ret_string = serial_string;

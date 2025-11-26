@@ -1,16 +1,17 @@
-/*-----------------------------------------*\
-|  RGBController_TrustGXT114.cpp            |
-|                                           |
-|  Generic RGB Interface for OpenRGB        |
-|  Trust GXT 114 USB Driver                 |
-|                                           |
-|  Guimard Morgan (morg) 1/24/2022          |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_TrustGXT114.cpp                             |
+|                                                           |
+|   RGBController for Trust GXT 114                         |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "RGBController_TrustGXT114.h"
-
-#include <thread>
 #include <chrono>
+#include <thread>
+#include "RGBController_TrustGXT114.h"
 
 /**------------------------------------------------------------------*\
     @name Trust GXT 114
@@ -26,13 +27,13 @@
 RGBController_TrustGXT114::RGBController_TrustGXT114(TrustGXT114Controller* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "Trust GXT 114";
+
+    name                                = controller->GetNameString();
     vendor                              = "Trust";
     type                                = DEVICE_TYPE_MOUSE;
-    description                         = name;
+    description                         = "Trust GXT 114 Device";
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Static;
     Static.name                         = "Static";

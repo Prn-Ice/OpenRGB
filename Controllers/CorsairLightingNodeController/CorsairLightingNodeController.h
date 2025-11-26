@@ -6,14 +6,14 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      12 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <chrono>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "DeviceGuardManager.h"
 #include "RGBController.h"
 
@@ -88,11 +88,12 @@ enum
 class CorsairLightingNodeController
 {
 public:
-    CorsairLightingNodeController(hid_device* dev_handle, const char* path);
+    CorsairLightingNodeController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~CorsairLightingNodeController();
 
     std::string     GetFirmwareString();
     std::string     GetLocationString();
+    std::string     GetNameString();
     std::string     GetSerialString();
 
     unsigned int    GetStripsOnChannel(unsigned int channel);
@@ -124,6 +125,7 @@ private:
     hid_device*                                         dev;
     std::string                                         firmware_version;
     std::string                                         location;
+    std::string                                         name;
     std::thread*                                        keepalive_thread;
     std::atomic<bool>                                   keepalive_thread_run;
     std::chrono::time_point<std::chrono::steady_clock>  last_commit_time;

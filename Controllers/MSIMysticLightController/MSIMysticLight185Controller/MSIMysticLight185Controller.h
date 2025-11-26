@@ -12,14 +12,14 @@
 |   Adam Honse                                  06 Mar 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <cstring>
 #include <limits>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "MSIMysticLightCommon.h"
 #include "RGBController.h"
 
@@ -29,9 +29,11 @@ public:
     MSIMysticLight185Controller
         (
         hid_device*     handle,
-        const char      *path,
-        unsigned short  pid
+        const char*     path,
+        unsigned short  pid,
+        std::string     dev_name
         );
+
     ~MSIMysticLight185Controller();
 
     void            SetMode
@@ -113,28 +115,11 @@ public:
     DIRECT_MODE     GetSupportedDirectMode() { return per_led_mode; }
 
 private:
-    bool            ReadSettings();
-    bool            ReadFwVersion();
-    void            ReadSerial();
-    void            ReadName();
-    ZoneData*       GetZoneData
-                        (
-                        FeaturePacket_185&  data_packet,
-                        MSI_ZONE            zone
-                        );
-    RainbowZoneData* GetRainbowZoneData(MSI_ZONE zone);
-    Color*          GetPerLedZoneData
-                        (
-                        MSI_ZONE zone
-                        );
-    void            SelectPerLedProtocol();
-
     hid_device*                     dev;
     std::string                     name;
     std::string                     location;
     std::string                     version_APROM;
     std::string                     version_LDROM;
-    std::string                     chip_id;
 
     FeaturePacket_185               data;
     FeaturePacket_PerLED_185        per_led_data_onboard_and_sync;
@@ -155,4 +140,18 @@ private:
     int                             numof_JRGBs;
     const std::vector<MSI_ZONE>*    supported_zones;
     DIRECT_MODE                     per_led_mode;
+
+    bool            ReadSettings();
+    bool            ReadFwVersion();
+    ZoneData*       GetZoneData
+                        (
+                        FeaturePacket_185&  data_packet,
+                        MSI_ZONE            zone
+                        );
+    RainbowZoneData* GetRainbowZoneData(MSI_ZONE zone);
+    Color*          GetPerLedZoneData
+                        (
+                        MSI_ZONE zone
+                        );
+    void            SelectPerLedProtocol();
 };

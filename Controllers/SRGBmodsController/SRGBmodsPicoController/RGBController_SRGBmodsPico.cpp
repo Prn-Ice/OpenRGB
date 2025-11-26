@@ -1,11 +1,14 @@
-/*-----------------------------------------*\
-|  RGBController_SRGBmodsPico.cpp           |
-|                                           |
-|  Generic RGB Interface for SRGBmods       |
-|  Raspberry Pi Pico LED Controller         |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 7/21/2022   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_SRGBmodsPico.cpp                            |
+|                                                           |
+|   RGBController for SRGBmods Raspberry Pi Pico LED        |
+|   Controller                                              |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                21 Jul 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_SRGBmodsPico.h"
 
@@ -22,20 +25,20 @@
 
 RGBController_SRGBmodsPico::RGBController_SRGBmodsPico(SRGBmodsPicoController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "SRGBmods Device";
-    vendor      = "SRGBmods.net";
-    description = "SRGBmods Pico LED Controller Device";
-    type        = DEVICE_TYPE_LEDSTRIP;
-    location    = controller->GetLocationString();
-    serial      = controller->GetSerialString();
+    name                = controller->GetNameString();
+    vendor              = "SRGBmods.net";
+    description         = "SRGBmods Pico LED Controller Device";
+    type                = DEVICE_TYPE_LEDSTRIP;
+    location            = controller->GetLocationString();
+    serial              = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0xFFFF;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0xFFFF;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();
@@ -110,7 +113,7 @@ void RGBController_SRGBmodsPico::SetupZones()
 
 void RGBController_SRGBmodsPico::ResizeZone(int zone, int new_size)
 {
-    if((size_t) zone >= zones.size())
+    if((size_t)zone >= zones.size())
     {
         return;
     }
@@ -129,7 +132,7 @@ void RGBController_SRGBmodsPico::DeviceUpdateLEDs()
     {
         if(zones[zone_idx].leds_count > 0)
         {
-            controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+            controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
         }
     }
 }

@@ -6,13 +6,12 @@
 |   Adam Honse (CalcProgrammer1)                06 Dec 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "AMDWraithPrismController.h"
-#include "RGBController.h"
 #include "RGBController_AMDWraithPrism.h"
 
 /*---------------------------------------------------------*\
@@ -36,11 +35,12 @@
 void DetectAMDWraithPrismControllers(hid_device_info* info, const std::string&)
 {
     hid_device* dev = hid_open_path(info->path);
-    if( dev )
+
+    if(dev)
     {
         AMDWraithPrismController*     controller     = new AMDWraithPrismController(dev, info->path);
         RGBController_AMDWraithPrism* rgb_controller = new RGBController_AMDWraithPrism(controller);
-        // Constructor sets the name
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

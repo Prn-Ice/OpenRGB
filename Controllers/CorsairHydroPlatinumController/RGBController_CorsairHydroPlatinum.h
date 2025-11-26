@@ -4,9 +4,10 @@
 |   RGBController for Corsair Hydro Platinum coolers        |
 |                                                           |
 |   Kasper                                      28 Mar 2021 |
+|   Nikola Jurkovic (jurkovic.nikola)           13 Aug 2025 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -18,6 +19,7 @@ class RGBController_CorsairHydroPlatinum : public RGBController
 {
 public:
     RGBController_CorsairHydroPlatinum(CorsairHydroPlatinumController* controller_ptr);
+    ~RGBController_CorsairHydroPlatinum();
 
     void        SetupZones();
 

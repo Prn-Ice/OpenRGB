@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       10 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -27,13 +27,12 @@
 RGBController_MSIOptix::RGBController_MSIOptix(MSIOptixController* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "MSI Optix USB Device";
+    name                                = controller->GetNameString();
     vendor                              = "MSI";
     type                                = DEVICE_TYPE_LEDSTRIP;
-    description                         = name;
+    description                         = "MSI Optix USB Device";
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Direct;
     Direct.name                         = "Direct";

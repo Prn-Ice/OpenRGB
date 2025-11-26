@@ -1,22 +1,26 @@
-﻿/*-----------------------------------------*\
-|  ValkyrieKeyboardController.cpp           |
-|                                           |
-|  Driver for Valkyrie RGB keyboardlighting |
-|  controller                               |
-|                                           |
-|  Nollie(Nuonuo)               2023/12/6   |
-|  Bartholomew Ho (imnotmental) 02/01/2024  |
-\*-----------------------------------------*/
+﻿/*---------------------------------------------------------*\
+| ValkyrieKeyboardController.cpp                            |
+|                                                           |
+|   Driver for Valkyrie keyboard                            |
+|                                                           |
+|   Nollie (Nuonuo)                             06 Dec 2023 |
+|   Bartholomew Ho (imnotmental)                01 Feb 2024 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "StringUtils.h"
 #include "ValkyrieKeyboardController.h"
 
-ValkyrieKeyboardController::ValkyrieKeyboardController(hid_device* dev_handle, const char* path, const unsigned short pid, const int interface)
+ValkyrieKeyboardController::ValkyrieKeyboardController(hid_device* dev_handle, const char* path, const unsigned short pid, const int interface, std::string dev_name)
 {
-    dev           = dev_handle;
-    location      = path;
-    usb_pid       = pid;
-    interface_num = interface;
+    dev             = dev_handle;
+    location        = path;
+    name            = dev_name;
+    usb_pid         = pid;
+    interface_num   = interface;
 }
 
 ValkyrieKeyboardController::~ValkyrieKeyboardController()
@@ -29,6 +33,11 @@ std::string ValkyrieKeyboardController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string ValkyrieKeyboardController::GetNameString()
+{
+    return(name);
+}
+
 std::string ValkyrieKeyboardController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -39,10 +48,7 @@ std::string ValkyrieKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 unsigned short ValkyrieKeyboardController::GetUSBPID()
@@ -55,7 +61,7 @@ int ValkyrieKeyboardController::GetInterfaceNum()
     return(interface_num);
 }
 
-void ValkyrieKeyboardController::SendColors(unsigned char*  color_data,unsigned int color_data_size)
+void ValkyrieKeyboardController::SendColors(unsigned char* color_data, unsigned int /*color_data_size*/)
 {
     unsigned char usb_buf_pro[392];
     unsigned char usb_buf_normal[408];
@@ -84,8 +90,8 @@ void ValkyrieKeyboardController::SendColors(unsigned char*  color_data,unsigned 
         }
     }
 
-
     SendInitializeColorPacket();
+
     for(int i = 0; i <= 6; i++)
     {
         unsigned int    usb_data_num = 16;
@@ -98,23 +104,24 @@ void ValkyrieKeyboardController::SendColors(unsigned char*  color_data,unsigned 
 
         switch(interface_num)
         {
-             case 3:
-             for(int index = 0; index < usb_data_num; index++)
-             {
-                 send_usb_buf[index * 4 + 1] = usb_buf_pro[index * 4 + i * 64    ];
-                 send_usb_buf[index * 4 + 2] = usb_buf_pro[index * 4 + i * 64 + 1];
-                 send_usb_buf[index * 4 + 3] = usb_buf_pro[index * 4 + i * 64 + 2];
-                 send_usb_buf[index * 4 + 4] = usb_buf_pro[index * 4 + i * 64 + 3];
-             }
-             break;
-             default:
-             for(int index = 0; index < usb_data_num; index++)
-             {
-                 send_usb_buf[index * 4 + 1] = usb_buf_normal[index * 4 + i * 64    ];
-                 send_usb_buf[index * 4 + 2] = usb_buf_normal[index * 4 + i * 64 + 1];
-                 send_usb_buf[index * 4 + 3] = usb_buf_normal[index * 4 + i * 64 + 2];
-                 send_usb_buf[index * 4 + 4] = usb_buf_normal[index * 4 + i * 64 + 3];
-             }
+            case 3:
+                for(unsigned int index = 0; index < usb_data_num; index++)
+                {
+                    send_usb_buf[index * 4 + 1] = usb_buf_pro[index * 4 + i * 64    ];
+                    send_usb_buf[index * 4 + 2] = usb_buf_pro[index * 4 + i * 64 + 1];
+                    send_usb_buf[index * 4 + 3] = usb_buf_pro[index * 4 + i * 64 + 2];
+                    send_usb_buf[index * 4 + 4] = usb_buf_pro[index * 4 + i * 64 + 3];
+                }
+                break;
+            default:
+                for(unsigned int index = 0; index < usb_data_num; index++)
+                {
+                    send_usb_buf[index * 4 + 1] = usb_buf_normal[index * 4 + i * 64    ];
+                    send_usb_buf[index * 4 + 2] = usb_buf_normal[index * 4 + i * 64 + 1];
+                    send_usb_buf[index * 4 + 3] = usb_buf_normal[index * 4 + i * 64 + 2];
+                    send_usb_buf[index * 4 + 4] = usb_buf_normal[index * 4 + i * 64 + 3];
+                }
+                break;
         }
 
         /*-----------------------------------------------------*\

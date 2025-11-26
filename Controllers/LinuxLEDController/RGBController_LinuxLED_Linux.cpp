@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      25 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LinuxLED_Linux.h"
@@ -24,21 +24,28 @@
 
 RGBController_LinuxLED::RGBController_LinuxLED(LinuxLEDController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "Linux LED";
-    type        = DEVICE_TYPE_LEDSTRIP;
-    description = "Linux Sysfs LED Device";
+    name                = controller->GetName();
+    type                = DEVICE_TYPE_LEDSTRIP;
+    description         = "Linux Sysfs LED Device";
 
-    location    = "R: " + controller->GetRedPath() + "\r\n" +
-                  "G: " + controller->GetGreenPath() + "\r\n" +
-                  "B: " + controller->GetBluePath();
+    if(controller->GetRgbPath().empty())
+    {
+        location        = "R: " + controller->GetRedPath() + "\r\n" +
+                          "G: " + controller->GetGreenPath() + "\r\n" +
+                          "B: " + controller->GetBluePath();
+    }
+    else
+    {
+        location        = controller->GetRgbPath();
+    }
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();

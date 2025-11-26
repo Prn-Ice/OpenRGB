@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       02 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define N5312A_REPORT_ID           0x07
@@ -41,12 +41,12 @@ enum
 class N5312AController
 {
 public:
-    N5312AController(hid_device* dev_handle, const hid_device_info& info);
+    N5312AController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~N5312AController();
 
-    std::string GetSerialString();
     std::string GetDeviceLocation();
-    std::string GetFirmwareVersion();
+    std::string GetNameString();
+    std::string GetSerialString();
 
     void        SetColor(RGBColor color);
     void        SetMode(RGBColor color, unsigned char mode_value, unsigned char brightness, unsigned char speed);
@@ -55,7 +55,7 @@ private:
     hid_device* dev;
 
     std::string location;
-    std::string serial_number;
+    std::string name;
     std::string version;
 
     void        SendInit();

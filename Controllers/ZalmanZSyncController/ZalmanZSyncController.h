@@ -1,25 +1,24 @@
-/*-----------------------------------------*\
-|  ZalmanZSyncController.h                  |
-|                                           |
-|  Definitions and types for Zalman Z Sync  |
-|  lighting controller                      |
-|                                           |
-|  The Zalman Z Sync device uses the same   |
-|  protocol as the Corsair Lighting Node    |
-|  devices except supports 8 channels.      |
-|                                           |
-|  This code copied from the                |
-|  CorsairLightingNodeController files      |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 1/30/2021   |
-\*-----------------------------------------*/
-
-#include "RGBController.h"
-#include <chrono>
-#include <vector>
-#include <hidapi/hidapi.h>
+/*---------------------------------------------------------*\
+| ZalmanZSyncController.h                                   |
+|                                                           |
+|   Driver for Zalman Z Sync                                |
+|                                                           |
+|   Based on CorsairLightingNodeConroller, the protocol is  |
+|   the same as the Corsair Lighting Node except with 8     |
+|   channels                                                |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                30 Jan 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
+
+#include <chrono>
+#include <vector>
+#include <hidapi.h>
+#include "RGBController.h"
 
 enum
 {
@@ -95,11 +94,12 @@ enum
 class ZalmanZSyncController
 {
 public:
-    ZalmanZSyncController(hid_device* dev_handle, const char* path);
+    ZalmanZSyncController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~ZalmanZSyncController();
 
     std::string     GetFirmwareString();
     std::string     GetLocationString();
+    std::string     GetNameString();
     std::string     GetSerialString();
 
     unsigned int    GetStripsOnChannel(unsigned int channel);
@@ -129,6 +129,7 @@ private:
     hid_device*             dev;
     std::string             firmware_version;
     std::string             location;
+    std::string             name;
     std::thread*            keepalive_thread;
     std::atomic<bool>       keepalive_thread_run;
     std::chrono::time_point<std::chrono::steady_clock> last_commit_time;

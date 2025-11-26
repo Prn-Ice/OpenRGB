@@ -6,14 +6,12 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      12 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "CorsairLightingNodeController.h"
-#include "RGBController.h"
 #include "RGBController_CorsairLightingNode.h"
 
 #define CORSAIR_VID                     0x1B1C
@@ -39,9 +37,9 @@ void DetectCorsairLightingNodeControllers(hid_device_info* info, const std::stri
 
     if(dev)
     {
-        CorsairLightingNodeController*     controller     = new CorsairLightingNodeController(dev, info->path);
+        CorsairLightingNodeController*     controller     = new CorsairLightingNodeController(dev, info->path, name);
         RGBController_CorsairLightingNode* rgb_controller = new RGBController_CorsairLightingNode(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }   /* DetectCorsairLightingNodeControllers() */

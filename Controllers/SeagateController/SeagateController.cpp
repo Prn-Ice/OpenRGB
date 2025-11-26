@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  SeagateController.cpp                    |
-|                                           |
-|  Code for Seagate Firecuda External HDD   |
-|  RGB controller                           |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 6/15/2023   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| SeagateController.cpp                                     |
+|                                                           |
+|   Driver for Seagate                                      |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                15 Jun 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "SeagateController.h"
 
@@ -121,7 +123,7 @@ void SeagateController::SetLEDBreathing
 void SeagateController::SetLEDsSpectrum
     (
     unsigned char   led_id,
-    bool            save
+    bool            /*save*/
     )
 {
     /*-----------------------------------------------------------------------------*\

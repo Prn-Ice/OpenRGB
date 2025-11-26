@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             17 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -28,7 +28,7 @@ RGBController_AsusROGStrixLC::RGBController_AsusROGStrixLC(AsusROGStrixLCControl
     controller                  = controller_ptr;
     uint8_t speed               = ROGSTRIXLC_CONTROLLER_SPEED_NORMAL;
 
-    name                        = "ROG Strix LC";
+    name                        = controller->GetDeviceName();
     vendor                      = "ASUS";
     type                        = DEVICE_TYPE_COOLER;
     description                 = "ASUS Liquid Cooler including 120mm, 140mm, 240mm, 280mm and 360mm radiators.";
@@ -181,7 +181,7 @@ void RGBController_AsusROGStrixLC::ResizeZone(int /*zone*/, int /*new_size*/)
 
 void RGBController_AsusROGStrixLC::DeviceUpdateLEDs()
 {
-    for(int zone_idx = 0; zone_idx < zones.size(); zone_idx++)
+    for(unsigned int zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
         UpdateZoneLEDs(zone_idx);
     }
@@ -206,7 +206,7 @@ void RGBController_AsusROGStrixLC::DeviceUpdateMode()
 
 int RGBController_AsusROGStrixLC::GetLED_Zone(int led_idx)
 {
-    for(int zone_idx = 0; zone_idx < zones.size(); zone_idx++)
+    for(unsigned int zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
         int zone_start  = zones[zone_idx].start_idx;
         int zone_end    = zone_start + zones[zone_idx].leds_count - 1;

@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                13 Jun 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_ENESMBus.h"
@@ -27,17 +27,17 @@
 
 RGBController_ENESMBus::RGBController_ENESMBus(ENESMBusController * controller_ptr)
 {
-    controller  = controller_ptr;
+    controller                  = controller_ptr;
 
     /*---------------------------------------------------------*\
     | Get ENEController settings                                |
     \*---------------------------------------------------------*/
-    json ene_settings = ResourceManager::get()->GetSettingsManager()->GetSettings("ENESMBusSettings");
+    json ene_settings           = ResourceManager::get()->GetSettingsManager()->GetSettings("ENESMBusSettings");
 
     /*---------------------------------------------------------*\
     | Check if save to device is enabled                        |
     \*---------------------------------------------------------*/
-    unsigned int save_flag = 0;
+    unsigned int save_flag      = 0;
 
     if(ene_settings.contains("enable_save"))
     {
@@ -51,29 +51,28 @@ RGBController_ENESMBus::RGBController_ENESMBus(ENESMBusController * controller_p
     | Determine name and type (DRAM or Motherboard) by checking |
     | the ENE controller's version string                       |
     \*---------------------------------------------------------*/
-    version     = controller->GetDeviceName();
+    name                        = controller->GetName();
+    description                 = "ENE SMBus Device";
+    version                     = controller->GetVersion();
+    location                    = controller->GetLocation();
+    type                        = controller->GetType();
 
     if((version.find("DIMM_LED") != std::string::npos) || (version.find("AUDA") != std::string::npos) )
     {
-        type    = DEVICE_TYPE_DRAM;
-        name    = "ENE DRAM";
-        vendor  = "ENE";
+        vendor                  = "ENE";
     }
     else if(version.find("ROG STRIX ARION") != std::string::npos)
     {
-        type    = DEVICE_TYPE_STORAGE;
-        name    = "ASUS ROG Strix Arion";
-        vendor  = "ASUS";
+        vendor                  = "ASUS";
+    }
+    else if(location.find("NVMe:") != std::string::npos)
+    {
+        vendor                  = "XPG";
     }
     else
     {
-        type    = DEVICE_TYPE_MOTHERBOARD;
-        name    = "ASUS Aura Motherboard";
-        vendor  = "ASUS";
+        vendor                  = "ASUS";
     }
-
-    location    = controller->GetDeviceLocation();
-    description = "ENE SMBus Device";
 
     mode Direct;
     Direct.name                 = "Direct";

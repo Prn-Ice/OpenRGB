@@ -4,14 +4,13 @@
 |   Detector for Alienware Keyboard                         |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "AlienwareAW510KController.h"
 #include "AlienwareAW410KController.h"
-#include "RGBController.h"
 #include "RGBController_AlienwareAW510K.h"
 #include "RGBController_AlienwareAW410K.h"
 
@@ -39,9 +38,9 @@ void DetectAlienwareAW510KControllers(hid_device_info* info, const std::string& 
     hid_device* dev = hid_open_path(info->path);
     if( dev )
     {
-        AlienwareAW510KController*     controller     = new AlienwareAW510KController(dev, info->path);
+        AlienwareAW510KController*     controller     = new AlienwareAW510KController(dev, info->path, name);
         RGBController_AlienwareAW510K* rgb_controller = new RGBController_AlienwareAW510K(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
@@ -51,9 +50,9 @@ void DetectAlienwareAW410KControllers(hid_device_info* info, const std::string& 
     hid_device* dev = hid_open_path(info->path);
     if( dev )
     {
-        AlienwareAW410KController*     controller     = new AlienwareAW410KController(dev, info->path);
+        AlienwareAW410KController*     controller     = new AlienwareAW410KController(dev, info->path, name);
         RGBController_AlienwareAW410K* rgb_controller = new RGBController_AlienwareAW410K(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }/* DetectAlienwareKeyboardControllers() */

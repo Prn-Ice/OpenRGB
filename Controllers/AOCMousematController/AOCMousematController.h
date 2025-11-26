@@ -6,13 +6,13 @@
 |   Adam Honse (CalcProgrammer1)                15 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 /*-----------------------------------------*\
@@ -55,10 +55,11 @@ enum
 class AOCMousematController
 {
 public:
-    AOCMousematController(hid_device* dev_handle, const char* path);
+    AOCMousematController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~AOCMousematController();
 
     std::string GetDeviceLocation();
+    std::string GetDeviceName();
     std::string GetSerialString();
 
     void SendDirect
@@ -78,4 +79,5 @@ public:
 private:
     hid_device*             dev;
     std::string             location;
+    std::string             name;
 };

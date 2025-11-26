@@ -4,7 +4,7 @@
 |   Device detector functionality                           |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -30,6 +30,15 @@ public:
     I2CDeviceDetector(std::string name, I2CDeviceDetectorFunction detector)
 	{
         ResourceManager::get()->RegisterI2CDeviceDetector(name, detector);
+	}
+};
+
+class I2CDIMMDeviceDetector
+{
+public:
+    I2CDIMMDeviceDetector(std::string name, I2CDIMMDeviceDetectorFunction detector, uint16_t jedec_id, uint8_t dimm_type)
+	{
+        ResourceManager::get()->RegisterI2CDIMMDeviceDetector(name, detector, jedec_id, dimm_type);
 	}
 };
 

@@ -1,17 +1,19 @@
-/*-----------------------------------------*\
-|  TrustGXT180Controller.h                  |
-|                                           |
-|  Driver for Trust GXT 180                 |
-|  controller - header file                 |
-|                                           |
-|  Guimard Morgan (morg) 3/24/2022          |
-\*-----------------------------------------*/
-
-#include "RGBController.h"
-#include <string>
-#include <hidapi/hidapi.h>
+/*---------------------------------------------------------*\
+| TrustGXT180Controller.h                                   |
+|                                                           |
+|   Driver for Trust GXT 180                                |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Mar 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
+
+#include <string>
+#include <hidapi.h>
+#include "RGBController.h"
 
 #define TRUST_GXT_180_REPORT_SIZE       64
 #define TRUST_GXT_180_NUMBER_OF_LEDS    1
@@ -40,12 +42,13 @@ enum
 class TrustGXT180Controller
 {
 public:
-    TrustGXT180Controller(hid_device* dev_handle, const hid_device_info& info);
+    TrustGXT180Controller(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~TrustGXT180Controller();
 
-    std::string                 GetSerialString();
     std::string                 GetDeviceLocation();
-    std::string                 GetFirmwareVersion();
+    std::string                 GetNameString();
+    std::string                 GetSerialString();
+
     void                        SetMode(RGBColor color, unsigned char brightness, unsigned char speed, unsigned char mode_value);
 
 protected:
@@ -53,6 +56,5 @@ protected:
 
 private:
     std::string                 location;
-    std::string                 serial_number;
-    std::string                 version;
+    std::string                 name;
 };

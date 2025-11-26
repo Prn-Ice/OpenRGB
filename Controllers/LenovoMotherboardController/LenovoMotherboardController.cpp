@@ -6,30 +6,18 @@
 |   Morgan Guimard (morg)                       26 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "LenovoMotherboardController.h"
+#include "StringUtils.h"
 
-LenovoMotherboardController::LenovoMotherboardController(hid_device* dev_handle, const hid_device_info& info)
+LenovoMotherboardController::LenovoMotherboardController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 }
 
 LenovoMotherboardController::~LenovoMotherboardController()
@@ -42,14 +30,22 @@ std::string LenovoMotherboardController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string LenovoMotherboardController::GetSerialString()
+std::string LenovoMotherboardController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string LenovoMotherboardController::GetFirmwareVersion()
+std::string LenovoMotherboardController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LenovoMotherboardController::SetMode(uint8_t zone, uint8_t mode, uint8_t brightness, uint8_t speed, RGBColor color)

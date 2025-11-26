@@ -4,11 +4,12 @@
 |   Driver for Corsair K55 RGB PRO XT keyboard              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "CorsairK55RGBPROXTController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
 #define COLOR_BANK_SIZE     137
 #define HID_PACKET_LENGTH   65
@@ -37,10 +38,11 @@ static const unsigned char filler[] =
       0x6D };
 
 
-CorsairK55RGBPROXTController::CorsairK55RGBPROXTController(hid_device* dev_handle, const char* path)
+CorsairK55RGBPROXTController::CorsairK55RGBPROXTController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev             = dev_handle;
     location        = path;
+    name            = dev_name;
 
     LightingControl();
 }
@@ -55,9 +57,9 @@ std::string CorsairK55RGBPROXTController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string CorsairK55RGBPROXTController::GetFirmwareString()
+std::string CorsairK55RGBPROXTController::GetNameString()
 {
-    return "";
+    return(name);
 }
 
 std::string CorsairK55RGBPROXTController::GetSerialString()
@@ -70,10 +72,7 @@ std::string CorsairK55RGBPROXTController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CorsairK55RGBPROXTController::LightingControl()

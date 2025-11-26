@@ -6,7 +6,7 @@
 |   Wayne Riordan                               09 Jan 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -14,10 +14,11 @@
 
 using namespace std;
 
-LenovoM300Controller::LenovoM300Controller(hid_device* dev_handle, const hid_device_info& info)
+LenovoM300Controller::LenovoM300Controller(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
-    device = dev_handle;
-    location = info.path;
+    device      = dev_handle;
+    location    = info.path;
+    name        = dev_name;
 }
 
 LenovoM300Controller::~LenovoM300Controller()
@@ -28,6 +29,11 @@ LenovoM300Controller::~LenovoM300Controller()
 std::string LenovoM300Controller::GetDeviceLocation()
 {
     return("HID: " + location);
+}
+
+std::string LenovoM300Controller::GetDeviceName()
+{
+    return(name);
 }
 
 void LenovoM300Controller::SetMode(std::vector<RGBColor> colors, unsigned char mode_value, unsigned int brigthness)

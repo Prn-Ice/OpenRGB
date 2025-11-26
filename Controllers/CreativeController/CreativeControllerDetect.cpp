@@ -4,10 +4,10 @@
 |   Detector for Creative devices                           |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "CreativeSoundBlasterXG6Controller.h"
 #include "RGBController_CreativeSoundBlasterXG6.h"
 #include "Detector.h"
@@ -27,9 +27,9 @@ void DetectCreativeDevice(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        CreativeSoundBlasterXG6Controller*     controller     = new CreativeSoundBlasterXG6Controller(dev, info->path);
+        CreativeSoundBlasterXG6Controller*     controller     = new CreativeSoundBlasterXG6Controller(dev, info->path, name);
         RGBController_CreativeSoundBlasterXG6* rgb_controller = new RGBController_CreativeSoundBlasterXG6(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             30 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_BloodyMouse.h"
@@ -71,6 +71,7 @@ RGBController_BloodyMouse::RGBController_BloodyMouse(BloodyMouseController *cont
             type                = DEVICE_TYPE_MOUSE;
     }
 
+    name                        = controller->GetName();
     vendor                      = "Bloody";
     description                 = "Controller compatible with the Bloody W60 Pro and MP 50RS";
     serial                      = controller->GetSerial();
@@ -109,7 +110,9 @@ void RGBController_BloodyMouse::SetupZones()
         case BLOODY_W60_PRO_PID:
             layout = w60_pro;
             break;
+        case BLOODY_W70_MAX_PID:
         case BLOODY_W90_MAX_PID:
+        case BLOODY_W90_PRO_PID:
             layout = w90_max;
             break;
         case BLOODY_MP_50RS_PID:

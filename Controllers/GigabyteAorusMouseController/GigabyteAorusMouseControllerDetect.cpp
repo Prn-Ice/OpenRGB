@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       29 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
-#include "RGBController.h"
-#include "hidapi/hidapi.h"
+#include "hidapi.h"
 #include "GigabyteAorusMouseController.h"
 #include "RGBController_GigabyteAorusMouse.h"
 
@@ -31,9 +30,8 @@ void DetectGigabyteAorusMouseControllers(hid_device_info* info, const std::strin
 
     if(dev)
     {
-        GigabyteAorusMouseController*     controller         = new GigabyteAorusMouseController(dev, *info);
-        RGBController_GigabyteAorusMouse* rgb_controller     = new RGBController_GigabyteAorusMouse(controller);
-        rgb_controller->name                     = name;
+        GigabyteAorusMouseController*     controller     = new GigabyteAorusMouseController(dev, *info, name);
+        RGBController_GigabyteAorusMouse* rgb_controller = new RGBController_GigabyteAorusMouse(controller);
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

@@ -1,14 +1,18 @@
-/*-----------------------------------------*\
-|  SonyDS4Controller.h                      |
-|                                           |
-|  Controller for Sony Dualshock 4          |
-|                                           |
-|  Pol Rius (alpemwarrior) 24/09/2020       |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| SonyDS4Controller.h                                       |
+|                                                           |
+|   Driver for Sony Dualshock 4                             |
+|                                                           |
+|   Pol Rius (alpemwarrior)                     24 Sep 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#pragma once
 
 #include <string>
+#include <hidapi.h>
 
 class SonyDS4Controller
 {
@@ -22,7 +26,7 @@ public:
     void SetColors(unsigned char red, unsigned char green, unsigned char blue);
 
 private:
-    hid_device*     device_handle;
+    hid_device*     dev;
     bool            is_bluetooth = false;
     std::string     location;
 

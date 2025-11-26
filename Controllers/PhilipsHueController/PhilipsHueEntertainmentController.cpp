@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      06 Nov 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController.h"
@@ -18,7 +18,7 @@ PhilipsHueEntertainmentController::PhilipsHueEntertainmentController(hueplusplus
     | Fill in location string with bridge IP            |
     \*-------------------------------------------------*/
     location                            = "IP: " + bridge.getBridgeIP();
-    num_leds                            = group.getLightIds().size();
+    num_leds                            = (unsigned int)group.getLightIds().size();
     connected                           = false;
 }
 

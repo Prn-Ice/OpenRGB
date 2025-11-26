@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      12 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -15,14 +15,16 @@
 #include <string>
 #include "CorsairLightingNodeController.h"
 #include "CorsairDeviceGuard.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-CorsairLightingNodeController::CorsairLightingNodeController(hid_device* dev_handle, const char* path)
+CorsairLightingNodeController::CorsairLightingNodeController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
-    dev         = dev_handle;
-    location    = path;
-    guard_manager_ptr = new DeviceGuardManager(new CorsairDeviceGuard());
+    dev                 = dev_handle;
+    location            = path;
+    name                = dev_name;
+    guard_manager_ptr   = new DeviceGuardManager(new CorsairDeviceGuard());
 
     SendFirmwareRequest();
 
@@ -68,6 +70,11 @@ std::string CorsairLightingNodeController::GetLocationString()
     return("HID: " + location);
 }
 
+std::string CorsairLightingNodeController::GetNameString()
+{
+    return(name);
+}
+
 std::string CorsairLightingNodeController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -78,10 +85,7 @@ std::string CorsairLightingNodeController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CorsairLightingNodeController::SetBrightness(unsigned char brightness)

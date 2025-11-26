@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             11 Aug 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -15,7 +15,7 @@
 #include "CorsairPeripheralV2Controller.h"
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 class CorsairPeripheralV2SWController : public CorsairPeripheralV2Controller
 {

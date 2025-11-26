@@ -6,7 +6,7 @@
 |   Erik Gilling (konkers)                      25 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CorsairDominatorPlatinum.h"
@@ -36,6 +36,7 @@ RGBController_CorsairDominatorPlatinum::RGBController_CorsairDominatorPlatinum(C
 {
     controller  = controller_ptr;
 
+    name        = controller->GetDeviceName();
     vendor      = "Corsair";
     type        = DEVICE_TYPE_DRAM;
     description = "Corsair RAM RGB Device";

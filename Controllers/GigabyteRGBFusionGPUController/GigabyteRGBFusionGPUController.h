@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                20 Feb 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -49,10 +49,11 @@ enum
 class RGBFusionGPUController
 {
 public:
-    RGBFusionGPUController(i2c_smbus_interface* bus, rgb_fusion_dev_id dev);
+    RGBFusionGPUController(i2c_smbus_interface* bus, rgb_fusion_dev_id dev, std::string dev_name);
     ~RGBFusionGPUController();
 
     std::string     GetDeviceLocation();
+    std::string     GetDeviceName();
 
     void            SetColor(unsigned char red, unsigned char green, unsigned char blue);
     void            SetMode(unsigned char mode, unsigned char speed, unsigned char brightness);
@@ -61,5 +62,5 @@ public:
 private:
     i2c_smbus_interface*    bus;
     rgb_fusion_dev_id       dev;
-
+    std::string             name;
 };

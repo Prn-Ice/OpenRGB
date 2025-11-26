@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             18 Apr 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CMMP750Controller.h"
@@ -173,11 +173,6 @@ void RGBController_CMMP750Controller::UpdateZoneLEDs(int zone)
 void RGBController_CMMP750Controller::UpdateSingleLED(int led)
 {
     UpdateZoneLEDs(led);
-}
-
-void RGBController_CMMP750Controller::SetCustomMode()
-{
-    active_mode = 0;
 }
 
 void RGBController_CMMP750Controller::DeviceUpdateMode()

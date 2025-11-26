@@ -4,16 +4,14 @@
 |   Detector for ASUS legacy USB devices                    |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdexcept>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "AsusCerberusKeyboardController.h"
 #include "AsusSagarisKeyboardController.h"
 #include "AsusStrixClawController.h"
-#include "RGBController.h"
 #include "RGBController_AsusCerberusKeyboard.h"
 #include "RGBController_AsusSagarisKeyboard.h"
 #include "RGBController_AsusStrixClaw.h"
@@ -31,9 +29,9 @@ void DetectAsusCerberusMech(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        AsusCerberusKeyboardController*     controller          = new AsusCerberusKeyboardController(dev, info->path, info->release_number);
+        AsusCerberusKeyboardController*     controller          = new AsusCerberusKeyboardController(dev, info->path, info->release_number, name);
         RGBController_AsusCerberusKeyboard* rgb_controller      = new RGBController_AsusCerberusKeyboard(controller);
-        rgb_controller->name                                = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
@@ -44,9 +42,9 @@ void DetectAsusSagarisKeyboard(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        AsusSagarisKeyboardController*     controller          = new AsusSagarisKeyboardController(dev, info->path, info->release_number);
+        AsusSagarisKeyboardController*     controller          = new AsusSagarisKeyboardController(dev, info->path, info->release_number, name);
         RGBController_AsusSagarisKeyboard* rgb_controller      = new RGBController_AsusSagarisKeyboard(controller);
-        rgb_controller->name                                = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
@@ -57,9 +55,9 @@ void DetectAsusStrixClaw(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        StrixClawController*     controller          = new StrixClawController(dev, info->path);
+        StrixClawController*     controller          = new StrixClawController(dev, info->path, name);
         RGBController_StrixClaw* rgb_controller      = new RGBController_StrixClaw(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

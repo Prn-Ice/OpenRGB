@@ -4,12 +4,11 @@
 |   Detector for Gigabyte Aorus CPU coolers                 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
-#include "RGBController.h"
 #include "ATC800Controller.h"
 #include "RGBController_AorusATC800.h"
 
@@ -37,9 +36,8 @@ void DetectGigabyteAorusCPUCoolerControllers(hid_device_info* info, const std::s
 
     if(dev)
     {
-        ATC800Controller*          controller     = new ATC800Controller(dev, info->path);
+        ATC800Controller*          controller     = new ATC800Controller(dev, info->path, name);
         RGBController_AorusATC800* rgb_controller = new RGBController_AorusATC800(controller);
-        rgb_controller->name                      = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

@@ -6,16 +6,14 @@
 |   Timo Schlegel (@eispalast)                  Dec 12 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "DygmaRaiseController.h"
-#include "RGBController.h"
 #include "RGBController_DygmaRaise.h"
 #include "find_usb_serial_port.h"
 #include <vector>
-#include <stdio.h>
 
 #define DYGMA_RAISE_VID 0x1209
 #define DYGMA_RAISE_PID 0x2201

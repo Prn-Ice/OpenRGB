@@ -7,10 +7,8 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      28 Jul 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
-
-#pragma once
 
 /*---------------------------------------------------------*\
 | Includes                                                  |
@@ -83,10 +81,15 @@ struct scsi_device_info * scsi_enumerate(const char * vendor, const char * produ
         /*-------------------------------------------------*\
         | Read the model string and close the model file    |
         \*-------------------------------------------------*/
-        read(sg_model_fd, sg_model_buf, 512);
+        if(read(sg_model_fd, sg_model_buf, 512) < 0)
+        {
+            close(sg_model_fd);
+            close(sg_vendor_fd);
+            break;
+        }
         close(sg_model_fd);
 
-        for(int i = 0; i < strlen(sg_model_buf); i++)
+        for(unsigned int i = 0; i < strlen(sg_model_buf); i++)
         {
             if(sg_model_buf[i] == '\r' || sg_model_buf[i] == '\n')
             {
@@ -98,10 +101,14 @@ struct scsi_device_info * scsi_enumerate(const char * vendor, const char * produ
         /*-------------------------------------------------*\
         | Read the vendor string and close the vendor file  |
         \*-------------------------------------------------*/
-        read(sg_vendor_fd, sg_vendor_buf, 512);
+        if(read(sg_vendor_fd, sg_vendor_buf, 512) < 0)
+        {
+            close(sg_vendor_fd);
+            break;
+        }
         close(sg_vendor_fd);
 
-        for(int i = 0; i < strlen(sg_vendor_buf); i++)
+        for(unsigned int i = 0; i < strlen(sg_vendor_buf); i++)
         {
             if(sg_vendor_buf[i] == '\r' || sg_vendor_buf[i] == '\n')
             {
@@ -212,8 +219,8 @@ int scsi_write(struct scsi_device * dev, const unsigned char * data, size_t data
     header.mx_sb_len                        = sense_length;
     header.iovec_count                      = 0;
     header.dxfer_len                        = data_length;
-    header.dxferp                           = data;
-    header.cmdp                             = cdb;
+    header.dxferp                           = (void *)data;
+    header.cmdp                             = (unsigned char *)cdb;
     header.sbp                              = sense;
     header.timeout                          = 20000;
     header.flags                            = 0;

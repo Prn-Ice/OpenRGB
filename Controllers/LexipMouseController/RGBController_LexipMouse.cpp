@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       21 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -27,13 +27,13 @@
 RGBController_LexipMouse::RGBController_LexipMouse(LexipMouseController* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "Lexip Gaming Mouse";
+
+    name                                = controller->GetNameString();
     vendor                              = "Lexip";
     type                                = DEVICE_TYPE_MOUSE;
     description                         = name;
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Direct;
     Direct.name                         = "Direct";

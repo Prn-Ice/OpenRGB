@@ -6,16 +6,18 @@
 |   Adam Honse (CalcProgrammer1)                04 Jul 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "DuckyKeyboardController.h"
+#include "StringUtils.h"
 
-DuckyKeyboardController::DuckyKeyboardController(hid_device* dev_handle, const char* path, const unsigned short pid)
+DuckyKeyboardController::DuckyKeyboardController(hid_device* dev_handle, const char* path, const unsigned short pid, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
     usb_pid     = pid;
 
     SendInitialize();
@@ -26,9 +28,14 @@ DuckyKeyboardController::~DuckyKeyboardController()
     hid_close(dev);
 }
 
-std::string DuckyKeyboardController::GetDeviceLocation()
+std::string DuckyKeyboardController::GetLocationString()
 {
     return("HID: " + location);
+}
+
+std::string DuckyKeyboardController::GetNameString()
+{
+    return(name);
 }
 
 std::string DuckyKeyboardController::GetSerialString()
@@ -41,10 +48,7 @@ std::string DuckyKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 unsigned short DuckyKeyboardController::GetUSBPID()

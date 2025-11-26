@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       10 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "MSIOptixController.h"
-#include "RGBController.h"
 #include "RGBController_MSIOptix.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,9 @@ void DetectMSIOptixControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        MSIOptixController*     controller      = new MSIOptixController(dev, *info);
+        MSIOptixController*     controller      = new MSIOptixController(dev, *info, name);
         RGBController_MSIOptix* rgb_controller  = new RGBController_MSIOptix(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

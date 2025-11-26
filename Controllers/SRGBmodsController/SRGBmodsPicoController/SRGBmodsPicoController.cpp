@@ -1,21 +1,25 @@
-/*-----------------------------------------*\
-|  SRGBmodsPicoController.cpp               |
-|                                           |
-|  Driver for SRGBmods Raspberry Pi Pico    |
-|  LED Controller                           |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 7/21/2022   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| SRGBmodsPicoController.cpp                                |
+|                                                           |
+|   Driver for SRGBmods Raspberry Pi Pico LED Controller    |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                21 Jul 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "SRGBmodsPicoController.h"
 #include <cstring>
+#include "SRGBmodsPicoController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-SRGBmodsPicoController::SRGBmodsPicoController(hid_device* dev_handle, const char* path)
+SRGBmodsPicoController::SRGBmodsPicoController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     /*-----------------------------------------------------*\
     | The SRGBmods Pico controller requires a packet within |
@@ -53,6 +57,11 @@ std::string SRGBmodsPicoController::GetLocationString()
     return("HID: " + location);
 }
 
+std::string SRGBmodsPicoController::GetNameString()
+{
+    return(name);
+}
+
 std::string SRGBmodsPicoController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -63,10 +72,7 @@ std::string SRGBmodsPicoController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void SRGBmodsPicoController::SetChannelLEDs(unsigned char channel, RGBColor* colors, unsigned int num_colors)

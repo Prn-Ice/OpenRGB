@@ -6,13 +6,13 @@
 |   Adam Honse (CalcProgrammer1)                15 Mar 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 #define REDRAGON_MOUSE_REPORT_ID   0x02
 #define REDRAGON_MOUSE_REPORT_SIZE 16
@@ -31,10 +31,11 @@ enum
 class RedragonMouseController
 {
 public:
-    RedragonMouseController(hid_device* dev_handle, const char* path);
+    RedragonMouseController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~RedragonMouseController();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        SendMouseApply();
@@ -62,8 +63,9 @@ public:
                     );
 
 private:
-    hid_device*             dev;
-    std::string             location;
+    hid_device* dev;
+    std::string location;
+    std::string name;
 
     void        SendWritePacket
                     (

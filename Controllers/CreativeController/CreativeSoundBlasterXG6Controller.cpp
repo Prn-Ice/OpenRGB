@@ -4,15 +4,16 @@
 |   Driver for Creative SoundBlaster XG6                    |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "CreativeSoundBlasterXG6Controller.h"
 
-CreativeSoundBlasterXG6Controller::CreativeSoundBlasterXG6Controller(hid_device* dev_handle, const char* path)
+CreativeSoundBlasterXG6Controller::CreativeSoundBlasterXG6Controller(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 CreativeSoundBlasterXG6Controller::~CreativeSoundBlasterXG6Controller()
@@ -23,6 +24,11 @@ CreativeSoundBlasterXG6Controller::~CreativeSoundBlasterXG6Controller()
 std::string CreativeSoundBlasterXG6Controller::GetDeviceLocation()
 {
     return("HID " + location);
+}
+
+std::string CreativeSoundBlasterXG6Controller::GetDeviceName()
+{
+    return(name);
 }
 
 void CreativeSoundBlasterXG6Controller::SetLedColor (unsigned char red,

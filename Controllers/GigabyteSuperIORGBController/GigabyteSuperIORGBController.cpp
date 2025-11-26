@@ -6,21 +6,35 @@
 |   Ryan Frankcombe (422gRdHuX5uk)              11 Sep 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "GigabyteSuperIORGBController.h"
 #include "super_io.h"
 
-GigabyteSuperIORGBController::GigabyteSuperIORGBController(int sioaddr)
+GigabyteSuperIORGBController::GigabyteSuperIORGBController(int sioaddr, std::string dev_name)
 {
     gig_sioaddr = sioaddr;
+    name        = dev_name;
 }
 
 GigabyteSuperIORGBController::~GigabyteSuperIORGBController()
 {
 
 }
+
+std::string GigabyteSuperIORGBController::GetDeviceLocation()
+{
+    char hex[12];
+    snprintf(hex, sizeof(hex), "0x%X", gig_sioaddr);
+    return("SIO: " + std::string(hex));
+}
+
+std::string GigabyteSuperIORGBController::GetDeviceName()
+{
+    return(name);
+}
+
 void GigabyteSuperIORGBController::ChipEntry()
 {
     /*--------------------------------*\
@@ -36,6 +50,7 @@ void GigabyteSuperIORGBController::ChipEntry()
     \*_-------------------------------*/
     superio_outb(gig_sioaddr, GIGABYTE_SUPERIO_CHIPSELECT_REGISTER_1, GIGABYTE_SUPERIO_CHIPSELECT_VALUE_1);
 }
+
 void GigabyteSuperIORGBController::ChipExit()
 {
     /*-----------------------------------------------------------------------------------*\
@@ -44,6 +59,7 @@ void GigabyteSuperIORGBController::ChipExit()
     \*_----------------------------------------------------------------------------------*/
     superio_outb(gig_sioaddr, GIGABYTE_SUPERIO_CHIPEXIT_REGISTER_1, GIGABYTE_SUPERIO_CHIPEXIT_VALUE_1);
 }
+
 void GigabyteSuperIORGBController::SetColor(unsigned int red, unsigned int green, unsigned int blue)
 {
     /*--------------------------------*\
@@ -75,11 +91,11 @@ void GigabyteSuperIORGBController::SetMode(int new_mode)
         ChipEntry();
     }
 
-     /*-----------------------------------------------------*\
+    /*-----------------------------------------------------*\
     | Write the colors to the color sequence registers      |
     \*-----------------------------------------------------*/
     switch (new_mode)
-       {
+    {
        case GIGABYTE_MODE1_STATIC:
             superio_outb(gig_sioaddr, GIGABYTE_SUPERIO_STATIC_REGISTER_1, GIGABYTE_SUPERIO_STATIC_VALUE_1);
             superio_outb(gig_sioaddr, GIGABYTE_SUPERIO_STATIC_REGISTER_2, GIGABYTE_SUPERIO_STATIC_VALUE_2);
@@ -117,7 +133,8 @@ void GigabyteSuperIORGBController::SetMode(int new_mode)
             superio_outb(gig_sioaddr, GIGABYTE_SUPERIO_FLASHING_REGISTER_5, GIGABYTE_SUPERIO_FLASHING_VALUE_5);
             superio_outb(gig_sioaddr, GIGABYTE_SUPERIO_FLASHING_REGISTER_6, GIGABYTE_SUPERIO_FLASHING_VALUE_6);
             break;
-        }
+    }
+
     if(new_mode>=GIGABYTE_MODE1_STATIC && new_mode<=GIGABYTE_MODE1_FLASHING)
     {
         ChipExit();

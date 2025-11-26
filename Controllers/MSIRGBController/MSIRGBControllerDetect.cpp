@@ -6,15 +6,11 @@
 |   Adam Honse (CalcProgrammer1)                11 Feb 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "MSIRGBController.h"
-#include "RGBController.h"
 #include "RGBController_MSIRGB.h"
 #include "super_io.h"
 #include "dmiinfo.h"
@@ -118,9 +114,8 @@ void DetectMSIRGBControllers()
             {
                 if (board_dmi.find(std::string(compatible_devices[i].name)) != std::string::npos)
                 {
-                    MSIRGBController*     controller     = new MSIRGBController(sioaddr, compatible_devices[i].invert);
+                    MSIRGBController*     controller     = new MSIRGBController(sioaddr, compatible_devices[i].invert, "MSI " + board_dmi);
                     RGBController_MSIRGB* rgb_controller = new RGBController_MSIRGB(controller);
-                    rgb_controller->name                 = "MSI " + board_dmi;
 
                     ResourceManager::get()->RegisterRGBController(rgb_controller);
                     break;

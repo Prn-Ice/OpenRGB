@@ -7,7 +7,7 @@
 |   Credit to Luca Lovisa for original work                 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string>
@@ -542,14 +542,6 @@ void RGBController_LianLiUniHub_AL10::DeviceUpdateMode()
     }
 
     controller->Synchronize();
-}
-
-void RGBController_LianLiUniHub_AL10::SetCustomMode()
-{
-    /*-------------------------------------------------*\
-    | Set mode to Static Color                          |
-    \*-------------------------------------------------*/
-    active_mode = 0;
 }
 
 uint8_t RGBController_LianLiUniHub_AL10::convertAnyFanCount(uint8_t count)

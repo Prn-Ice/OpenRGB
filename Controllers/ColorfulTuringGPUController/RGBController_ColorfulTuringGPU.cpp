@@ -4,7 +4,7 @@
 |   RGBController for Colorful Turing GPU                   |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <array>
@@ -24,7 +24,8 @@
 RGBController_ColorfulTuringGPU::RGBController_ColorfulTuringGPU(ColorfulTuringGPUController * colorful_gpu_ptr)
 {
     controller              = colorful_gpu_ptr;
-    name                    = "Colorful GPU Device";
+
+    name                    = controller->GetDeviceName();
     vendor                  = "Colorful";
     type                    = DEVICE_TYPE_GPU;
     description             = name;
@@ -79,15 +80,15 @@ RGBController_ColorfulTuringGPU::~RGBController_ColorfulTuringGPU()
 
 int RGBController_ColorfulTuringGPU::getModeIndex(int mode_value)
 {
-    for(int mode_index = 0; mode_index < modes.size(); mode_index++)
+    for(unsigned int mode_index = 0; mode_index < modes.size(); mode_index++)
     {
         if(modes[mode_index].value == mode_value)
         {
-            return mode_index;
+            return(mode_index);
         }
     }
 
-    return 0;
+    return(0);
 }
 
 void RGBController_ColorfulTuringGPU::SetupZones()

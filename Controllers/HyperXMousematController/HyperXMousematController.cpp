@@ -6,17 +6,19 @@
 |   Adam Honse (CalcProgrammer1)                25 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HyperXMousematController.h"
+#include "StringUtils.h"
 
-HyperXMousematController::HyperXMousematController(hidapi_wrapper hid_wrapper, hid_device* dev_handle, const char* path)
+HyperXMousematController::HyperXMousematController(hidapi_wrapper hid_wrapper, hid_device* dev_handle, const char* path, std::string dev_name)
 {
     wrapper     = hid_wrapper;
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 HyperXMousematController::~HyperXMousematController()
@@ -29,6 +31,11 @@ std::string HyperXMousematController::GetDeviceLocation()
     return("HID " + location);
 }
 
+std::string HyperXMousematController::GetNameString()
+{
+    return(name);
+}
+
 std::string HyperXMousematController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -39,10 +46,7 @@ std::string HyperXMousematController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 /*-------------------------------------------------------------------------------------------------*\

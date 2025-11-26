@@ -6,7 +6,7 @@
 |   Chris M (DrNo)                              08 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -134,10 +134,10 @@ RGBController_DarkProjectKeyboard::RGBController_DarkProjectKeyboard(DarkProject
 {
     controller                  = controller_ptr;
 
-    name                        = "Dark Project Keyboard";
+    name                        = controller->GetName();
     vendor                      = "Dark Project";
     type                        = DEVICE_TYPE_KEYBOARD;
-    description                 = controller->GetDeviceName();
+    description                 = "Dark Project Keyboard Device";
     serial                      = controller->GetSerial();
     location                    = controller->GetLocation();
 

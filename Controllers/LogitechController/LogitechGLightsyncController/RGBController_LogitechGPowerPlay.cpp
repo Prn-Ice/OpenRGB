@@ -6,7 +6,7 @@
 |   TheRogueZeta                                31 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LogitechGPowerPlay.h"
@@ -26,7 +26,7 @@ RGBController_LogitechGPowerPlay::RGBController_LogitechGPowerPlay(LogitechGLigh
 {
     controller              = controller_ptr;
 
-    name                    = "Logitech G PowerPlay Wireless Charging System";
+    name                    = controller->GetNameString();
     vendor                  = "Logitech";
     type                    = DEVICE_TYPE_MOUSEMAT;
     description             = "Logitech G PowerPlay Wireless Charging System";

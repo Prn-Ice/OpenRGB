@@ -1,8 +1,21 @@
+/*---------------------------------------------------------*\
+| ZETKeyboardControllerDetect.cpp                           |
+|                                                           |
+|   Detector for ZET Blade                                  |
+|                                                           |
+|   Based on HyperX Alloy Elite2 implementation by          |
+|   KundaPanda                                              |
+|                                                           |
+|   Moon_darker (Vaker)                         23 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <hidapi.h>
 #include "Detector.h"
 #include "ZETBladeOpticalController.h"
-#include "RGBController.h"
 #include "RGBController_ZETBladeOptical.h"
-#include <hidapi/hidapi.h>
 
 /*-----------------------------------------------------*\
 | ZET keyboard VID/PID pairs                            |
@@ -16,9 +29,8 @@ void DetectZETBladeOptical(hid_device_info* info, const std::string& name)
 
     if (dev)
     {
-        ZETBladeOpticalController*     controller     = new ZETBladeOpticalController(dev, info->path);
+        ZETBladeOpticalController*     controller     = new ZETBladeOpticalController(dev, info->path, name);
         RGBController_ZETBladeOptical* rgb_controller = new RGBController_ZETBladeOptical(controller);
-        rgb_controller->name                          = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

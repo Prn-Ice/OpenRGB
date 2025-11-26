@@ -8,15 +8,12 @@
 |   Dongguan Yonghang Electronic Technology Co., Ltd        |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include <string>
-#include <stdio.h>
 #include "RGBController.h"
-#include "ResourceManager.h"
-#include "SettingsManager.h"
 #include "JGINYUEInternalUSBController.h"
 #include "dmiinfo.h"
 
@@ -39,6 +36,8 @@ JGINYUEInternalUSBController::JGINYUEInternalUSBController(hid_device* dev_handl
     dev           = dev_handle;
     location      = path;
     device_name   = "JGINYUE " + dmi.getMainboard();
+
+    memset(&device_config, 0x00, sizeof(device_config));
 
     Init_device(device_config);
 }
@@ -192,21 +191,22 @@ void JGINYUEInternalUSBController::DirectLEDControl
         break;
     }
 
-    device_config[Active_zone].Mode_active          =JGINYUE_USB_MODE_DIRECT;
-    device_config[Active_zone].Direct_Mode_control  =0x01;
+    if(device_config[Active_zone].Mode_active != JGINYUE_USB_MODE_DIRECT)
+    {
+        device_config[Active_zone].Mode_active          =JGINYUE_USB_MODE_DIRECT;
+        device_config[Active_zone].Direct_Mode_control  =0x01;
 
-    memset(usb_buf, 0x00, sizeof(usb_buf));
+        memset(usb_buf, 0x00, sizeof(usb_buf));
 
-    usb_buf[0x00]   = JGINYUE_USB_LED_STRIPE_SET_COMMAND_HEADER;
-    usb_buf[0x01]   = zone;
-    usb_buf[0x02]   = device_config[Active_zone].LED_numbers;
-    usb_buf[0x03]   = device_config[Active_zone].RG_Swap;
-    usb_buf[0x04]   = device_config[Active_zone].Direction;
-    usb_buf[0x05]   = device_config[Active_zone].Direct_Mode_control;
+        usb_buf[0x00]   = JGINYUE_USB_LED_STRIPE_SET_COMMAND_HEADER;
+        usb_buf[0x01]   = zone;
+        usb_buf[0x02]   = device_config[Active_zone].LED_numbers;
+        usb_buf[0x03]   = device_config[Active_zone].RG_Swap;
+        usb_buf[0x04]   = device_config[Active_zone].Direction;
+        usb_buf[0x05]   = device_config[Active_zone].Direct_Mode_control;
 
-    hid_write(dev, usb_buf, 16);
-
-    std::this_thread::sleep_for(20ms);
+        hid_write(dev, usb_buf, 16);
+    }
 
     memset(usb_buf, 0x00, sizeof(usb_buf));
 

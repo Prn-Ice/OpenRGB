@@ -7,13 +7,13 @@
 |   Adam Honse (CalcProgrammer1)                15 Mar 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define EVISION_KB_MAX_PACKET_SIZE                  ( 0x36 )/* max packet size for color*/
@@ -94,10 +94,11 @@ enum
 class EVisionKeyboardController
 {
 public:
-    EVisionKeyboardController(hid_device* dev_handle, const char* path);
+    EVisionKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~EVisionKeyboardController();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        SetKeyboardColors
@@ -137,6 +138,7 @@ public:
 private:
     hid_device*             dev;
     std::string             location;
+    std::string             name;
 
     void        ComputeChecksum
                     (

@@ -6,7 +6,7 @@
 |   Jeff P.                                                 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CorsairCommanderCore.h"
@@ -53,12 +53,12 @@ RGBController_CorsairCommanderCore::RGBController_CorsairCommanderCore(CorsairCo
 {
     controller  = controller_ptr;
 
+    name        = controller->GetNameString();
     vendor      = "Corsair";
-    description = "Corsair Commander Core";
+    description = "Corsair Commander Core Device";
     version     = controller->GetFirmwareString();
     type        = DEVICE_TYPE_COOLER;
     location    = controller->GetLocationString();
-
     SetupZones();
 
     mode Direct;
@@ -86,23 +86,34 @@ void RGBController_CorsairCommanderCore::SetupZones()
 
     std::vector<unsigned short int> led_count = controller->GetLedCounts();
     zones.resize(7);
-    zones[0].name                   = "Pump";
-    zones[0].type                   = ZONE_TYPE_MATRIX;
-    zones[0].leds_min               = led_count.at(0);
-    zones[0].leds_max               = led_count.at(0);
-    zones[0].leds_count             = led_count.at(0);
-    zones[0].matrix_map             = new matrix_map_type;
-    if(led_count.at(0) == 24)
+    if(controller->GetPidInt() == CORSAIR_COMMANDER_CORE_XT_PID)
     {
-        zones[0].matrix_map->height     = 11;
-        zones[0].matrix_map->width      = 11;
-        zones[0].matrix_map->map        = (unsigned int *)&matrix_map24;
+        zones[0].name                   = "External RGB Port";
+        zones[0].type                   = ZONE_TYPE_LINEAR;
+        zones[0].leds_min               = zones[0].leds_min;
+        zones[0].leds_max               = 204;
+        zones[0].leds_count             = zones[0].leds_count;
     }
     else
     {
-        zones[0].matrix_map->height     = 7;
-        zones[0].matrix_map->width      = 7;
-        zones[0].matrix_map->map        = (unsigned int *)&matrix_map29;
+        zones[0].name                   = "Pump";
+        zones[0].type                   = ZONE_TYPE_MATRIX;
+        zones[0].leds_min               = led_count.at(0);
+        zones[0].leds_max               = led_count.at(0);
+        zones[0].leds_count             = led_count.at(0);
+        zones[0].matrix_map             = new matrix_map_type;
+        if(led_count.at(0) == 24)
+        {
+            zones[0].matrix_map->height     = 11;
+            zones[0].matrix_map->width      = 11;
+            zones[0].matrix_map->map        = (unsigned int *)&matrix_map24;
+        }
+        else
+        {
+            zones[0].matrix_map->height     = 7;
+            zones[0].matrix_map->width      = 7;
+            zones[0].matrix_map->map        = (unsigned int *)&matrix_map29;
+        }
     }
 
     for(unsigned int i = 1; i < (CORSAIR_COMMANDER_CORE_NUM_CHANNELS + 1); i++)
@@ -123,7 +134,7 @@ void RGBController_CorsairCommanderCore::SetupZones()
 
     for(unsigned int zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
-        for (unsigned int led_idx = 0; led_idx < zones[zone_idx].leds_count; led_idx++)
+        for(unsigned int led_idx = 0; led_idx < zones[zone_idx].leds_count; led_idx++)
         {
             led new_led;
             new_led.name            = zones[zone_idx].name + " LED " + std::to_string(led_idx+1);
@@ -145,7 +156,18 @@ void RGBController_CorsairCommanderCore::ResizeZone(int zone, int new_size)
     if(((unsigned int)new_size >= zones[zone].leds_min) && ((unsigned int)new_size <= zones[zone].leds_max))
     {
         zones[zone].leds_count = new_size;
-
+        if(zone == 0 && controller->GetPidInt() == CORSAIR_COMMANDER_CORE_XT_PID)
+        {
+            if(new_size > 0)
+            {
+                controller->SetFanMode(true);
+                controller->SetLedAmount(new_size);
+            }
+            else
+            {
+                controller->SetFanMode(false);
+            }
+        }
         SetupZones();
     }
 }

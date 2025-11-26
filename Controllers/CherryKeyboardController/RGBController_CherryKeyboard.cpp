@@ -6,7 +6,7 @@
 |   Sebastian Kraus                             25 Dec 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CherryKeyboard.h"
@@ -23,7 +23,7 @@
 static unsigned int matrix_map[CHERRY_MATRIX_MAP_HEIGHT][CHERRY_MATRIX_MAP_WIDTH] =
     { {  0,  NA,  12,  18,  24,  30,  36,  42,  48,  54,  60,  66,  72,  78,  84,  90,  96,  102, 108, 114, 120 },
       {  1,   7,  13,  19,  25,  31,  37,  43,  49,  55,  61,  67,  73,  79,  85,  91,  97,  103, 109, 115, 121 },
-      {  2,   8,  14,  20,  26,  32,  38,  44,  50,  56,  62,  68,  74,  NA,  86,  92,  98,  104, 110, 116,  NA },
+      {  2,   8,  14,  20,  26,  32,  38,  44,  50,  56,  62,  68,  74,  80,  86,  92,  98,  104, 110, 116,  NA },
       {  3,   9,  15,  21,  27,  33,  39,  45,  51,  57,  63,  69,  75,  81,  NA,  NA,  NA,  105, 111, 117, 122 },
       {  4,  10,  16,  22,  28,  34,  40,  46,  52,  58,  64,  70,  NA,  82,  NA,  94,  NA,  106, 112, 118,  NA },
       {  5,  11,  17,  NA,  NA,  NA,  41,  NA,  NA,  NA,  65,  71,  77,  83,  89,  95, 101,  113,  NA, 119, 124 } };
@@ -43,7 +43,7 @@ RGBController_CherryKeyboard::RGBController_CherryKeyboard(CherryKeyboardControl
 {
     controller  = controller_ptr;
 
-    name        = "Cherry Keyboard Device";
+    name        = controller->GetDeviceName();
     vendor      = "Cherry";
     type        = DEVICE_TYPE_KEYBOARD;
     description = "Cherry Keyboard Device";
@@ -390,11 +390,6 @@ void RGBController_CherryKeyboard::UpdateSingleLED(int /*led*/)
     DeviceUpdateLEDs();
 }
 
-void RGBController_CherryKeyboard::SetCustomMode()
-{
-
-}
-
 void RGBController_CherryKeyboard::DeviceUpdateMode()
 {
     unsigned char red    = 0x00;
@@ -440,9 +435,9 @@ bool RGBController_CherryKeyboard::hasUnofficialModeSupport(const uint16_t produ
     // RGB keyboards known for not supporting unofficial modes
     case MX_BOARD_3_0S_FL_RGB_PID:
     case MX_BOARD_3_0S_FL_RGB_KOR_PID:
-    case MX_BOARD_2_0S_FL_RGB_PID:
+    case MX_BOARD_2_0S_FL_RGB_US_PID:
     case MX_BOARD_2_0S_FL_NBL_PID:
-    case MX_BOARD_2_0S_FL_RGB_DE_PID:
+    case MX_BOARD_2_0S_FL_RGB_EU_PID:
     case MV_BOARD_3_0FL_RGB_PID:
         return false;
     // RGB keyboards which (probably) support unofficial modes
@@ -451,9 +446,12 @@ bool RGBController_CherryKeyboard::hasUnofficialModeSupport(const uint16_t produ
     case MX_BOARD_10_0_FL_RGB_PID: // unknown (probably yes, related to 10.0N)
     case G80_3000_TKL_RGB_PID: // unknown
     case MX_1_0_FL_RGB_PID: // unkown
-    case G80_3000N_TKL_RGB_PID: // yes
-    case G80_3000N_FL_RGB_PID: // firmware v0102: YES, firmware v0103: NO
-    case MX_BOARD_10_0N_FL_RGB_PID: // yes
+    case G80_3000N_TKL_RGB_EU_PID: // yes
+    case G80_3000N_TKL_RGB_US_PID: // yes
+    case G80_3000N_FL_RGB_EU_PID: // firmware v0102: YES, firmware v0103: NO
+    case G80_3000N_FL_RGB_US_PID: // firmware v0102: YES, firmware v0103: NO
+    case MX_BOARD_10_0N_FL_RGB_EU_PID: // yes
+    case MX_BOARD_10_0N_FL_RGB_US_PID: // yes
     default:
         return true;
     }

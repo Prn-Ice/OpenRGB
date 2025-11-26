@@ -7,7 +7,7 @@
 |   Dominik Mikolajczyk (dmiko)                 23 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <iterator>
@@ -176,7 +176,7 @@ RGBController_AlienwareAW410K::RGBController_AlienwareAW410K(AlienwareAW410KCont
 {
     controller                      = controller_ptr;
 
-    name                            = "Alienware AW410K Keyboard Device";
+    name                            = controller->GetDeviceName();
     vendor                          = "Alienware";
     type                            = DEVICE_TYPE_KEYBOARD;
     description                     = "Alienware AW410K Keyboard Device";

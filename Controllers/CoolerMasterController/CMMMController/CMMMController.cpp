@@ -7,28 +7,20 @@
 |   Dracrius                                    12 Mar 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "CMMMController.h"
+#include "StringUtils.h"
 
-CMMMController::CMMMController(hid_device* dev_handle, char *_path, uint16_t pid) : product_id(pid)
+CMMMController::CMMMController(hid_device* dev_handle, char *_path, uint16_t pid, std::string dev_name)
 {
-    const int szTemp = HID_MAX_STR;
-    wchar_t tmpName[szTemp];
-
     dev                                  = dev_handle;
     location                             = _path;
+    name                                 = dev_name;
     current_speed                        = CM_MM_SPEED_3;
-
-    hid_get_manufacturer_string(dev, tmpName, szTemp);
-    std::wstring wName = std::wstring(tmpName);
-    vendor = std::string(wName.begin(), wName.end());
-
-    hid_get_indexed_string(dev, 2, tmpName, szTemp);
-    wName = std::wstring(tmpName);
-    serial = std::string(wName.begin(), wName.end());
+    product_id                           = pid;
 
     if(product_id == CM_MM530_PID || product_id == CM_MM531_PID)
     {
@@ -125,17 +117,38 @@ void CMMMController::GetModeStatus()
 
 std::string CMMMController::GetDeviceVendor()
 {
-    return vendor;
+    wchar_t vendor_string[HID_MAX_STR];
+    int ret = hid_get_manufacturer_string(dev, vendor_string, HID_MAX_STR);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(vendor_string));
 }
 
 std::string CMMMController::GetSerial()
 {
-    return serial;
+    wchar_t serial_string[HID_MAX_STR];
+    int ret = hid_get_indexed_string(dev, 2, serial_string, HID_MAX_STR);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string CMMMController::GetLocation()
 {
     return("HID: " + location);
+}
+
+std::string CMMMController::GetName()
+{
+    return(name);
 }
 
 uint16_t CMMMController::GetProductID()

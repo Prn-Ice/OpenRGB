@@ -4,22 +4,23 @@
 |   Driver for Corsair K55 RGB PRO XT keyboard              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 class CorsairK55RGBPROXTController
 {
 public:
-    CorsairK55RGBPROXTController(hid_device* dev_handle, const char* path);
+    CorsairK55RGBPROXTController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~CorsairK55RGBPROXTController();
+
     std::string GetDeviceLocation();
-    std::string GetFirmwareString();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void SetLEDs(std::vector<RGBColor> colors);
@@ -32,7 +33,6 @@ public:
              unsigned int direction
          );
     void SwitchMode(bool software);
-
 
     enum
     {
@@ -80,9 +80,8 @@ public:
 private:
     hid_device* dev;
 
-    std::string firmware_version;
     std::string location;
-    device_type type;
+    std::string name;
 
     void LightingControl();
 };

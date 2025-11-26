@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_ThermaltakeRiing.cpp       |
-|                                           |
-|  Generic RGB Interface for Thermaltake    |
-|  Riing controller                         |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 2/9/2020    |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_ThermaltakeRiing.cpp                        |
+|                                                           |
+|   RGBController for Thermaltake Riing                     |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                09 Feb 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_ThermaltakeRiing.h"
 
@@ -30,6 +32,7 @@ RGBController_ThermaltakeRiing::RGBController_ThermaltakeRiing(ThermaltakeRiingC
     description = "Thermaltake Riing Device";
     location    = controller->GetDeviceLocation();
     serial      = controller->GetSerialString();
+    version     = controller->GetFirmwareVersion();
 
     mode Direct;
     Direct.name       = "Direct";
@@ -205,7 +208,7 @@ void RGBController_ThermaltakeRiing::DeviceUpdateLEDs()
 {
     for(std::size_t zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
-        controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+        controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
     }
 }
 
@@ -226,6 +229,6 @@ void RGBController_ThermaltakeRiing::DeviceUpdateMode()
     for(std::size_t zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
         controller->SetMode(modes[active_mode].value, modes[active_mode].speed);
-        controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+        controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
     }
 }

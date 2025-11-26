@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       02 Jun 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "LegoDimensionsToypadBaseController.h"
-#include "RGBController.h"
 #include "RGBController_LegoDimensionsToypadBase.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,9 @@ void DetectLegoDimensionsToypadBaseControllers(hid_device_info* info, const std:
 
     if(dev)
     {
-        LegoDimensionsToypadBaseController*     controller      = new LegoDimensionsToypadBaseController(dev, *info);
+        LegoDimensionsToypadBaseController*     controller      = new LegoDimensionsToypadBaseController(dev, *info, name);
         RGBController_LegoDimensionsToypadBase* rgb_controller  = new RGBController_LegoDimensionsToypadBase(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

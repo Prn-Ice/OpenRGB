@@ -6,14 +6,13 @@
 |   Sergey Gavrilov (DrZlo13)                   06 Jun 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "AnnePro2Controller.h"
-#include "RGBController.h"
 #include "RGBController_AnnePro2.h"
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 /*---------------------------------------------------------*\
 | Anne Pro 2 vendor IDs                                     |
@@ -41,11 +40,12 @@
 void DetectAnnePro2Controllers(hid_device_info* info, const std::string&)
 {
     hid_device* dev = hid_open_path(info->path);
-    if( dev )
+
+    if(dev)
     {
         AnnePro2Controller*     controller     = new AnnePro2Controller(dev, info->path);
         RGBController_AnnePro2* rgb_controller = new RGBController_AnnePro2(controller);
-        // Constructor sets the name
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

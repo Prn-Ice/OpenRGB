@@ -7,7 +7,7 @@
 |   Chris M (Dr_No)                             11 Aug 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "LogManager.h"
@@ -31,8 +31,9 @@ RGBController_CorsairV2SW::RGBController_CorsairV2SW(CorsairPeripheralV2Controll
     controller                          = controller_ptr;
     const corsair_v2_device* corsair    = controller->GetDeviceData();
 
+    name                                = controller->GetName();
     vendor                              = "Corsair";
-    description                         = controller->GetName();
+    description                         = "Corsair Peripheral V2 SW Device";
     type                                = corsair->type;
     version                             = controller->GetFirmwareString();
     location                            = controller->GetDeviceLocation();

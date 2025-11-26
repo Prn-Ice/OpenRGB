@@ -7,24 +7,26 @@
 |   using snipets from Chris M (Dr.No)                      |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "AsusAuraRyuoAIOController.h"
 
-AsusAuraRyuoAIOController::AsusAuraRyuoAIOController(hid_device* dev_handle, const char* path) : AuraUSBController(dev_handle, path)
+AsusAuraRyuoAIOController::AsusAuraRyuoAIOController(hid_device* dev_handle, const char* path, std::string dev_name) : AuraUSBController(dev_handle, path, dev_name)
 {
-	/*-----------------------------------------------------*\
-	| Add addressable devices                               |
-	|    Manually adding device info for now                |
-	|    TODO: Implement config table accurately            |
-	\*-----------------------------------------------------*/
-	device_info.push_back({0x00, 0x00, 12, 0, AuraDeviceType::FIXED});
+    /*-----------------------------------------------------*\
+    | Add addressable devices                               |
+    |    Manually adding device info for now                |
+    |    TODO: Implement config table accurately            |
+    \*-----------------------------------------------------*/
+    device_info.push_back({0x00, 0x00, 12, 0, AuraDeviceType::FIXED});
 }
 
 AsusAuraRyuoAIOController::~AsusAuraRyuoAIOController()
 {
-	hid_close(dev);
+    /*---------------------------------------------------------*\
+    | HID device is closed in the base class                    |
+    \*---------------------------------------------------------*/
 }
 
 std::string AsusAuraRyuoAIOController::GetLocation()
@@ -34,10 +36,10 @@ std::string AsusAuraRyuoAIOController::GetLocation()
 
 void AsusAuraRyuoAIOController::SetMode(unsigned char /*channel*/, unsigned char /*mode*/, unsigned char /*red*/, unsigned char /*grn*/, unsigned char /*blu*/)
 {
-	/*---------------------------------------------------------*\
-	| This interface is not used in this controller however is  |
-	|   required by the abstract class                          |
-	\*---------------------------------------------------------*/
+    /*---------------------------------------------------------*\
+    | This interface is not used in this controller however is  |
+    |   required by the abstract class                          |
+    \*---------------------------------------------------------*/
 }
 
 void AsusAuraRyuoAIOController::SetMode(unsigned char mode, unsigned char speed, unsigned char direction, RGBColor colour)

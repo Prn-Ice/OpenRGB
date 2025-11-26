@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       29 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -26,10 +26,10 @@
 RGBController_GigabyteAorusMouse::RGBController_GigabyteAorusMouse(GigabyteAorusMouseController* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "Gigabyte Aorus";
+    name                                = controller->GetNameString();
     vendor                              = "Gigabyte";
     type                                = DEVICE_TYPE_MOUSE;
-    description                         = name;
+    description                         = "Gigabyte Mouse Device";
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
     version                             = controller->GetFirmwareVersion();

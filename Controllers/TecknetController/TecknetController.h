@@ -1,21 +1,23 @@
-/*-------------------------------------------------------------------*\
-|  TecknetController.h                                                |
-|                                                                     |
-|  Driver for Tecknet Devices                                         |
-|                                                                     |
-|  Chris M (Dr_No)          29th Jul 2020                             |
-|                                                                     |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| TecknetController.h                                       |
+|                                                           |
+|   Driver for Tecknet devices                              |
+|                                                           |
+|   Chris M (Dr_No)                             29 Jul 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#ifndef TECKNETCONTROLLER_H
-#define TECKNETCONTROLLER_H
+#pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
+#define HID_MAX_STR                   255
 #define TECKNET_COLOUR_MODE_DATA_SIZE (sizeof(tecknet_colour_mode_data[0]) / sizeof(tecknet_colour_mode_data[0][0]))
-#define TECKNET_DEVICE_NAME_SIZE (sizeof(device_name) / sizeof(device_name[ 0 ]))
-#define TECKNET_PACKET_LENGTH    0x10                       //16 bytes
+#define TECKNET_DEVICE_NAME_SIZE      (sizeof(device_name) / sizeof(device_name[ 0 ]))
+#define TECKNET_PACKET_LENGTH         0x10                  //16 bytes
 
 enum
 {
@@ -64,7 +66,6 @@ public:
 
 private:
     std::string             device_name;
-    std::string             serial;
     std::string             location;
     hid_device*             dev;
 
@@ -78,5 +79,3 @@ private:
 
     void SendUpdate();
 };
-
-#endif // TECKNETCONTROLLER_H

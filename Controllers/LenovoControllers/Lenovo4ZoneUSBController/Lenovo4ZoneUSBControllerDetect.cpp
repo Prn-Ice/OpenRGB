@@ -4,13 +4,11 @@
 |   Detector for Lenovo 4-Zone devices                      |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
-#include "LogManager.h"
-#include "RGBController.h"
 #include "Lenovo4ZoneUSBController.h"
 #include "LenovoDevices4Zone.h"
 #include "RGBController_Lenovo4ZoneUSB.h"
@@ -35,9 +33,8 @@ void DetectLenovo4ZoneUSBControllers(hid_device_info* info, const std::string& n
 
     if(dev)
     {
-        Lenovo4ZoneUSBController* controller = new Lenovo4ZoneUSBController(dev, info->path, info->product_id);
+        Lenovo4ZoneUSBController*     controller      = new Lenovo4ZoneUSBController(dev, info->path, info->product_id, name);
         RGBController_Lenovo4ZoneUSB* rgb_controller  = new RGBController_Lenovo4ZoneUSB(controller);
-        rgb_controller->name                     = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

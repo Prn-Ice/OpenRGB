@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                04 Jul 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -203,11 +203,11 @@ RGBController_DuckyKeyboard::RGBController_DuckyKeyboard(DuckyKeyboardController
 {
     controller  = controller_ptr;
 
-    name        = "Ducky Keyboard Device";
+    name        = controller->GetNameString();
     vendor      = "Ducky";
     type        = DEVICE_TYPE_KEYBOARD;
     description = "Ducky Keyboard Device";
-    location    = controller->GetDeviceLocation();
+    location    = controller->GetLocationString();
     serial      = controller->GetSerialString();
 
     mode Direct;

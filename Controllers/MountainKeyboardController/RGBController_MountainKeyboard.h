@@ -6,11 +6,12 @@
 |   Wojciech Lazarski                              Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
+#include <cstring>
 #include "RGBController.h"
 #include "MountainKeyboardController.h"
 
@@ -54,4 +55,6 @@ private:
     MountainKeyboardController* controller;
     unsigned char ConvertDirection(unsigned int direction, bool rotation);
     void          DeviceUpdate(const mode& current_mode);
+
+    unsigned char wheel_color [3];
 };

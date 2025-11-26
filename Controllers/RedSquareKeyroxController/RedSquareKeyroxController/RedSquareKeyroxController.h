@@ -6,13 +6,13 @@
 |   cafeed28                                    03 Nov 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define PACKET_DATA_LENGTH      520
@@ -60,11 +60,12 @@ enum
 class RedSquareKeyroxController
 {
 public:
-    RedSquareKeyroxController(hid_device *dev_handle, const hid_device_info &info, int variant);
+    RedSquareKeyroxController(hid_device *dev_handle, const hid_device_info &info, int variant, std::string dev_name);
     ~RedSquareKeyroxController();
 
     int                 GetVariant();
     std::string         GetDeviceLocation();
+    std::string         GetNameString();
     std::string         GetSerialString();
 
     int                 GetDirectionLRUD(int direction); // Direction for Left-Right-Up-Down modes
@@ -83,6 +84,7 @@ protected:
 private:
     int                         variant;
     std::string                 location;
+    std::string                 name;
     std::string                 serial_number;
     std::vector<unsigned int>   led_sequence_positions;
 };

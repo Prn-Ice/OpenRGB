@@ -6,13 +6,13 @@
 |   Mohammed Julfikar Ali Mahbub (o-julfikar)   01 Apr 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define HID_MAX_STR                     255
@@ -39,15 +39,17 @@ enum
 class BloodyB820RController
 {
 public:
-    BloodyB820RController(hid_device* dev_handle, const char* path);
+    BloodyB820RController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~BloodyB820RController();
 
     std::string     GetSerial();
     std::string     GetLocation();
+    std::string     GetName();
 
     void            SetLEDDirect(std::vector<RGBColor> colors);
     void            SendControlPacket(uint8_t data);
 private:
     std::string     location;
+    std::string     name;
     hid_device*     dev;
 };

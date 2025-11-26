@@ -6,15 +6,12 @@
 |   Erik Gilling (konkers)                      25 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 #include "Detector.h"
 #include "CorsairDominatorPlatinumController.h"
-#include "RGBController.h"
 #include "RGBController_CorsairDominatorPlatinum.h"
 #include "SettingsManager.h"
 #include "LogManager.h"
@@ -160,9 +157,8 @@ void DetectCorsairDominatorPlatinumControllers(std::vector<i2c_smbus_interface *
 
                     LOG_DEBUG("[%s] Model: %s, Leds: %d", CORSAIR_DOMINATOR_PLATINUM_NAME, name.c_str(), leds);
 
-                    CorsairDominatorPlatinumController*     controller    = new CorsairDominatorPlatinumController(busses[bus], addr, leds);
+                    CorsairDominatorPlatinumController*     controller    = new CorsairDominatorPlatinumController(busses[bus], addr, leds, name);
                     RGBController_CorsairDominatorPlatinum* rgbcontroller = new RGBController_CorsairDominatorPlatinum(controller);
-                    rgbcontroller->name = name;
 
                     ResourceManager::get()->RegisterRGBController(rgbcontroller);
                 }

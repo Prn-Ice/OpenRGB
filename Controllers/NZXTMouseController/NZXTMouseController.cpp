@@ -6,16 +6,18 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      13 Dec 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "NZXTMouseController.h"
+#include "StringUtils.h"
 
-NZXTMouseController::NZXTMouseController(hid_device* dev_handle, const char* path)
+NZXTMouseController::NZXTMouseController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     /*-----------------------------------------------------*\
     | Request firmware version                              |
@@ -38,6 +40,11 @@ std::string NZXTMouseController::GetLocation()
     return("HID: " + location);
 }
 
+std::string NZXTMouseController::GetName()
+{
+    return(name);
+}
+
 std::string NZXTMouseController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -48,10 +55,7 @@ std::string NZXTMouseController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void NZXTMouseController::SetLEDs
@@ -110,7 +114,6 @@ void NZXTMouseController::SetLEDs
 void NZXTMouseController::SendFirmwareRequest()
 {
     unsigned char   usb_buf[64];
-    int             ret_val = 0;
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -131,7 +134,7 @@ void NZXTMouseController::SendFirmwareRequest()
     \*-----------------------------------------------------*/
     do
     {
-        ret_val = hid_read(dev, usb_buf, sizeof(usb_buf));
+        hid_read(dev, usb_buf, sizeof(usb_buf));
     } while( (usb_buf[0] != 0x43) || (usb_buf[1] != 0x86) );
 
     /*-----------------------------------------------------*\

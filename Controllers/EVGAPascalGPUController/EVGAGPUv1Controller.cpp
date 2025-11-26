@@ -6,15 +6,16 @@
 |   Adam Honse (CalcProgrammer1)                11 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "EVGAGPUv1Controller.h"
 
-EVGAGPUv1Controller::EVGAGPUv1Controller(i2c_smbus_interface* bus, evga_dev_id dev)
+EVGAGPUv1Controller::EVGAGPUv1Controller(i2c_smbus_interface* bus, evga_dev_id dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 }
 
 EVGAGPUv1Controller::~EVGAGPUv1Controller()
@@ -30,6 +31,11 @@ std::string EVGAGPUv1Controller::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string EVGAGPUv1Controller::GetDeviceName()
+{
+    return(name);
 }
 
 unsigned char EVGAGPUv1Controller::GetMode()

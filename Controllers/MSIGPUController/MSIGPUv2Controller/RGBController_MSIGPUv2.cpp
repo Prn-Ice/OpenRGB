@@ -6,7 +6,7 @@
 |   Wojciech Lazarski                           03 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <array>
@@ -25,18 +25,17 @@ static const unsigned char speed_values[3]      = { 0x04, 0x02, 0x01 };
     @comment
 \*-------------------------------------------------------------------*/
 
-RGBController_MSIGPUv2::RGBController_MSIGPUv2(MSIGPUv2Controller * msi_gpu_ptr, int msi_gpu_id)
+RGBController_MSIGPUv2::RGBController_MSIGPUv2(MSIGPUv2Controller * controller_ptr, int msi_gpu_id)
 {
-    msi_gpu     = msi_gpu_ptr;
+    controller                      = controller_ptr;
 
-    name        = "MSI GPU Device";
-    vendor      = "MSI";
-    type        = DEVICE_TYPE_GPU;
-    description = name;
-    location    = msi_gpu->GetDeviceLocation();
+    name                            = controller->GetDeviceName();
+    vendor                          = "MSI";
+    type                            = DEVICE_TYPE_GPU;
+    description                     = "MSI GPU V2 Device";
+    location                        = controller->GetDeviceLocation();
 
     mode Off;
-
     Off.name                        = "Off";
     Off.value                       = MSI_GPU_V2_MODE_OFF;
     Off.flags                       = MODE_FLAG_MANUAL_SAVE;
@@ -169,6 +168,7 @@ RGBController_MSIGPUv2::RGBController_MSIGPUv2(MSIGPUv2Controller * msi_gpu_ptr,
         case MSI_RTX4060TI_GAMING_X_16G_SLIM_WHITE_SUB_DEV | NVIDIA_RTX4060TI_16G_DEV << 16:
         case MSI_RTX4070S_GAMING_X_SLIM_SUB_DEV | NVIDIA_RTX4070S_DEV << 16:
         case MSI_RTX4070TI_GAMING_X_TRIO_WHITE_SUB_DEV | NVIDIA_RTX4070TIS_DEV << 16:
+        case MSI_RTX4080S_GAMING_X_TRIO_SUB_DEV | NVIDIA_RTX4080S_DEV << 16:
         case MSI_RTX4080S_GAMING_X_SLIM_WHITE_SUB_DEV | NVIDIA_RTX4080_DEV << 16:
         case MSI_RTX4080S_GAMING_X_SLIM_WHITE_SUB_DEV | NVIDIA_RTX4080S_DEV << 16:
             break;
@@ -293,7 +293,7 @@ RGBController_MSIGPUv2::RGBController_MSIGPUv2(MSIGPUv2Controller * msi_gpu_ptr,
 
 RGBController_MSIGPUv2::~RGBController_MSIGPUv2()
 {
-    delete msi_gpu;
+    delete controller;
 }
 
 void RGBController_MSIGPUv2::SetupZones()
@@ -359,62 +359,62 @@ void RGBController_MSIGPUv2::DeviceUpdateAll(const mode& current_mode)
             {
                 if(current_mode.direction == MODE_DIRECTION_LEFT)
                 {
-                    msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_LEFT | MSI_GPU_V2_CONTROL_NON_RGBMODE);
+                    controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_LEFT | MSI_GPU_V2_CONTROL_NON_RGBMODE);
                 }
                 else
                 {
-                    msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_RIGHT | MSI_GPU_V2_CONTROL_NON_RGBMODE);
+                    controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_RIGHT | MSI_GPU_V2_CONTROL_NON_RGBMODE);
                 }
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
 
-                msi_gpu->SetRGB1V2(RGBGetRValue(current_mode.colors[0]), RGBGetGValue(current_mode.colors[0]), RGBGetBValue(current_mode.colors[0]));
-                msi_gpu->SetRGB2V2(RGBGetRValue(current_mode.colors[1]), RGBGetGValue(current_mode.colors[1]), RGBGetBValue(current_mode.colors[1]));
-                msi_gpu->SetRGB3V2(RGBGetRValue(current_mode.colors[2]), RGBGetGValue(current_mode.colors[2]), RGBGetBValue(current_mode.colors[2]));
+                controller->SetRGB1V2(RGBGetRValue(current_mode.colors[0]), RGBGetGValue(current_mode.colors[0]), RGBGetBValue(current_mode.colors[0]));
+                controller->SetRGB2V2(RGBGetRValue(current_mode.colors[1]), RGBGetGValue(current_mode.colors[1]), RGBGetBValue(current_mode.colors[1]));
+                controller->SetRGB3V2(RGBGetRValue(current_mode.colors[2]), RGBGetGValue(current_mode.colors[2]), RGBGetBValue(current_mode.colors[2]));
             }
             else
             {
                 if(current_mode.direction == MODE_DIRECTION_LEFT)
                 {
-                    msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_LEFT);
+                    controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_LEFT);
                 }
                 else
                 {
-                    msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_RIGHT);
+                    controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_RIGHT);
                 }
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
             }
             break;
 
         case MSI_GPU_V2_MODE_MAGIC:
             if(current_mode.flags & MODE_FLAG_HAS_MODE_SPECIFIC_COLOR)
             {
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_NON_RGBMODE);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_NON_RGBMODE);
 
-                msi_gpu->SetRGB1V2(RGBGetRValue(current_mode.colors[0]), RGBGetGValue(current_mode.colors[0]), RGBGetBValue(current_mode.colors[0]));
-                msi_gpu->SetRGB2V2(RGBGetRValue(current_mode.colors[1]), RGBGetGValue(current_mode.colors[1]), RGBGetBValue(current_mode.colors[1]));
-                msi_gpu->SetRGB3V2(RGBGetRValue(current_mode.colors[2]), RGBGetGValue(current_mode.colors[2]), RGBGetBValue(current_mode.colors[2]));
+                controller->SetRGB1V2(RGBGetRValue(current_mode.colors[0]), RGBGetGValue(current_mode.colors[0]), RGBGetBValue(current_mode.colors[0]));
+                controller->SetRGB2V2(RGBGetRValue(current_mode.colors[1]), RGBGetGValue(current_mode.colors[1]), RGBGetBValue(current_mode.colors[1]));
+                controller->SetRGB3V2(RGBGetRValue(current_mode.colors[2]), RGBGetGValue(current_mode.colors[2]), RGBGetBValue(current_mode.colors[2]));
             }
             else
             {
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
 
-                msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_RIGHT);
+                controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_CONTROL, MSI_GPU_V2_CONTROL_DIRECTION_RIGHT);
             }
             break;
 
 
         case MSI_GPU_V2_MODE_BREATHING:
         case MSI_GPU_V2_MODE_FADEIN:
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
 
-            msi_gpu->SetRGB1V2(RGBGetRValue(current_mode.colors[0]), RGBGetGValue(current_mode.colors[0]), RGBGetBValue(current_mode.colors[0]));
-            msi_gpu->SetRGB2V2(RGBGetRValue(current_mode.colors[1]), RGBGetGValue(current_mode.colors[1]), RGBGetBValue(current_mode.colors[1]));
+            controller->SetRGB1V2(RGBGetRValue(current_mode.colors[0]), RGBGetGValue(current_mode.colors[0]), RGBGetBValue(current_mode.colors[0]));
+            controller->SetRGB2V2(RGBGetRValue(current_mode.colors[1]), RGBGetGValue(current_mode.colors[1]), RGBGetBValue(current_mode.colors[1]));
             break;
 
         case MSI_GPU_V2_MODE_FLOWING:
@@ -426,36 +426,36 @@ void RGBController_MSIGPUv2::DeviceUpdateAll(const mode& current_mode)
         case MSI_GPU_V2_MODE_RHYTHM:
         case MSI_GPU_V2_MODE_STACK:
         case MSI_GPU_V2_MODE_METEOR:
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
-            msi_gpu->SetRGB1(RGBGetRValue(colors[0]), RGBGetGValue(colors[0]), RGBGetBValue(colors[0]));
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+            controller->SetRGB1(RGBGetRValue(colors[0]), RGBGetGValue(colors[0]), RGBGetBValue(colors[0]));
             break;
 
         case MSI_GPU_V2_MODE_STREAMING:
         case MSI_GPU_V2_MODE_LIGHTNING:
         case MSI_GPU_V2_MODE_OFF:
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
             break;
 
         default:
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
-            msi_gpu->SetMode(MSI_GPU_V2_MODE_OFF);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_UNKNOWN, 0x00);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_MODE, MSI_GPU_V2_MODE_IDLE);
+            controller->SetMode(MSI_GPU_V2_MODE_OFF);
     }
 
 
     if(current_mode.flags & MODE_FLAG_HAS_BRIGHTNESS)
     {
-        msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_BRIGHTNESS, MSI_GPU_V2_BRIGHTNESS_MULTI * modes[active_mode].brightness);
+        controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_BRIGHTNESS, MSI_GPU_V2_BRIGHTNESS_MULTI * modes[active_mode].brightness);
         if(modes[active_mode].flags & MODE_FLAG_HAS_SPEED)
         {
-            msi_gpu->MSIGPURegisterWrite(MSI_GPU_V2_REG_SPEED, speed_values[current_mode.speed]);
+            controller->MSIGPURegisterWrite(MSI_GPU_V2_REG_SPEED, speed_values[current_mode.speed]);
         }
 
     }
 
-    msi_gpu->SetMode(current_mode.value);
+    controller->SetMode(current_mode.value);
 }
 
 
@@ -484,5 +484,5 @@ void RGBController_MSIGPUv2::DeviceUpdateMode()
 
 void RGBController_MSIGPUv2::DeviceSaveMode()
 {
-    msi_gpu->Save();
+    controller->Save();
 }

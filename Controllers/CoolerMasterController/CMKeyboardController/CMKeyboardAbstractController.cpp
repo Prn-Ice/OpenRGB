@@ -6,27 +6,26 @@
 |   Tam D (too.manyhobbies)                     30 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "CMKeyboardAbstractController.h"
+#include "StringUtils.h"
 
-CMKeyboardAbstractController::CMKeyboardAbstractController(hid_device* dev_handle, hid_device_info* dev_info)
+CMKeyboardAbstractController::CMKeyboardAbstractController(hid_device* dev_handle, hid_device_info* dev_info, std::string dev_name)
 {
     wchar_t tmp[HID_MAX_STR];
 
     m_pDev                   = dev_handle;
     m_productId              = dev_info->product_id;
     m_sLocation              = dev_info->path;
+    m_deviceName             = dev_name;
 
     hid_get_manufacturer_string(m_pDev, tmp, HID_MAX_STR);
-    std::wstring wVendorName = std::wstring(tmp);
-    m_vendorName             = std::string(wVendorName.begin(), wVendorName.end());
+    m_vendorName             = StringUtils::wstring_to_string(tmp);
 
     hid_get_product_string(m_pDev, tmp, HID_MAX_STR);
-    std::wstring wDeviceName = std::wstring(tmp);
-    m_deviceName             = std::string(wDeviceName.begin(), wDeviceName.end());
-    m_serialNumber           = m_deviceName;
+    m_serialNumber           = StringUtils::wstring_to_string(tmp);
 
     bool bNotFound           = true;
 
@@ -48,20 +47,12 @@ CMKeyboardAbstractController::CMKeyboardAbstractController(hid_device* dev_handl
 
 CMKeyboardAbstractController::~CMKeyboardAbstractController()
 {
-    if(m_pDev)
-    {
-        hid_close(m_pDev);
-    }
+    hid_close(m_pDev);
 };
 
 std::string CMKeyboardAbstractController::GetDeviceName()
 {
     return(m_deviceName);
-}
-
-void CMKeyboardAbstractController::SetDeviceName(std::string name)
-{
-    m_deviceName = name;
 }
 
 std::string CMKeyboardAbstractController::GetDeviceVendor()

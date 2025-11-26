@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       01 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "MSIVigorGK30Controller.h"
-#include "RGBController.h"
 #include "RGBController_MSIVigorGK30.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,8 @@ void DetectMSIVigorGK30Controllers(hid_device_info* info, const std::string& nam
 
     if(dev)
     {
-        MSIVigorGK30Controller*     controller      = new MSIVigorGK30Controller(dev, *info);
+        MSIVigorGK30Controller*     controller      = new MSIVigorGK30Controller(dev, *info, name);
         RGBController_MSIVigorGK30* rgb_controller  = new RGBController_MSIVigorGK30(controller);
-        rgb_controller->name                        = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

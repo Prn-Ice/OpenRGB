@@ -6,31 +6,20 @@
 |   Morgan Guimard (morg)                       18 Sep 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "CMMonitorController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-CMMonitorController::CMMonitorController(hid_device* dev_handle, const hid_device_info& info)
+CMMonitorController::CMMonitorController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 }
 
 CMMonitorController::~CMMonitorController()
@@ -43,9 +32,22 @@ std::string CMMonitorController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string CMMonitorController::GetNameString()
+{
+    return(name);
+}
+
 std::string CMMonitorController::GetSerialString()
 {
-    return(serial_number);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CMMonitorController::SetMode(uint8_t mode_value, const RGBColor& color, uint8_t speed, uint8_t brightness)

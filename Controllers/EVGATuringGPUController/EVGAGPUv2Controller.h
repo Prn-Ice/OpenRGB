@@ -6,7 +6,7 @@
 |   TheRogueZeta                                15 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -86,10 +86,11 @@ enum
 class EVGAGPUv2Controller
 {
 public:
-    EVGAGPUv2Controller(i2c_smbus_interface* bus, evga_dev_id dev);
+    EVGAGPUv2Controller(i2c_smbus_interface* bus, evga_dev_id dev, std::string dev_name);
     ~EVGAGPUv2Controller();
 
     std::string     GetDeviceLocation();
+    std::string     GetDeviceName();
 
     unsigned char   GetBrightnessA();
     RGBColor        GetColorA();
@@ -110,4 +111,5 @@ private:
 
     i2c_smbus_interface*    bus;
     evga_dev_id             dev;
+    std::string             name;
 };

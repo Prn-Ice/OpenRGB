@@ -4,13 +4,12 @@
 |   Detector for HP Omen 30L                                |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "HPOmen30LController.h"
-#include "RGBController.h"
 #include "RGBController_HPOmen30L.h"
 
 #define HP_OMEN_30L_VID 0x103C

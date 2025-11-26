@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       29 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define GIGABYTE_AORUS_MOUSE_REPORT_SIZE    8
@@ -40,12 +40,13 @@ enum
 class GigabyteAorusMouseController
 {
 public:
-    GigabyteAorusMouseController(hid_device* dev_handle, const hid_device_info& info);
+    GigabyteAorusMouseController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~GigabyteAorusMouseController();
 
-    std::string GetSerialString();
     std::string GetDeviceLocation();
     std::string GetFirmwareVersion();
+    std::string GetNameString();
+    std::string GetSerialString();
 
     void        SetMode(RGBColor color, uint8_t mode_value, uint8_t brightness, uint8_t speed);
     void        SendDirect(RGBColor color);
@@ -54,6 +55,6 @@ private:
     hid_device* dev;
 
     std::string location;
-    std::string serial_number;
+    std::string name;
     std::string version;
 };

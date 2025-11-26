@@ -7,17 +7,12 @@
 |   KundaPanda                                  04 Jan 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "GainwardGPUv1Controller.h"
 #include "GainwardGPUv2Controller.h"
-#include "LogManager.h"
-#include "RGBController.h"
 #include "RGBController_GainwardGPUv1.h"
 #include "RGBController_GainwardGPUv2.h"
 #include "i2c_smbus.h"
@@ -82,9 +77,8 @@ void DetectGainwardGPUControllers(i2c_smbus_interface* bus, uint8_t i2c_addr, co
             \*-----------------------------------------------------------------*/
             case 0x08:
                 {
-                    GainwardGPUv1Controller*     controller     = new GainwardGPUv1Controller(bus, i2c_addr);
+                    GainwardGPUv1Controller*     controller     = new GainwardGPUv1Controller(bus, i2c_addr, name);
                     RGBController_GainwardGPUv1* rgb_controller = new RGBController_GainwardGPUv1(controller);
-                    rgb_controller->name                        = name;
 
                     ResourceManager::get()->RegisterRGBController(rgb_controller);
                 }
@@ -95,9 +89,8 @@ void DetectGainwardGPUControllers(i2c_smbus_interface* bus, uint8_t i2c_addr, co
             \*-----------------------------------------------------------------*/
             case 0x49:
                 {
-                    GainwardGPUv2Controller*     controller     = new GainwardGPUv2Controller(bus, i2c_addr);
+                    GainwardGPUv2Controller*     controller     = new GainwardGPUv2Controller(bus, i2c_addr, name);
                     RGBController_GainwardGPUv2* rgb_controller = new RGBController_GainwardGPUv2(controller);
-                    rgb_controller->name                        = name;
 
                     ResourceManager::get()->RegisterRGBController(rgb_controller);
                 }
@@ -106,13 +99,16 @@ void DetectGainwardGPUControllers(i2c_smbus_interface* bus, uint8_t i2c_addr, co
     }
 } /* DetectGainwardGPUControllers() */
 
-REGISTER_I2C_PCI_DETECTOR("Gainward GTX 1080 Phoenix"      ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_GTX1080_DEV,     GAINWARD_SUB_VEN,   GAINWARD_GTX_1080_PHOENIX,      0x08);
-REGISTER_I2C_PCI_DETECTOR("Gainward GTX 1080 Ti Phoenix"   ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_GTX1080TI_DEV,   GAINWARD_SUB_VEN,   GAINWARD_GTX_1080_TI_PHOENIX,   0x08);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 2070 Super Phantom",    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX2070S_OC_DEV, GAINWARD_SUB_VEN,   NVIDIA_RTX2070S_OC_DEV,         0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 2080 Phoenix GS"   ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX2080_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX2080_A_DEV,           0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 3070 Phantom"      ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3070_DEV,     GAINWARD_SUB_VEN,   GAINWARD_RTX_3070_PHANTOM,      0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 3070 Phoenix"      ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3070_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX3070_DEV,             0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 3070 Ti Phoenix"   ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3070TI_DEV,   GAINWARD_SUB_VEN,   NVIDIA_RTX3070TI_DEV,           0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 3080 Phoenix"      ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3080_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX3080_DEV,             0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 3080 Ti Phoenix"   ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3080TI_DEV,   GAINWARD_SUB_VEN,   NVIDIA_RTX3080TI_DEV,           0x49);
-REGISTER_I2C_PCI_DETECTOR("Gainward RTX 3090 Phoenix"      ,    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3090_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX3090_DEV,             0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce GTX 1080 Phoenix",          DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_GTX1080_DEV,     GAINWARD_SUB_VEN,   GAINWARD_GTX_1080_PHOENIX,      0x08);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce GTX 1080 Ti Phoenix",       DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_GTX1080TI_DEV,   GAINWARD_SUB_VEN,   GAINWARD_GTX_1080TI_PHOENIX,    0x08);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce GTX 1660 SUPER Ghost",      DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_GTX1660S_DEV,    NVIDIA_SUB_VEN,     NVIDIA_GTX1660S_DEV,            0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 2070 SUPER Phantom",    DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX2070S_OC_DEV, GAINWARD_SUB_VEN,   NVIDIA_RTX2070S_OC_DEV,         0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 2080 Phoenix GS",       DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX2080_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX2080_A_DEV,           0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3060 Pegasus 12G",      DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3060_DEV,     NVIDIA_SUB_VEN,     NVIDIA_RTX3060_DEV,             0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3070 Phantom",          DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3070_DEV,     GAINWARD_SUB_VEN,   GAINWARD_RTX_3070_PHANTOM,      0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3070 Phoenix",          DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3070_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX3070_DEV,             0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3070 Ti Phoenix",       DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3070TI_DEV,   GAINWARD_SUB_VEN,   NVIDIA_RTX3070TI_DEV,           0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3080 Phoenix",          DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3080_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX3080_DEV,             0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3080 Ti Phoenix",       DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3080TI_DEV,   GAINWARD_SUB_VEN,   NVIDIA_RTX3080TI_DEV,           0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3090 Phoenix",          DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3090_DEV,     GAINWARD_SUB_VEN,   NVIDIA_RTX3090_DEV,             0x49);
+REGISTER_I2C_PCI_DETECTOR("Gainward GeForce RTX 3090 Ti Phantom",       DetectGainwardGPUControllers,   NVIDIA_VEN, NVIDIA_RTX3090TI_DEV,   GAINWARD_SUB_VEN,   GAINWARD_RTX_3090TI_PHANTOM,    0x49);

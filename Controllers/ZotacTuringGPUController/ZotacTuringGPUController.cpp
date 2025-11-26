@@ -1,18 +1,21 @@
-/*-----------------------------------------*\
-|  ZotacTuringGPUController.cpp             |
-|                                           |
-|  Driver for ZOTAC GeForce RTX 20 series   |
-|  GPU lighting controller                  |
-|                                           |
-|  David Henry                  1/07/2023   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| ZotacTuringGPUController.cpp                              |
+|                                                           |
+|   Driver for Zotac Turing GPU                             |
+|                                                           |
+|   David Henry                                 07 Jan 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "ZotacTuringGPUController.h"
 
-ZotacTuringGPUController::ZotacTuringGPUController(i2c_smbus_interface* bus, u8 dev)
+ZotacTuringGPUController::ZotacTuringGPUController(i2c_smbus_interface* bus, u8 dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 }
 
 ZotacTuringGPUController::~ZotacTuringGPUController()
@@ -27,6 +30,11 @@ std::string ZotacTuringGPUController::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string ZotacTuringGPUController::GetDeviceName()
+{
+    return(name);
 }
 
 void ZotacTuringGPUController::GetMode(RGBColor& color, int& mode, unsigned int& speed)

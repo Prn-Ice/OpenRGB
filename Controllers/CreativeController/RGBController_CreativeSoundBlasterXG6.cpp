@@ -4,7 +4,7 @@
 |   RGBController for Creative SoundBlaster XG6             |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CreativeSoundBlasterXG6.h"
@@ -24,7 +24,7 @@ RGBController_CreativeSoundBlasterXG6::RGBController_CreativeSoundBlasterXG6(Cre
 {
     controller                  = controller_ptr;
 
-    name                        = "Creative SoundBlasterX G6 Device";
+    name                        = controller->GetDeviceName();
     vendor                      = "Creative";
     type                        = DEVICE_TYPE_HEADSET;
     description                 = "Creative SoundBlasterX G6 Device";

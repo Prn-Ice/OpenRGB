@@ -6,7 +6,7 @@
 |   Edoardo Ridolfi (edo2313)                   26 Dec 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_HoltekA1FA.h"
@@ -24,57 +24,57 @@
 
 RGBController_HoltekA1FA::RGBController_HoltekA1FA(HoltekA1FAController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller              = controller_ptr;
 
-    name        = "Holtek Mousemat Device";
-    vendor      = "Holtek";
-    type        = DEVICE_TYPE_MOUSEMAT;
-    description = "Holtek Mousemat Device";
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    name                    = controller->GetNameString();
+    vendor                  = "Holtek";
+    type                    = DEVICE_TYPE_MOUSEMAT;
+    description             = "Holtek Mousemat Device";
+    location                = controller->GetDeviceLocation();
+    serial                  = controller->GetSerialString();
 
     mode Static;
-    Static.name       = "Static";
-    Static.value      = HOLTEK_A1FA_MODE_STATIC;
-    Static.speed      = HOLTEK_A1FA_MODE_STATIC;
-    Static.flags      = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
-    Static.color_mode = MODE_COLORS_PER_LED;
-    Static.colors_min = 1;
-    Static.colors_max = 7;
+    Static.name             = "Static";
+    Static.value            = HOLTEK_A1FA_MODE_STATIC;
+    Static.speed            = HOLTEK_A1FA_MODE_STATIC;
+    Static.flags            = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
+    Static.color_mode       = MODE_COLORS_PER_LED;
+    Static.colors_min       = 1;
+    Static.colors_max       = 7;
     Static.colors.resize(7);
     modes.push_back(Static);
 
     mode Breathing;
-    Breathing.name       = "Breathing";
-    Breathing.value      = HOLTEK_A1FA_MODE_BREATHING;
-    Breathing.flags      = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_RANDOM_COLOR;
-    Breathing.color_mode = MODE_COLORS_PER_LED;
-    Breathing.speed_min  = HOLTEK_A1FA_SPEED_SLOWEST;
-    Breathing.speed_max  = HOLTEK_A1FA_SPEED_FASTEST;
-    Breathing.speed      = HOLTEK_A1FA_SPEED_NORMAL;
-    Breathing.colors_min = 1;
-    Breathing.colors_max = 7;
+    Breathing.name          = "Breathing";
+    Breathing.value         = HOLTEK_A1FA_MODE_BREATHING;
+    Breathing.flags         = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_RANDOM_COLOR;
+    Breathing.color_mode    = MODE_COLORS_PER_LED;
+    Breathing.speed_min     = HOLTEK_A1FA_SPEED_SLOWEST;
+    Breathing.speed_max     = HOLTEK_A1FA_SPEED_FASTEST;
+    Breathing.speed         = HOLTEK_A1FA_SPEED_NORMAL;
+    Breathing.colors_min    = 1;
+    Breathing.colors_max    = 7;
     Breathing.colors.resize(7);
     modes.push_back(Breathing);
 
     mode Neon;
-    Neon.name           = "Neon";
-    Neon.value          = HOLTEK_A1FA_MODE_NEON;
-    Neon.flags          = MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_BRIGHTNESS;
-    Neon.color_mode     = MODE_COLORS_NONE;
-    Neon.speed_min      = HOLTEK_A1FA_SPEED_SLOWEST;
-    Neon.speed_max      = HOLTEK_A1FA_SPEED_FASTEST;
-    Neon.speed          = HOLTEK_A1FA_SPEED_NORMAL;
+    Neon.name               = "Neon";
+    Neon.value              = HOLTEK_A1FA_MODE_NEON;
+    Neon.flags              = MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_BRIGHTNESS;
+    Neon.color_mode         = MODE_COLORS_NONE;
+    Neon.speed_min          = HOLTEK_A1FA_SPEED_SLOWEST;
+    Neon.speed_max          = HOLTEK_A1FA_SPEED_FASTEST;
+    Neon.speed              = HOLTEK_A1FA_SPEED_NORMAL;
     modes.push_back(Neon);
 
     mode Rainbow;
-    Rainbow.name       = "Rainbow";
-    Rainbow.value      = HOLTEK_A1FA_MODE_RAINBOW;
-    Rainbow.flags      = MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_BRIGHTNESS;
-    Rainbow.color_mode = MODE_COLORS_NONE;
-    Rainbow.speed_min  = HOLTEK_A1FA_SPEED_SLOWEST;
-    Rainbow.speed_max  = HOLTEK_A1FA_SPEED_FASTEST;
-    Rainbow.speed      = HOLTEK_A1FA_SPEED_NORMAL;
+    Rainbow.name            = "Rainbow";
+    Rainbow.value           = HOLTEK_A1FA_MODE_RAINBOW;
+    Rainbow.flags           = MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_BRIGHTNESS;
+    Rainbow.color_mode      = MODE_COLORS_NONE;
+    Rainbow.speed_min       = HOLTEK_A1FA_SPEED_SLOWEST;
+    Rainbow.speed_max       = HOLTEK_A1FA_SPEED_FASTEST;
+    Rainbow.speed           = HOLTEK_A1FA_SPEED_NORMAL;
     modes.push_back(Rainbow);
 
     SetupZones();

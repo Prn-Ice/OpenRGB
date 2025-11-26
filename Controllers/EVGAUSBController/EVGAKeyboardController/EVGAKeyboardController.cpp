@@ -6,10 +6,11 @@
 |   Chris M (Dr_No)                             25 Nov 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "EVGAKeyboardController.h"
+#include "StringUtils.h"
 
 static uint8_t packet_map[EVGA_KEYBOARD_FULL_SIZE_KEYCOUNT + EVGA_KEYBOARD_Z20_EXTRA_KEYS] =
 {
@@ -56,22 +57,12 @@ static uint8_t packet_map[EVGA_KEYBOARD_FULL_SIZE_KEYCOUNT + EVGA_KEYBOARD_Z20_E
             82, 102
 };
 
-EVGAKeyboardController::EVGAKeyboardController(hid_device* dev_handle, const char* path, uint16_t kb_pid)
+EVGAKeyboardController::EVGAKeyboardController(hid_device* dev_handle, const char* path, uint16_t kb_pid, std::string dev_name)
 {
-    const uint8_t   sz      = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
     dev                     = dev_handle;
     location                = path;
+    name                    = dev_name;
     pid                     = kb_pid;
-
-    hid_get_manufacturer_string(dev, tmp, sz);
-    std::wstring w_tmp      = std::wstring(tmp);
-    device_name             = std::string(w_tmp.begin(), w_tmp.end());
-
-    hid_get_product_string(dev, tmp, sz);
-    w_tmp                   = std::wstring(tmp);
-    device_name.append(" ").append(std::string(w_tmp.begin(), w_tmp.end()));
 
     SetSleepTime();
 }
@@ -81,27 +72,22 @@ EVGAKeyboardController::~EVGAKeyboardController()
     hid_close(dev);
 }
 
-std::string EVGAKeyboardController::GetDeviceName()
+std::string EVGAKeyboardController::GetName()
 {
-    return device_name;
+    return(name);
 }
 
 std::string EVGAKeyboardController::GetSerial()
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
+    wchar_t serial_string[HID_MAX_STR];
+    int ret = hid_get_serial_number_string(dev, serial_string, HID_MAX_STR);
 
-    int ret             = hid_get_serial_number_string(dev, tmp, sz);
-
-    if (ret != 0)
+    if(ret != 0)
     {
         return("");
     }
 
-    std::wstring w_tmp  = std::wstring(tmp);
-    std::string serial  = std::string(w_tmp.begin(), w_tmp.end());
-
-    return serial;
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string EVGAKeyboardController::GetLocation()
@@ -111,7 +97,7 @@ std::string EVGAKeyboardController::GetLocation()
 
 uint16_t EVGAKeyboardController::GetPid()
 {
-    return pid;
+    return(pid);
 }
 
 void  EVGAKeyboardController::SetLedsDirect(std::vector<RGBColor> colors)
@@ -201,11 +187,11 @@ void EVGAKeyboardController::GetStatus(mode *mode)
                 mode->speed      = buffer[EVGA_KB_SPEED_LSB];
                 break;
         }
-        LOG_DEBUG("[%s] Mode %d Setup with %d colours @ %04X speed and %02X brightness", device_name.c_str(), mode->value, mode->colors.size(), mode->speed, mode->brightness);
+        LOG_DEBUG("[%s] Mode %d Setup with %d colours @ %04X speed and %02X brightness", name.c_str(), mode->value, mode->colors.size(), mode->speed, mode->brightness);
     }
     else
     {
-        LOG_INFO("[%s] An error occured reading data for mode %d", device_name.c_str(), mode->value);
+        LOG_INFO("[%s] An error occured reading data for mode %d", name.c_str(), mode->value);
     }
 }
 
@@ -336,7 +322,7 @@ uint8_t EVGAKeyboardController::GetChecksum(uint8_t * data, size_t count)
         checksum -= data[i];
     }
 
-    return checksum;
+    return(checksum);
 }
 
 uint8_t EVGAKeyboardController::FindDirection(uint8_t mode, uint8_t direction)
@@ -355,7 +341,7 @@ uint8_t EVGAKeyboardController::FindDirection(uint8_t mode, uint8_t direction)
         }
     }
 
-    return temp;
+    return(temp);
 }
 
 uint8_t EVGAKeyboardController::FindColours(uint8_t * data, uint8_t count, std::vector<RGBColor> &colors)
@@ -372,7 +358,7 @@ uint8_t EVGAKeyboardController::FindColours(uint8_t * data, uint8_t count, std::
         colors.push_back(ToRGBColor(data[offset + 1],data[offset + 2],data[offset + 3]));
     }
 
-    return data[0];
+    return(data[0]);
 }
 
 uint8_t EVGAKeyboardController::GetMode()
@@ -393,13 +379,13 @@ uint8_t EVGAKeyboardController::GetMode()
 
     if(result > 0)
     {
-        LOG_DEBUG("[%s] Returned mode %02X - %02X %02X %02X %02X %02X", device_name.c_str(), buffer[index], buffer[index-2], buffer[index-1], buffer[index], buffer[index+1], buffer[index+2]);
-        return buffer[index];
+        LOG_DEBUG("[%s] Returned mode %02X - %02X %02X %02X %02X %02X", name.c_str(), buffer[index], buffer[index-2], buffer[index-1], buffer[index], buffer[index+1], buffer[index+2]);
+        return(buffer[index]);
     }
     else
     {
-        LOG_INFO("[%s] An error occured reading current mode", device_name.c_str());
-        return 0;
+        LOG_INFO("[%s] An error occured reading current mode", name.c_str());
+        return(0);
     }
 }
 

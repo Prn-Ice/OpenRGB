@@ -6,7 +6,7 @@
 |   Mola19                                      05 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_AsusROGSpatha.h"
@@ -30,7 +30,7 @@ RGBController_AsusROGSpatha::RGBController_AsusROGSpatha(AsusAuraMouseGen1Contro
 {
     controller                  = controller_ptr;
 
-    name                        = "ASUS ROG Spatha";
+    name                        = controller->GetName();
     vendor                      = "ASUS";
     type                        = DEVICE_TYPE_MOUSE;
     description                 = "ASUS Aura Mouse Device";
@@ -221,7 +221,7 @@ void RGBController_AsusROGSpatha::DeviceUpdateMode()
 
         if(modes[active_mode].value == ASUS_ROG_SPATHA_MODE_SPECTRUM_CYCLE || modes[active_mode].value == ASUS_ROG_SPATHA_MODE_BREATHING)
         {
-            for(int j = 0; j < modes[active_mode].colors.size(); j++)
+            for(unsigned int j = 0; j < modes[active_mode].colors.size(); j++)
             {
                 controller->SendUpdate(0x13 + j * 3 + i * 38, RGBGetRValue(modes[active_mode].colors[j]));
                 controller->SendUpdate(0x14 + j * 3 + i * 38, RGBGetGValue(modes[active_mode].colors[j]));
@@ -255,7 +255,7 @@ void RGBController_AsusROGSpatha::DeviceSaveMode()
 
         if(modes[active_mode].value == ASUS_ROG_SPATHA_MODE_SPECTRUM_CYCLE || modes[active_mode].value == ASUS_ROG_SPATHA_MODE_BREATHING)
         {
-            for(int j = 0; j < modes[active_mode].colors.size(); j++)
+            for(unsigned int j = 0; j < modes[active_mode].colors.size(); j++)
             {
                 controller->UpdateProfile(0x13 + j * 3 + i * 38, profile, RGBGetRValue(modes[active_mode].colors[j]));
                 controller->UpdateProfile(0x14 + j * 3 + i * 38, profile, RGBGetGValue(modes[active_mode].colors[j]));

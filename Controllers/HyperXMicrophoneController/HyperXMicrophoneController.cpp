@@ -6,32 +6,21 @@
 |   Matt Silva (thesilvanator)                              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HyperXMicrophoneController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-HyperXMicrophoneController::HyperXMicrophoneController(hidapi_wrapper hid_wrapper, hid_device* dev_handle, std::string path)
+HyperXMicrophoneController::HyperXMicrophoneController(hidapi_wrapper hid_wrapper, hid_device* dev_handle, std::string path, std::string dev_name)
 {
     wrapper     = hid_wrapper;
     dev         = dev_handle;
     location    = path;
-
-    wchar_t serial_string[128];
-    int ret = wrapper.hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name        = dev_name;
 }
 
 HyperXMicrophoneController::~HyperXMicrophoneController()
@@ -48,12 +37,25 @@ HyperXMicrophoneController::~HyperXMicrophoneController()
 
 std::string HyperXMicrophoneController::GetDeviceLocation()
 {
-    return location;
+    return(location);
+}
+
+std::string HyperXMicrophoneController::GetNameString()
+{
+    return(name);
 }
 
 std::string HyperXMicrophoneController::GetSerialString()
 {
-    return serial_number;
+    wchar_t serial_string[128];
+    int ret = wrapper.hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void HyperXMicrophoneController::SaveColors(std::vector<RGBColor> colors, unsigned int num_frames)

@@ -6,7 +6,7 @@
 |   Mohammed Julfikar Ali Mahbub (o-julfikar)   01 Apr 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -154,7 +154,7 @@ RGBController_BloodyB820R::RGBController_BloodyB820R(BloodyB820RController *cont
 {
     controller                  = controller_ptr;
 
-    name                        = "Bloody B820R";
+    name                        = controller->GetName();
     vendor                      = "A4Tech";
     type                        = DEVICE_TYPE_KEYBOARD;
     description                 = "A4Tech Bloody Keyboard";

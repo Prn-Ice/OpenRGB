@@ -1,35 +1,23 @@
-/*-------------------------------------------------------------------*\
-|  RoccatKoneAimoController.cpp                                         |
-|                                                                     |
-|  Driver for Roccat Kone Aimo Mouse                                  |
-|                                                                     |
-|  Thibaud M (enlight3d)          17th Nov 2020                       |
-|                                                                     |
-\*-------------------------------------------------------------------*/
-
-#include "RoccatKoneAimoController.h"
+/*---------------------------------------------------------*\
+| RoccatKoneAimoController.cpp                              |
+|                                                           |
+|   Driver for Roccat Kone Aimo                             |
+|                                                           |
+|   Thibaud M (enlight3d)                       17 Nov 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "RoccatKoneAimoController.h"
+#include "StringUtils.h"
 
-RoccatKoneAimoController::RoccatKoneAimoController(hid_device* dev_handle, char *_path)
+RoccatKoneAimoController::RoccatKoneAimoController(hid_device* dev_handle, char *_path, std::string dev_name)
 {
-    dev                 = dev_handle;
-    location            = _path;
-
-    const int szTemp    = 256;
-    wchar_t tmpName[szTemp];
-
-    hid_get_manufacturer_string(dev, tmpName, szTemp);
-    std::wstring wName = std::wstring(tmpName);
-    device_name        = std::string(wName.begin(), wName.end());
-
-    hid_get_product_string(dev, tmpName, szTemp);
-    wName = std::wstring(tmpName);
-    device_name.append(" ").append(std::string(wName.begin(), wName.end()));
-
-    hid_get_serial_number_string(dev, tmpName, szTemp);
-    wName  = std::wstring(tmpName);
-    serial = std::string(wName.begin(), wName.end());
+    dev         = dev_handle;
+    location    = _path;
+    name        = dev_name;
 
     /*-----------------------------------------------------*\
     | Init usb buffer to 0 and add first two bytes          |
@@ -46,14 +34,22 @@ RoccatKoneAimoController::~RoccatKoneAimoController()
     hid_close(dev);
 }
 
-std::string RoccatKoneAimoController::GetDeviceName()
+std::string RoccatKoneAimoController::GetName()
 {
-    return device_name;
+    return(name);
 }
 
 std::string RoccatKoneAimoController::GetSerial()
 {
-    return serial;
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string RoccatKoneAimoController::GetLocation()
@@ -95,7 +91,7 @@ void RoccatKoneAimoController::SetChannelColors(ROCCAT_KONE_AIMO_CHANNEL channel
     for(unsigned char i = 0; i < num_colors; i++)
     {
         std::size_t color   = channel + i;
-        int usb_idx         = 0x02 + (color * 4);
+        int usb_idx         = (int)(0x02 + (color * 4));
 
         usb_colors_buf[usb_idx + R_OFFSET] = RGBGetRValue(colors[i]);
         usb_colors_buf[usb_idx + G_OFFSET] = RGBGetGValue(colors[i]);

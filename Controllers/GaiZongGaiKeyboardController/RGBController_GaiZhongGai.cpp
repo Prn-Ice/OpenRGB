@@ -6,7 +6,7 @@
 |   An Yang                                     24 Jun 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <math.h>
@@ -259,7 +259,7 @@ void board_led_xy_self_call
         return;
 
     temp = p_in[*offset];
-    switch (temp >> 5)
+    switch(temp >> 5)
     {
     case 0x07://END
         return;
@@ -272,7 +272,7 @@ void board_led_xy_self_call
     break;
 
     case 0x00://transferred meaning
-        switch (temp >> 3)
+        switch(temp >> 3)
         {
         case 0x01://square
             led_distance = 3.54f;
@@ -281,7 +281,7 @@ void board_led_xy_self_call
             angle_step = pi / 4.0f;
             break;
         case 0x00://transferred meaning
-            if (temp >> 2 == 1)//regular triangle
+            if(temp >> 2 == 1)//regular triangle
             {
                 led_distance = 2.8f;
                 board_distance = 2.9f;
@@ -293,18 +293,23 @@ void board_led_xy_self_call
         break;
     }
     //New center point coordinates
-    new_x = x + cos(angle) * (distance + board_distance);
-    new_y = y + sin(angle) * (distance + board_distance);
+    new_x = x + cosf(angle) * (distance + board_distance);
+    new_y = y + sinf(angle) * (distance + board_distance);
 
     //Rotate 180 degrees
-    if (angle > pi)
+    if(angle > pi)
+    {
         new_angle = angle - pi;
+    }
     else
+    {
         new_angle = angle + pi;
-    for (i = 1; i < range_num; i++)
+    }
+
+    for(i = 1; i < range_num; i++)
     {
         new_angle -= angle_step;//clockwise
-        if (i & 1)//Is led
+        if(i & 1)//Is led
         {
             uint8_t x_u8 = (int16_t)(((new_x + cos(new_angle) * led_distance) *
                             p_in[120] * 0.01f + 0.5f) / 1) -
@@ -320,7 +325,7 @@ void board_led_xy_self_call
         }
         else//Is COM
         {
-            if (temp & (1 << (i / 2 - 1)))//child node
+            if(temp & (1 << (i / 2 - 1)))//child node
             {
                 (*offset)++;
                 board_led_xy_self_call(
@@ -378,85 +383,67 @@ uint16_t LightBoard_init(uint8_t* p_in)
 
 RGBController_GaiZhongGaiKeyboard::RGBController_GaiZhongGaiKeyboard(GaiZhongGaiKeyboardController* controller_ptr)
 {
-    controller = controller_ptr;
+    controller          = controller_ptr;
+    name                = controller->GetNameString();
 
     switch(controller->GetUSBPID())
     {
-    case GAIZHONGGAI_68_PRO_PID:
-    {
-        name        = "GaiZhongGai Keyboard Device";
-        type        = DEVICE_TYPE_KEYBOARD;
-        description = "https://oshwhub.com/yangzen/zui-gai68-/";
-    }
-        break;
-    case GAIZHONGGAI_42_PRO_PID:
-    {
-        name        = "GaiZhongGai Keyboard Device";
-        type        = DEVICE_TYPE_KEYBOARD;
-        description = "https://oshwhub.com/myng/42-jian-pan/";
-    }
-        break;
-    case GAIZHONGGAI_17_TOUCH_PRO_PID:
-    {
-        name        = "GaiZhongGai Keyboard Device";
-        type        = DEVICE_TYPE_KEYPAD;
-        description = "https://oshwhub.com/yangzen/xing-huo-ji-hua-zui-gai-17-4-chu-mo-ji-xie-jian-pan-pro/";
-    }
-        break;
-    case GAIZHONGGAI_17_PRO_PID:
-    {
-        name        = "GaiZhongGai Keyboard Device";
-        type        = DEVICE_TYPE_KEYPAD;
-        description = "https://oshwhub.com/hivisme/17jian-shuo-zi-xiao-jian-pan/";
-    }
-        break;
-    case GAIZHONGGAI_20_PRO_PID:
-    {
-        name        = "GaiZhongGai Keyboard Device";
-        type        = DEVICE_TYPE_KEYPAD;
-        description = "https://oshwhub.com/runkuny/19keys_pad_normal/";
-    }
-        break;
-    case GAIZHONGGAI_LIGHT_BOARD_PID:
-    {
-        name        = "GaiZhongGai Controller Device";
-        type        = DEVICE_TYPE_ACCESSORY;
-        description = "https://oshwhub.com/yangzen/xing-huo-2-qi-guang-ban-qu-dong-/";
-    }
-        break;
-    case GAIZHONGGAI_RGB_HUB_GREEN_PID:
-    {
-        name        = "GaiZhongGai Controller Device";
-        type        = DEVICE_TYPE_LEDSTRIP;
-        description = "https://oshwhub.com/yangzen/album/gai-zhong-gai-jian-pan-ge-ji/";
-    }
-        break;
-    case GAIZHONGGAI_RGB_HUB_BLUE_PID:
-    {
-        name        = "GaiZhongGai Controller Device";
-        type        = DEVICE_TYPE_LEDSTRIP;
-        description = "https://oshwhub.com/yangzen/album/gai-zhong-gai-jian-pan-ge-ji/";
-    }
-        break;
-    case GAIZHONGGAI_DIAL_PID:
-    {
-        name        = "GaiZhongGai DIAL Device";
-        type        = DEVICE_TYPE_UNKNOWN;
-        description = "https://oshwhub.com/morempty/CH552gyin-liang-xuan-niu/";
-    }
-        break;
+        case GAIZHONGGAI_68_PRO_PID:
+            type        = DEVICE_TYPE_KEYBOARD;
+            description = "https://oshwhub.com/yangzen/zui-gai68-/";
+            break;
+
+        case GAIZHONGGAI_42_PRO_PID:
+            type        = DEVICE_TYPE_KEYBOARD;
+            description = "https://oshwhub.com/myng/42-jian-pan/";
+            break;
+
+        case GAIZHONGGAI_17_TOUCH_PRO_PID:
+            type        = DEVICE_TYPE_KEYPAD;
+            description = "https://oshwhub.com/yangzen/xing-huo-ji-hua-zui-gai-17-4-chu-mo-ji-xie-jian-pan-pro/";
+            break;
+
+        case GAIZHONGGAI_17_PRO_PID:
+            type        = DEVICE_TYPE_KEYPAD;
+            description = "https://oshwhub.com/hivisme/17jian-shuo-zi-xiao-jian-pan/";
+            break;
+
+        case GAIZHONGGAI_20_PRO_PID:
+            type        = DEVICE_TYPE_KEYPAD;
+            description = "https://oshwhub.com/runkuny/19keys_pad_normal/";
+            break;
+
+        case GAIZHONGGAI_LIGHT_BOARD_PID:
+            type        = DEVICE_TYPE_ACCESSORY;
+            description = "https://oshwhub.com/yangzen/xing-huo-2-qi-guang-ban-qu-dong-/";
+            break;
+
+        case GAIZHONGGAI_RGB_HUB_GREEN_PID:
+            type        = DEVICE_TYPE_LEDSTRIP;
+            description = "https://oshwhub.com/yangzen/album/gai-zhong-gai-jian-pan-ge-ji/";
+            break;
+
+        case GAIZHONGGAI_RGB_HUB_BLUE_PID:
+            type        = DEVICE_TYPE_LEDSTRIP;
+            description = "https://oshwhub.com/yangzen/album/gai-zhong-gai-jian-pan-ge-ji/";
+            break;
+
+        case GAIZHONGGAI_DIAL_PID:
+            type        = DEVICE_TYPE_UNKNOWN;
+            description = "https://oshwhub.com/morempty/CH552gyin-liang-xuan-niu/";
+            break;
     }
 
-    vendor      = "Yang";
-    version     = controller->GetVersion();
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    vendor              = "Yang";
+    version             = controller->GetVersion();
+    location            = controller->GetDeviceLocation();
+    serial              = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0xFFFF;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0xFFFF;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();
@@ -688,7 +675,7 @@ void RGBController_GaiZhongGaiKeyboard::ResizeZone(int zone, int new_size)
 void RGBController_GaiZhongGaiKeyboard::DeviceUpdateLEDs()
 {
     unsigned char colordata[1024 * 3];
-    unsigned int data_size = colors.size();
+    unsigned int data_size = (unsigned int)colors.size();
 
     for(unsigned int color_idx = 0; color_idx < data_size; color_idx++)
     {

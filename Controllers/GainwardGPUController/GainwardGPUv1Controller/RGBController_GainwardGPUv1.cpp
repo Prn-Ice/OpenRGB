@@ -6,7 +6,7 @@
 |   TheRogueZeta                                05 Nov 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_GainwardGPUv1.h"
@@ -32,10 +32,10 @@ RGBController_GainwardGPUv1::RGBController_GainwardGPUv1(GainwardGPUv1Controller
 {
     controller              = controller_ptr;
 
-    name                    = "Gainward GPU";
+    name                    = controller->GetDeviceName();
     vendor                  = "Gainward";
     type                    = DEVICE_TYPE_GPU;
-    description             = "Gainward GTX GPU";
+    description             = "Gainward GPU V1 Device";
     location                = controller->GetDeviceLocation();
 
     mode Direct;

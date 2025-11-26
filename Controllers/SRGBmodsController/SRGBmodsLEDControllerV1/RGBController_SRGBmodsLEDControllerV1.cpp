@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_SRGBmodsLEDControllerV1.cpp|
-|                                           |
-|  Generic RGB Interface for SRGBmods       |
-|  LED Controller V1                        |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 6/30/2023   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_SRGBmodsLEDControllerV1.cpp                 |
+|                                                           |
+|   RGBController for SRGBmods LED Controller V1            |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                30 Jun 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_SRGBmodsLEDControllerV1.h"
 
@@ -24,7 +26,7 @@ RGBController_SRGBmodsLEDControllerV1::RGBController_SRGBmodsLEDControllerV1(SRG
 {
     controller                  = controller_ptr;
 
-    name                        = "SRGBmods Device";
+    name                        = controller->GetNameString();
     vendor                      = "SRGBmods.net";
     description                 = "SRGBmods LED Controller V1 Device";
     type                        = DEVICE_TYPE_LEDSTRIP;
@@ -152,7 +154,7 @@ void RGBController_SRGBmodsLEDControllerV1::SetupZones()
 
 void RGBController_SRGBmodsLEDControllerV1::ResizeZone(int zone, int new_size)
 {
-    if((size_t) zone >= zones.size())
+    if((size_t)zone >= zones.size())
     {
         return;
     }
@@ -173,7 +175,7 @@ void RGBController_SRGBmodsLEDControllerV1::DeviceUpdateLEDs()
         {
             if(zones[zone_idx].leds_count > 0)
             {
-                controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+                controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
             }
         }
     }

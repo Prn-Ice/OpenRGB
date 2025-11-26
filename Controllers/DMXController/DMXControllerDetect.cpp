@@ -4,19 +4,13 @@
 |   Detector for DMX devices                                |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <fcntl.h>
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
-#include <string.h>
 #include <vector>
 #include "Detector.h"
-#include "RGBController.h"
 #include "RGBController_DMX.h"
 #include "SettingsManager.h"
 

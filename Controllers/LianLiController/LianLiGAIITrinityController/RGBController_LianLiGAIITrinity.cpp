@@ -6,7 +6,7 @@
 |   Michael Losert                              27 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string>
@@ -30,6 +30,7 @@ RGBController_LianLiGAIITrinity::RGBController_LianLiGAIITrinity(LianLiGAIITrini
     vendor      = "Lian Li";
     type        = DEVICE_TYPE_COOLER;
     description = "Lian Li Galahad II Trinity AIO";
+    location    = controller->GetLocation();
 
     LianLiGAIITrinityController::GAII_Info controllerInfo = controller->GetControllerInfo();
     version     = controllerInfo.version;
@@ -415,9 +416,3 @@ void RGBController_LianLiGAIITrinity::DeviceUpdateMode()
 {
     DeviceUpdateLEDs();
 }
-
-void RGBController_LianLiGAIITrinity::SetCustomMode()
-{
-
-}
-

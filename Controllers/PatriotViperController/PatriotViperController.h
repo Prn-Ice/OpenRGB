@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                01 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -15,8 +15,8 @@
 #include <string>
 #include "i2c_smbus.h"
 
-typedef unsigned char	viper_dev_id;
-typedef unsigned short	viper_register;
+typedef unsigned char viper_dev_id;
+typedef unsigned char viper_register;
 
 enum
 {

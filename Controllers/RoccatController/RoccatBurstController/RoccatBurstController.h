@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       01 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include "RGBController.h"
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 #define ROCCAT_BURST_CONTROL_MODE_PACKET_LENGTH    6
 #define ROCCAT_BURST_DIRECT_MODE_PACKET_LENGTH     11
@@ -44,12 +44,12 @@ enum
 class RoccatBurstController
 {
 public:
-    RoccatBurstController(hid_device* dev_handle, const hid_device_info& info);
+    RoccatBurstController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~RoccatBurstController();
 
-    std::string     GetSerialString();
     std::string     GetDeviceLocation();
-    std::string     GetFirmwareVersion();
+    std::string     GetNameString();
+    std::string     GetSerialString();
 
     void            SetupDirectMode();
     void            SendDirect(std::vector<RGBColor> colors);
@@ -63,8 +63,7 @@ public:
 private:
     hid_device*     dev;
     std::string     location;
-    std::string     serial_number;
-    std::string     version;
+    std::string     name;
 
     unsigned int    CalculateCRC(unsigned char* bytes);
     void            SwitchControl(bool direct);

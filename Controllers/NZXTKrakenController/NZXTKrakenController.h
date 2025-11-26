@@ -6,14 +6,14 @@
 |   Martin Hartl (inlart)                       04 Apr 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum NZXTKrakenChannel_t
@@ -51,11 +51,12 @@ enum
 class NZXTKrakenController
 {
 public:
-    NZXTKrakenController(hid_device* dev_handle, const char* path);
+    NZXTKrakenController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~NZXTKrakenController();
 
     std::string GetFirmwareVersion();
     std::string GetLocation();
+    std::string GetName();
     std::string GetSerialString();
 
     void UpdateEffect
@@ -89,6 +90,7 @@ private:
     std::string             firmware_version;
     double                  liquid_temperature;
     std::string             location;
+    std::string             name;
     unsigned int            fan_speed;
     unsigned int            pump_speed;
 };

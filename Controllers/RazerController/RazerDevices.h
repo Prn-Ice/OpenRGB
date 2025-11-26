@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                04 Sep 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -53,6 +53,8 @@
 #define RAZER_BLACKWIDOW_V4_PID                         0x0287
 #define RAZER_BLACKWIDOW_V4_PRO_PID                     0x028D
 #define RAZER_BLACKWIDOW_V4_X_PID                       0x0293
+#define RAZER_BLACKWIDOW_V4_PRO_75_WIRED_PID            0x02B3
+#define RAZER_BLACKWIDOW_V4_75_WIRED_PID                0x02A5
 #define RAZER_BLACKWIDOW_X_CHROMA_PID                   0x0216
 #define RAZER_BLACKWIDOW_X_CHROMA_TE_PID                0x021A
 #define RAZER_BLADE_2016_PID                            0x020F
@@ -114,6 +116,8 @@
 #define RAZER_HUNTSMAN_V2_ANALOG_PID                    0x0266
 #define RAZER_HUNTSMAN_V2_TKL_PID                       0x026B
 #define RAZER_HUNTSMAN_V2_PID                           0x026C
+#define RAZER_HUNTSMAN_V3_PRO_PID                       0x02A6
+#define RAZER_HUNTSMAN_V3_PRO_TKL_WHITE_PID             0x02A7
 #define RAZER_ORBWEAVER_CHROMA_PID                      0x0207
 #define RAZER_ORNATA_CHROMA_PID                         0x021E
 #define RAZER_ORNATA_CHROMA_V2_PID                      0x025D
@@ -144,11 +148,16 @@
 #define RAZER_BASILISK_X_HYPERSPEED_PID                 0x0083
 #define RAZER_BASILISK_V2_PID                           0x0085
 #define RAZER_BASILISK_V3_PID                           0x0099
+#define RAZER_BASILISK_V3_35K_PID                       0x00CB
 #define RAZER_BASILISK_V3_PRO_WIRED_PID                 0x00AA
 #define RAZER_BASILISK_V3_PRO_WIRELESS_PID              0x00AB
+#define RAZER_BASILISK_V3_PRO_35K_WIRED_PID             0x00CC
+#define RAZER_BASILISK_V3_PRO_35K_WIRELESS_PID          0x00CD
 #define RAZER_BASILISK_V3_PRO_BLUETOOTH_PID             0x00AC
 #define RAZER_BASILISK_V3_X_HYPERSPEED_PID              0x00B9
 #define RAZER_COBRA_PID                                 0x00A3
+#define RAZER_COBRA_PRO_WIRED_PID                       0x00AF
+#define RAZER_COBRA_PRO_WIRELESS_PID                    0x00B0
 #define RAZER_DEATHADDER_1800_PID                       0x0038
 #define RAZER_DEATHADDER_2000_PID                       0x004F
 #define RAZER_DEATHADDER_2013_PID                       0x0037
@@ -216,6 +225,13 @@
 #define RAZER_KRAKEN_ULTIMATE_PID                       0x0527
 #define RAZER_KRAKEN_V2_PID                             0x0510
 #define RAZER_KRAKEN_KITTY_BLACK_EDITION_V2_PID         0x0560
+#define RAZER_KRAKEN_V3_HYPERSENSE_PID                  0x0533
+#define RAZER_KRAKEN_V3_X_PID                           0x0537
+#define RAZER_KRAKEN_V3_PID                             0x0549
+#define RAZER_KRAKEN_V4_WIRED_PID                       0x056B
+#define RAZER_KRAKEN_V4_WIRELESS_PID                    0x056C
+#define RAZER_KRAKEN_KITTY_V3_PRO_WIRED_PID             0x0587
+#define RAZER_KRAKEN_KITTY_V3_PRO_WIRELESS_PID          0x0588
 #define RAZER_TIAMAT_71_V2_PID                          0x0F03
 
 /*-----------------------------------------------------*\
@@ -234,6 +250,7 @@
 #define RAZER_FIREFLY_HYPERFLUX_PID                     0x0068
 #define RAZER_FIREFLY_PID                               0x0C00
 #define RAZER_FIREFLY_V2_PID                            0x0C04
+#define RAZER_FIREFLY_V2_PRO_PID                        0x0C08
 #define RAZER_GOLIATHUS_CHROMA_EXTENDED_PID             0x0C02
 #define RAZER_GOLIATHUS_CHROMA_PID                      0x0C01
 #define RAZER_GOLIATHUS_CHROMA_3XL_PID                  0x0C06
@@ -250,6 +267,8 @@
 #define RAZER_SEIREN_EMOTE_PID                          0x0F1B
 #define RAZER_STRIDER_CHROMA_PID                        0x0C05
 #define RAZER_THUNDERBOLT_4_DOCK_CHROMA_PID             0x0F21
+#define RAZER_THUNDERBOLT_5_DOCK_CHROMA_PID             0x0F52
+#define RAZER_HANBO_CHROMA_PID                          0x0F35
 
 typedef struct
 {

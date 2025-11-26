@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      18 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CorsairHydro.h"
@@ -26,6 +26,7 @@ RGBController_CorsairHydro::RGBController_CorsairHydro(CorsairHydroController* c
 {
     controller  = controller_ptr;
 
+    name        = controller->GetNameString();
     vendor      = "Corsair";
     description = "Corsair Hydro Series Device";
     version     = controller->GetFirmwareString();

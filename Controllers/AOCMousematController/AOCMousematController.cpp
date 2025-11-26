@@ -6,16 +6,18 @@
 |   Adam Honse (CalcProgrammer1)                15 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "AOCMousematController.h"
+#include "StringUtils.h"
 
-AOCMousematController::AOCMousematController(hid_device* dev_handle, const char* path)
+AOCMousematController::AOCMousematController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 AOCMousematController::~AOCMousematController()
@@ -28,6 +30,11 @@ std::string AOCMousematController::GetDeviceLocation()
     return("HID " + location);
 }
 
+std::string AOCMousematController::GetDeviceName()
+{
+    return(name);
+}
+
 std::string AOCMousematController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -38,10 +45,7 @@ std::string AOCMousematController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 /*-------------------------------------------------------------------------------------------------*\

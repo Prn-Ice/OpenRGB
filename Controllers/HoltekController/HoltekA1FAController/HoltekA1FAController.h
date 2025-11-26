@@ -6,13 +6,13 @@
 |   Edoardo Ridolfi (edo2313)                   26 Dec 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -49,10 +49,11 @@ enum
 class HoltekA1FAController
 {
 public:
-    HoltekA1FAController(hid_device *dev_handle, const char *path);
+    HoltekA1FAController(hid_device *dev_handle, const char *path, std::string dev_name);
     ~HoltekA1FAController();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void SendData(unsigned char mode, unsigned char brightness, unsigned char speed, unsigned char preset, unsigned char red, unsigned char green, unsigned char blue);
@@ -60,4 +61,5 @@ public:
 private:
     hid_device *dev;
     std::string location;
+    std::string name;
 };

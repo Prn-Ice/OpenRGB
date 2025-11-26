@@ -6,30 +6,18 @@
 |   Morgan Guimard (morg)                       02 Jun 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "LegoDimensionsToypadBaseController.h"
+#include "StringUtils.h"
 
-LegoDimensionsToypadBaseController::LegoDimensionsToypadBaseController(hid_device* dev_handle, const hid_device_info& info)
+LegoDimensionsToypadBaseController::LegoDimensionsToypadBaseController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 
     Activate();
 }
@@ -44,14 +32,22 @@ std::string LegoDimensionsToypadBaseController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string LegoDimensionsToypadBaseController::GetSerialString()
+std::string LegoDimensionsToypadBaseController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string LegoDimensionsToypadBaseController::GetFirmwareVersion()
+std::string LegoDimensionsToypadBaseController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LegoDimensionsToypadBaseController::Activate()

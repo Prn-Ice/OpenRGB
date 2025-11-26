@@ -6,7 +6,7 @@
 |   thombo                                      17 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_MSIMysticLight112.h"
@@ -27,10 +27,7 @@ const ZoneDescription led_zones[] =
     ZoneDescription{ "Onboard LEDs", MSI_ZONE_ON_BOARD_LED_0 }
 };
 
-
 static std::vector<const ZoneDescription*> zone_description;
-
-
 
 /**------------------------------------------------------------------*\
     @name MSI Mystic Light (112 Byte)
@@ -48,7 +45,7 @@ RGBController_MSIMysticLight112::RGBController_MSIMysticLight112
     MSIMysticLight112Controller* controller_ptr
     )
 {
-    controller = controller_ptr;
+    controller  = controller_ptr;
 
     name        = controller->GetDeviceName();
     vendor      = "MSI";

@@ -6,12 +6,13 @@
 |   Morgan Guimard (morg)                       01 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cmath>
 #include <string.h>
 #include "MSIVigorGK30Controller.h"
+#include "StringUtils.h"
 
 static unsigned char argb_colour_index_data[2][2][2] =
 {     //B0    B1
@@ -21,25 +22,11 @@ static unsigned char argb_colour_index_data[2][2][2] =
         { 0x01, 0x06 }, }       //G1 R1
 };
 
-MSIVigorGK30Controller::MSIVigorGK30Controller(hid_device* dev_handle, const hid_device_info& info)
+MSIVigorGK30Controller::MSIVigorGK30Controller(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
-    dev                 = dev_handle;
-    location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
-
+    dev         = dev_handle;
+    location    = info.path;
+    name        = dev_name;
 }
 
 MSIVigorGK30Controller::~MSIVigorGK30Controller()
@@ -52,14 +39,22 @@ std::string MSIVigorGK30Controller::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string MSIVigorGK30Controller::GetSerialString()
+std::string MSIVigorGK30Controller::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string MSIVigorGK30Controller::GetFirmwareVersion()
+std::string MSIVigorGK30Controller::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 unsigned int MSIVigorGK30Controller::GetLargestColour(unsigned int red, unsigned int green, unsigned int blue)
@@ -92,9 +87,9 @@ unsigned char MSIVigorGK30Controller::GetColourIndex(unsigned char red, unsigned
     | 0x06 white                                            |
     \*-----------------------------------------------------*/
     unsigned int divisor    = GetLargestColour( red, green, blue);
-    unsigned int r          = round( red / divisor );
-    unsigned int g          = round( green / divisor );
-    unsigned int b          = round( blue / divisor );
+    unsigned int r          = (unsigned int)round( red / divisor );
+    unsigned int g          = (unsigned int)round( green / divisor );
+    unsigned int b          = (unsigned int)round( blue / divisor );
     unsigned char idx       = argb_colour_index_data[r][g][b];
     return idx;
 }

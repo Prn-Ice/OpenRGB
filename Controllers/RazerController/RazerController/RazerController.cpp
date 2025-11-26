@@ -6,24 +6,26 @@
 |   Adam Honse (CalcProgrammer1)                22 Jan 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "RazerController.h"
 #include "RazerDevices.h"
 #include "LogManager.h"
+#include "RazerDeviceGuard.h"
 
 using namespace std::chrono_literals;
 
 RazerController::RazerController(hid_device* dev_handle, hid_device* dev_argb_handle, const char* path, unsigned short pid, std::string dev_name)
 {
-    dev             = dev_handle;
-    dev_argb        = dev_argb_handle;
-    dev_pid         = pid;
-    location        = path;
-    name            = dev_name;
-    device_index    = 0;
+    dev               = dev_handle;
+    dev_argb          = dev_argb_handle;
+    dev_pid           = pid;
+    location          = path;
+    name              = dev_name;
+    device_index      = 0;
+    guard_manager_ptr = new DeviceGuardManager(new RazerDeviceGuard());
 
     /*-----------------------------------------------------------------*\
     | Loop through all known devices to look for a name match           |
@@ -76,10 +78,15 @@ RazerController::RazerController(hid_device* dev_handle, hid_device* dev_argb_ha
     \*-----------------------------------------------------------------*/
     switch(dev_pid)
     {
+        case RAZER_BASILISK_ULTIMATE_WIRED_PID:
+        case RAZER_BASILISK_ULTIMATE_WIRELESS_PID:
         case RAZER_BASILISK_V3_PID:
+        case RAZER_BASILISK_V3_35K_PID:
         case RAZER_BASILISK_V3_X_HYPERSPEED_PID:
         case RAZER_BASILISK_V3_PRO_WIRED_PID:
         case RAZER_BASILISK_V3_PRO_WIRELESS_PID:
+        case RAZER_BASILISK_V3_PRO_35K_WIRED_PID:
+        case RAZER_BASILISK_V3_PRO_35K_WIRELESS_PID:
         case RAZER_BASILISK_V3_PRO_BLUETOOTH_PID:
         case RAZER_BASE_STATION_CHROMA_PID:
         case RAZER_BASE_STATION_V2_CHROMA_PID:
@@ -88,8 +95,11 @@ RazerController::RazerController(hid_device* dev_handle, hid_device* dev_argb_ha
         case RAZER_BLADE_15_2022_PID:
         case RAZER_CHARGING_PAD_CHROMA_PID:
         case RAZER_CHROMA_HDK_PID:
+        case RAZER_COBRA_PRO_WIRED_PID:
+        case RAZER_COBRA_PRO_WIRELESS_PID:
         case RAZER_CORE_X_PID:
         case RAZER_DEATHADDER_ELITE_PID:
+        case RAZER_DEATHADDER_V2_PID:
         case RAZER_DEATHADDER_V2_MINI_PID:
         case RAZER_DEATHADDER_ESSENTIAL_V2_PID:
         case RAZER_DEATHSTALKER_V2_PRO_TKL_WIRED_PID:
@@ -97,6 +107,7 @@ RazerController::RazerController(hid_device* dev_handle, hid_device* dev_argb_ha
         case RAZER_DEATHSTALKER_V2_PRO_WIRED_PID:
         case RAZER_DEATHSTALKER_V2_PRO_WIRELESS_PID:
         case RAZER_FIREFLY_V2_PID:
+        case RAZER_FIREFLY_V2_PRO_PID:
         case RAZER_FIREFLY_HYPERFLUX_PID:
         case RAZER_GOLIATHUS_CHROMA_EXTENDED_PID:
         case RAZER_GOLIATHUS_CHROMA_PID:
@@ -143,6 +154,8 @@ RazerController::RazerController(hid_device* dev_handle, hid_device* dev_argb_ha
         case RAZER_HUNTSMAN_V2_ANALOG_PID:
         case RAZER_HUNTSMAN_V2_TKL_PID:
         case RAZER_HUNTSMAN_V2_PID:
+        case RAZER_HUNTSMAN_V3_PRO_PID:
+        case RAZER_HUNTSMAN_V3_PRO_TKL_WHITE_PID:
         case RAZER_ORNATA_CHROMA_PID:
         case RAZER_ORNATA_CHROMA_V2_PID:
         case RAZER_ORNATA_V3_PID:
@@ -160,11 +173,36 @@ RazerController::RazerController(hid_device* dev_handle, hid_device* dev_argb_ha
     | Determine matrix type for device                                  |
     \*-----------------------------------------------------------------*/
     matrix_type = device_list[device_index]->matrix_type;
+
+    /*-----------------------------------------------------------------*\
+    | Start keepalive thread for devices that need it to prevent RGB    |
+    | from timing out                                                   |
+    \*-----------------------------------------------------------------*/
+    switch(dev_pid)
+    {
+        case RAZER_BLADE_14_2021_PID:
+        case RAZER_BLADE_14_2022_PID:
+            keepalive_thread_run = true;
+            keepalive_thread     = new std::thread(&RazerController::KeepaliveThreadFunction, this);
+            break;
+
+        default:
+            keepalive_thread_run = false;
+            keepalive_thread     = NULL;
+            break;
+    }
 }
 
 RazerController::~RazerController()
 {
+    if(keepalive_thread != NULL)
+    {
+        keepalive_thread_run = false;
+        keepalive_thread->join();
+    }
+
     hid_close(dev);
+    delete guard_manager_ptr;
 }
 
 std::string RazerController::GetName()
@@ -195,6 +233,23 @@ std::string RazerController::GetFirmwareString()
 std::string RazerController::GetSerialString()
 {
     return(razer_get_serial());
+}
+
+void RazerController::KeepaliveThreadFunction()
+{
+    /*-----------------------------------------------------------------*\
+    | Performing a get device mode request seems to be enough to keep   |
+    | the lighting active on devices with the lighting timeout, so      |
+    | periodically send a device mode request every 2.5s.               |
+    \*-----------------------------------------------------------------*/
+    while(keepalive_thread_run.load())
+    {
+        if((std::chrono::steady_clock::now() - last_update_time) > 2500ms)
+        {
+            razer_get_device_mode();
+        }
+        std::this_thread::sleep_for(1s);
+    }
 }
 
 void RazerController::SetAddressableZoneSizes(unsigned char zone_1_size, unsigned char zone_2_size, unsigned char zone_3_size, unsigned char zone_4_size, unsigned char zone_5_size, unsigned char zone_6_size)
@@ -336,8 +391,11 @@ bool RazerController::SupportsBreathing()
         | Mice                                                  |
         \*-----------------------------------------------------*/
         case RAZER_BASILISK_V3_PID:
+        case RAZER_BASILISK_V3_35K_PID:
         case RAZER_BASILISK_V3_PRO_WIRED_PID:
         case RAZER_BASILISK_V3_PRO_WIRELESS_PID:
+        case RAZER_BASILISK_V3_PRO_35K_WIRED_PID:
+        case RAZER_BASILISK_V3_PRO_35K_WIRELESS_PID:
         case RAZER_BASILISK_V3_PRO_BLUETOOTH_PID:
 
             supports_breathing = false;
@@ -374,6 +432,8 @@ bool RazerController::SupportsWave()
         case RAZER_BLACKWIDOW_V3_MINI_WIRELESS_PID:
         case RAZER_BLACKWIDOW_V4_PID:
         case RAZER_BLACKWIDOW_V4_PRO_PID:
+        case RAZER_BLACKWIDOW_V4_PRO_75_WIRED_PID:
+        case RAZER_BLACKWIDOW_V4_75_WIRED_PID:
         case RAZER_BLACKWIDOW_V4_X_PID:
         case RAZER_BLACKWIDOW_X_CHROMA_PID:
         case RAZER_BLACKWIDOW_X_CHROMA_TE_PID:
@@ -430,6 +490,8 @@ bool RazerController::SupportsWave()
         case RAZER_HUNTSMAN_V2_ANALOG_PID:
         case RAZER_HUNTSMAN_V2_TKL_PID:
         case RAZER_HUNTSMAN_V2_PID:
+        case RAZER_HUNTSMAN_V3_PRO_PID:
+        case RAZER_HUNTSMAN_V3_PRO_TKL_WHITE_PID:
         case RAZER_ORBWEAVER_CHROMA_PID:
         case RAZER_TARTARUS_PRO_PID:
         case RAZER_TARTARUS_V2_PID:
@@ -440,9 +502,14 @@ bool RazerController::SupportsWave()
         case RAZER_BASILISK_ULTIMATE_WIRED_PID:
         case RAZER_BASILISK_ULTIMATE_WIRELESS_PID:
         case RAZER_BASILISK_V3_PID:
+        case RAZER_BASILISK_V3_35K_PID:
         case RAZER_BASILISK_V3_PRO_WIRED_PID:
         case RAZER_BASILISK_V3_PRO_WIRELESS_PID:
+        case RAZER_BASILISK_V3_PRO_35K_WIRED_PID:
+        case RAZER_BASILISK_V3_PRO_35K_WIRELESS_PID:
         case RAZER_BASILISK_V3_PRO_BLUETOOTH_PID:
+        case RAZER_COBRA_PRO_WIRED_PID:
+        case RAZER_COBRA_PRO_WIRELESS_PID:
         case RAZER_DIAMONDBACK_CHROMA_PID:
         case RAZER_MAMBA_2015_WIRED_PID:
         case RAZER_MAMBA_2015_WIRELESS_PID:
@@ -469,6 +536,7 @@ bool RazerController::SupportsWave()
         case RAZER_CORE_X_PID:
         case RAZER_FIREFLY_PID:
         case RAZER_FIREFLY_V2_PID:
+        case RAZER_FIREFLY_V2_PRO_PID:
         case RAZER_FIREFLY_HYPERFLUX_PID:
         case RAZER_LAPTOP_STAND_CHROMA_PID:
         case RAZER_LAPTOP_STAND_CHROMA_V2_PID:
@@ -481,6 +549,7 @@ bool RazerController::SupportsWave()
         case RAZER_O11_DYNAMIC_PID:
         case RAZER_STRIDER_CHROMA_PID:
         case RAZER_THUNDERBOLT_4_DOCK_CHROMA_PID:
+        case RAZER_THUNDERBOLT_5_DOCK_CHROMA_PID:
 
             supports_wave = true;
             break;
@@ -689,7 +758,7 @@ razer_report RazerController::razer_create_custom_frame_extended_matrix_report(u
     const size_t row_length     = (size_t)(((stop_col + 1) - start_col) * 3);
     const size_t packet_length  = row_length + 5;
 
-    razer_report report         = razer_create_report(0x0F, 0x03, packet_length);
+    razer_report report         = razer_create_report(0x0F, 0x03, (unsigned char)packet_length);
 
     report.arguments[2]         = row_index;
     report.arguments[3]         = start_col;
@@ -708,7 +777,7 @@ razer_report RazerController::razer_create_custom_frame_standard_matrix_report(u
     const size_t row_length     = (size_t)(((stop_col + 1) - start_col) * 3);
     const size_t packet_length  = row_length + 4;
 
-    razer_report report         = razer_create_report(0x03, 0x0B, packet_length);
+    razer_report report         = razer_create_report(0x03, 0x0B, (unsigned char)packet_length);
 
     report.arguments[0]         = 0xFF;
     report.arguments[1]         = row_index;
@@ -971,6 +1040,20 @@ razer_report RazerController::razer_create_set_led_effect_report(unsigned char v
 | Get functions (request information from device)                                   |
 \*---------------------------------------------------------------------------------*/
 
+unsigned char RazerController::razer_get_device_mode()
+{
+    std::string         firmware_string         = "";
+    struct razer_report report                  = razer_create_report(0x00, RAZER_COMMAND_ID_GET_DEVICE_MODE, 0x02);
+    struct razer_report response_report         = razer_create_response();
+
+    std::this_thread::sleep_for(2ms);
+    razer_usb_send(&report);
+    std::this_thread::sleep_for(5ms);
+    razer_usb_receive(&response_report);
+
+    return(response_report.arguments[0]);
+}
+
 std::string RazerController::razer_get_firmware()
 {
     std::string         firmware_string         = "";
@@ -998,7 +1081,7 @@ std::string RazerController::razer_get_serial()
     std::this_thread::sleep_for(5ms);
     razer_usb_receive(&response_report);
 
-    strncpy(&serial_string[0], (const char*)&response_report.arguments[0], 22);
+    memcpy(&serial_string[0], &response_report.arguments[0], 22);
     serial_string[22] = '\0';
 
     for(size_t i = 0; i < 22; i++)
@@ -1071,7 +1154,7 @@ unsigned char RazerController::GetKeyboardLayoutType()
     }
 }
 
-std::string RazerController::GetKeyboardLayoutName()
+std::string RazerController::GetKeyboardLayoutString()
 {
     unsigned char layout;
     unsigned char variant;
@@ -1117,6 +1200,7 @@ std::string RazerController::GetVariantName()
     switch(variant)
     {
         case RAZER_KEYBOARD_VARIANT_BLACK:   return "Black";
+        case RAZER_KEYBOARD_VARIANT_QUARTZ:  return "Quartz";
         case RAZER_KEYBOARD_VARIANT_MERCURY: return "Mercury";
         default:                             return "Unkown Variant";
     }
@@ -1799,10 +1883,12 @@ int RazerController::razer_usb_send(razer_report* report)
 {
     report->crc = razer_calculate_crc(report);
 
+    DeviceGuardLock _ = guard_manager_ptr->AwaitExclusiveAccess();
     return hid_send_feature_report(dev, (unsigned char*)report, sizeof(*report));
 }
 
 int RazerController::razer_usb_send_argb(razer_argb_report* report)
 {
+    DeviceGuardLock _ = guard_manager_ptr->AwaitExclusiveAccess();
     return hid_send_feature_report(dev_argb, (unsigned char*)report, sizeof(*report));
 }

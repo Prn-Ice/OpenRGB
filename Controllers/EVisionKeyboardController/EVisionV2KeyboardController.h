@@ -6,13 +6,13 @@
 |   Le Philousophe                              25 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define EVISION_V2_PACKET_SIZE                       64
@@ -157,10 +157,10 @@ struct EvisionV2ModeConfig
 class EVisionV2KeyboardController
 {
 public:
-    EVisionV2KeyboardController(hid_device* dev_handle, const char* path, EVisionV2KeyboardLayout layout);
+    EVisionV2KeyboardController(hid_device* dev_handle, const char* path, EVisionV2KeyboardLayout dev_layout, std::string dev_name);
     ~EVisionV2KeyboardController();
 
-    std::string GetDeviceName();
+    std::string GetName();
     std::string GetSerial();
     std::string GetLocation();
 
@@ -182,16 +182,16 @@ public:
     EVisionV2KeyboardLayout  layout;
 
 private:
-    std::string device_name;
+    std::string name;
     std::string serial;
     std::string location;
     hid_device* dev;
 
-    size_t     map_size;
-    size_t     macros_size;
+    size_t      map_size;
+    size_t      macros_size;
 
-    uint8_t *keyvalue_map;
-    size_t led_count;
+    uint8_t *   keyvalue_map;
+    size_t      led_count;
 
-    std::mutex query_mutex;
+    std::mutex  query_mutex;
 };

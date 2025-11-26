@@ -6,13 +6,13 @@
 |   Felipe Cavalcanti                           13 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 struct aorus_atc800_mode_config
@@ -61,10 +61,11 @@ enum
 class ATC800Controller
 {
 public:
-    ATC800Controller(hid_device* dev_handle, const char* path);
+    ATC800Controller(hid_device* dev_handle, const char* path, std::string name);
     ~ATC800Controller();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        DisableTempRPMIndicator();
@@ -75,6 +76,7 @@ public:
     void        SendCoolerMode(uint8_t zone, uint8_t mode, aorus_atc800_mode_config zone_config);
 
 private:
-    hid_device*             dev;
-    std::string             location;
+    hid_device* dev;
+    std::string location;
+    std::string name;
 };

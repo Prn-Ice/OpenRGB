@@ -6,16 +6,12 @@
 |   TheRogueZeta                                15 Jul 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "EVGAGPUv3Controller.h"
 #include "LogManager.h"
-#include "RGBController.h"
 #include "RGBController_EVGAGPUv3.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"
@@ -38,18 +34,17 @@ void DetectEVGAAmpereGPUControllers(i2c_smbus_interface* bus, uint8_t address, c
         EVGAGPUv3Controller*     controller;
         RGBController_EVGAGPUv3* rgb_controller;
 
-        controller = new EVGAGPUv3Controller(bus, address);
-        controller-> evgaGPUName = name.c_str(); // Pass name of the card into the controller for logging.
+        controller = new EVGAGPUv3Controller(bus, address, name);
 
         if(controller-> ReadFWVersion() != "")
         {
             rgb_controller = new RGBController_EVGAGPUv3(controller);
-            rgb_controller->name = name;
+
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }
         else
         {
-            LOG_INFO("[%s] Failed to get a valid FW version, does the i2c interface support `i2c_smbus_read_i2c_block_data`?", controller-> evgaGPUName);
+            LOG_INFO("[%s] Failed to get a valid FW version, does the i2c interface support `i2c_smbus_read_i2c_block_data`?", controller->GetDeviceName().c_str());
             delete controller;
         }
     }
@@ -58,6 +53,7 @@ void DetectEVGAAmpereGPUControllers(i2c_smbus_interface* bus, uint8_t address, c
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3060 Ti FTW3 Gaming"                , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3060TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3060TI_FTW3_GAMING_SUB_DEV,             0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3060 Ti FTW3 Ultra"                 , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3060TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3060TI_FTW3_ULTRA_SUB_DEV,              0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3060 Ti FTW3 Ultra LHR"             , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3060TI_LHR_DEV,   EVGA_SUB_VEN,   EVGA_RTX3060TI_FTW3_ULTRA_KL_SUB_DEV,           0x2D);
+REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3060 Ti FTW3 Ultra Gaming LHR"      , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3060TI_LHR_DEV,   EVGA_SUB_VEN,   EVGA_RTX3060TI_FTW3_ULTRA_GAMING_LHR_SUB_DEV,   0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 Black Gaming"                  , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_DEV,         EVGA_SUB_VEN,   EVGA_RTX3070_XC3_BLACK_SUB_DEV,                 0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 XC3 Gaming"                    , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_DEV,         EVGA_SUB_VEN,   EVGA_RTX3070_XC3_GAMING_SUB_DEV,                0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 XC3 Ultra"                     , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_DEV,         EVGA_SUB_VEN,   EVGA_RTX3070_XC3_ULTRA_SUB_DEV,                 0x2D);
@@ -65,6 +61,7 @@ REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 XC3 Ultra LHR"                 
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 XC3 Ultra Gaming"              , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_LHR_DEV,     EVGA_SUB_VEN,   EVGA_RTX3070_XC3_ULTRA_GAMING_LHR_SUB_DEV,      0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 FTW3 Ultra"                    , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_DEV,         EVGA_SUB_VEN,   EVGA_RTX3070_FTW3_ULTRA_SUB_DEV,                0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 FTW3 Ultra LHR"                , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_LHR_DEV,     EVGA_SUB_VEN,   EVGA_RTX3070_FTW3_ULTRA_LHR_SUB_DEV,            0x2D);
+REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 FTW3 Ultra LHR"                , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070_LHR_DEV,     EVGA_SUB_VEN,   EVGA_RTX3070_FTW3_ULTRA_LHR_ALT_SUB_DEV,        0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 Ti XC3 Gaming"                 , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3070TI_XC3_GAMING_SUB_DEV,              0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 Ti XC3 Ultra"                  , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3070TI_XC3_ULTRA_SUB_DEV,               0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3070 Ti XC3 Ultra v2"               , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3070TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3070TI_XC3_ULTRA_V2_SUB_DEV,            0x2D);
@@ -112,3 +109,4 @@ REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3090 K|NGP|N Hydro Copper"          
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3090 Ti FTW3 Black Gaming"          , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3090TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3090TI_FTW3_BLACK_SUB_DEV,              0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3090 Ti FTW3 Gaming"                , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3090TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3090TI_FTW3_GAMING_SUB_DEV,             0x2D);
 REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3090 Ti FTW3 Ultra Gaming"          , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3090TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3090TI_FTW3_ULTRA_GAMING_SUB_DEV,       0x2D);
+REGISTER_I2C_PCI_DETECTOR("EVGA GeForce RTX 3090 Ti FTW3 Ultra Hybrid Gaming"   , DetectEVGAAmpereGPUControllers, NVIDIA_VEN,   NVIDIA_RTX3090TI_DEV,       EVGA_SUB_VEN,   EVGA_RTX3090TI_FTW3_ULTRA_HYBRID_GAMING_SUB_DEV,0x2D);

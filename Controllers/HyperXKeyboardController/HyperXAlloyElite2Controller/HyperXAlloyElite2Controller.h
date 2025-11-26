@@ -6,22 +6,23 @@
 |   KundaPanda (vojdo)                          02 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 class HyperXAlloyElite2Controller
 {
 public:
-    HyperXAlloyElite2Controller(hid_device* dev_handle, const char* path);
+    HyperXAlloyElite2Controller(hid_device* dev_handle, const char* path, std::string dev_name);
     ~HyperXAlloyElite2Controller();
 
     std::string                         GetDeviceLocation();
+    std::string                         GetNameString();
     std::string                         GetSerialString();
 
     void                                SetLEDsDirect(const std::vector<RGBColor>& colors);
@@ -29,6 +30,7 @@ public:
 private:
     hid_device*                         dev;
     std::string                         location;
+    std::string                         name;
 
     void                                SendDirectInitialization();
 };

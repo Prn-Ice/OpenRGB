@@ -6,7 +6,7 @@
 |   TheRogueZeta                                05 Nov 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -28,10 +28,12 @@ enum
 class GainwardGPUv1Controller
 {
 public:
-    GainwardGPUv1Controller(i2c_smbus_interface* bus, gainward_gpu_dev_id);
+    GainwardGPUv1Controller(i2c_smbus_interface* bus, gainward_gpu_dev_id, std::string dev_name);
     ~GainwardGPUv1Controller();
 
     std::string   GetDeviceLocation();
+    std::string   GetDeviceName();
+
     unsigned char GetLEDRed();
     unsigned char GetLEDGreen();
     unsigned char GetLEDBlue();
@@ -44,4 +46,5 @@ public:
 private:
     i2c_smbus_interface *   bus;
     gainward_gpu_dev_id     dev;
+    std::string             name;
 };

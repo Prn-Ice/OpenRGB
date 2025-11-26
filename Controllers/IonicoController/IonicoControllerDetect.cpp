@@ -6,12 +6,12 @@
 |   Lucas Strafe                                31 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "RGBController.h"
-#include "hidapi/hidapi.h"
+#include "hidapi.h"
 #include "IonicoController.h"
 #include "RGBController_Ionico.h"
 
@@ -34,9 +34,8 @@ void DetectIonicoControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        IonicoController*     controller         = new IonicoController(dev, *info, info->product_id);
+        IonicoController*     controller         = new IonicoController(dev, *info, info->product_id, name);
         RGBController_Ionico* rgb_controller     = new RGBController_Ionico(controller);
-        rgb_controller->name                     = name;
 
         if(info->product_id == IONICO_KB_PID)
         {

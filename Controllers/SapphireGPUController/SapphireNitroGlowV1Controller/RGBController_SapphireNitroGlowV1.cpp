@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_SapphireNitroGlowV1.cpp    |
-|                                           |
-|  Generic RGB Interface for OpenRGB        |
-|  Sapphire Nitro Glow V1 GPU Driver        |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 7/15/2020   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_SapphireNitroGlowV1.cpp                     |
+|                                                           |
+|   RGBController for Sapphire Nitro Glow V1                |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                15 Jul 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_SapphireNitroGlowV1.h"
 
@@ -24,7 +26,7 @@ RGBController_SapphireNitroGlowV1::RGBController_SapphireNitroGlowV1(SapphireNit
 {
     controller                 = controller_ptr;
 
-    name                       = "Sapphire Nitro Glow V1 Device";
+    name                       = controller->GetDeviceName();
     vendor                     = "Sapphire";
     description                = "Sapphire Nitro Glow V1 Device";
     location                   = controller->GetDeviceLocation();

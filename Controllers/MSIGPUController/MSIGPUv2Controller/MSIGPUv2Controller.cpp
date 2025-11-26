@@ -6,18 +6,20 @@
 |   Wojciech Lazarski                           03 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
+#include <chrono>
 #include "MSIGPUv2Controller.h"
 
 using namespace std::chrono_literals;
 
-MSIGPUv2Controller::MSIGPUv2Controller(i2c_smbus_interface* bus, msi_gpu_dev_id dev)
+MSIGPUv2Controller::MSIGPUv2Controller(i2c_smbus_interface* bus, msi_gpu_dev_id dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 }
 
 MSIGPUv2Controller::~MSIGPUv2Controller()
@@ -33,6 +35,11 @@ std::string MSIGPUv2Controller::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string MSIGPUv2Controller::GetDeviceName()
+{
+    return(name);
 }
 
 void MSIGPUv2Controller::SetRGB1(unsigned char red, unsigned char green, unsigned char blue)

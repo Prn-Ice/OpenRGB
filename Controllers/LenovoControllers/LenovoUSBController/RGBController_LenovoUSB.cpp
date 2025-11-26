@@ -6,7 +6,7 @@
 |   Cooper Hall (geobot19)                      17 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <iomanip>
@@ -299,6 +299,9 @@ void RGBController_LenovoUSB::SetupZones()
             lenovo_zones.push_back(lenovo_legion_Y760_vent_back_left);
             lenovo_zones.push_back(lenovo_legion_Y760_neon);
             break;
+        case LEGION_S7GEN7:
+            lenovo_zones.push_back(legion7_gen7and8_kbd_ansi);
+            break;
         case LEGION_7GEN7:
             lenovo_zones.push_back(legion7_gen7and8_kbd_ansi);
             lenovo_zones.push_back(lenovo_legion_7gen7_logo);
@@ -306,6 +309,8 @@ void RGBController_LenovoUSB::SetupZones()
             lenovo_zones.push_back(legion7_gen7and8_neon);
             break;
         case LEGION_7GEN8:
+        case LEGION_7GEN9:
+        case LEGION_7GEN9_H:
             lenovo_zones.push_back(legion7_gen7and8_kbd_ansi);
             lenovo_zones.push_back(legion7_gen7and8_neon);
             break;
@@ -375,7 +380,7 @@ void RGBController_LenovoUSB::UpdateZoneLEDs(int zone)
     {
         int index = zones[zone].start_idx+i;
 
-        color_map.push_back({leds[index].value & 0xFF, colors[index]});
+        color_map.push_back({(uint8_t)leds[index].value & 0xFF, colors[index]});
     }
 
     color_map.shrink_to_fit();
@@ -401,15 +406,13 @@ void RGBController_LenovoUSB::DeviceUpdateLEDs()
 
         prev_zone_id = zone_id;
 
-        curr_color_map.push_back({leds[i].value & 0xFF, colors[i]});
-
+        curr_color_map.push_back({(uint8_t)(leds[i].value & 0xFF), colors[i]});
     }
 
     if(curr_color_map.size() > 0)
     {
         controller->setZoneLeds(prev_zone_id, curr_color_map);
     }
-
 }
 
 void RGBController_LenovoUSB::DeviceUpdateMode()

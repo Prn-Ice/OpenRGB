@@ -6,20 +6,22 @@
 |   Chris M (Dr_No)                             30 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 /*-----------------------------------------------------*\
 | Mouse product IDs                                     |
 \*-----------------------------------------------------*/
 #define BLOODY_W60_PRO_PID                          0x37EA
+#define BLOODY_W70_MAX_PID                          0x79EF
 #define BLOODY_W90_MAX_PID                          0x3666
+#define BLOODY_W90_PRO_PID                          0x39B6
 
 /*-----------------------------------------------------*\
 | Mousemat product IDs                                  |
@@ -48,18 +50,20 @@ enum
 class BloodyMouseController
 {
 public:
-    BloodyMouseController(hid_device* dev_handle, const char* path, uint16_t product_id);
+    BloodyMouseController(hid_device* dev_handle, const char* path, uint16_t product_id, std::string dev_name);
     ~BloodyMouseController();
 
     uint16_t        GetPid();
     std::string     GetSerial();
     std::string     GetLocation();
+    std::string     GetName();
 
     void            SetLedsDirect(std::vector<RGBColor> colors);
 
 private:
     uint16_t        pid;
     std::string     location;
+    std::string     name;
     hid_device*     dev;
 
     void            InitDevice();

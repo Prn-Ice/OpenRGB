@@ -6,16 +6,18 @@
 |   Adam Honse (CalcProgrammer1)                10 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "AsusAuraMousematController.h"
+#include "StringUtils.h"
 
-AuraMousematController::AuraMousematController(hid_device* dev_handle, const char* path)
+AuraMousematController::AuraMousematController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 AuraMousematController::~AuraMousematController()
@@ -28,6 +30,11 @@ std::string AuraMousematController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string AuraMousematController::GetName()
+{
+    return(name);
+}
+
 std::string AuraMousematController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -38,10 +45,7 @@ std::string AuraMousematController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string AuraMousematController::GetVersion()

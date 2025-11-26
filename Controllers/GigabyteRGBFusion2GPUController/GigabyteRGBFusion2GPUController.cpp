@@ -4,7 +4,7 @@
 |   Driver for Gigabyte Aorus RGB Fusion 2 GPU              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -14,10 +14,11 @@
 
 using namespace std::chrono_literals;
 
-RGBFusion2GPUController::RGBFusion2GPUController(i2c_smbus_interface* bus, rgb_fusion_dev_id dev)
+RGBFusion2GPUController::RGBFusion2GPUController(i2c_smbus_interface* bus, rgb_fusion_dev_id dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 }
 
 RGBFusion2GPUController::~RGBFusion2GPUController()
@@ -33,6 +34,11 @@ std::string RGBFusion2GPUController::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string RGBFusion2GPUController::GetDeviceName()
+{
+    return(name);
 }
 
 void RGBFusion2GPUController::SaveConfig()

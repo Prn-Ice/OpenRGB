@@ -4,16 +4,17 @@
 |   Driver for MSI GPU                                      |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "MSIGPUController.h"
 #include <cstring>
 
-MSIGPUController::MSIGPUController(i2c_smbus_interface* bus, msi_gpu_dev_id dev)
+MSIGPUController::MSIGPUController(i2c_smbus_interface* bus, msi_gpu_dev_id dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 }
 
 MSIGPUController::~MSIGPUController()
@@ -29,6 +30,11 @@ std::string MSIGPUController::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string MSIGPUController::GetDeviceName()
+{
+    return(name);
 }
 
 void MSIGPUController::SetRGB1(unsigned char red, unsigned char green, unsigned char blue)

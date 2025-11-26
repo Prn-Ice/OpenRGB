@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      27 Aug 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -113,7 +113,7 @@ void HuePlusController::SetChannelEffect
             \*-----------------------------------------------------*/
             for (std::size_t idx = 0; idx < 40; idx++)
             {
-                int pixel_idx = idx * 3;
+                int pixel_idx = (int)idx * 3;
                 RGBColor color = colors[color_idx];
                 color_data[pixel_idx + 0x00] = RGBGetGValue(color);
                 color_data[pixel_idx + 0x01] = RGBGetRValue(color);
@@ -123,7 +123,7 @@ void HuePlusController::SetChannelEffect
             /*-----------------------------------------------------*\
             | Send mode and color data                              |
             \*-----------------------------------------------------*/
-            SendPacket(channel, mode, direction, color_idx, speed, 40, &color_data[0]);
+            SendPacket(channel, mode, direction, (unsigned char)color_idx, speed, 40, &color_data[0]);
         }
     }
     /*-----------------------------------------------------*\
@@ -136,7 +136,7 @@ void HuePlusController::SetChannelEffect
         \*-----------------------------------------------------*/
         for (std::size_t idx = 0; idx < num_colors; idx++)
         {
-            int pixel_idx = idx * 3;
+            int pixel_idx = (int)idx * 3;
             RGBColor color = colors[idx];
             color_data[pixel_idx + 0x00] = RGBGetGValue(color);
             color_data[pixel_idx + 0x01] = RGBGetRValue(color);
@@ -164,7 +164,7 @@ void HuePlusController::SetChannelLEDs
     \*-----------------------------------------------------*/
     for (std::size_t idx = 0; idx < num_colors; idx++)
     {
-        int pixel_idx = idx * 3;
+        int pixel_idx = (int)idx * 3;
         RGBColor color = colors[idx];
         color_data[pixel_idx + 0x00] = RGBGetGValue(color);
         color_data[pixel_idx + 0x01] = RGBGetRValue(color);

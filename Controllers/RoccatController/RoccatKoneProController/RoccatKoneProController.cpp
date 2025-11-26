@@ -1,33 +1,23 @@
-/*-------------------------------------------------------------------*\
-|  RoccatKoneProController.cpp                                        |
-|                                                                     |
-|  Driver for Roccat Kone Pro Mouse                                   |
-|                                                                     |
-|  Garrett Denham (GardenOfWyers)          01/12/2024                 |
-\*-------------------------------------------------------------------*/
-
-#include "RoccatKoneProController.h"
+/*---------------------------------------------------------*\
+| RoccatKoneProController.cpp                               |
+|                                                           |
+|   Driver for Roccat Kone Pro                              |
+|                                                           |
+|   Garrett Denham (GardenOfWyers)              12 Jan 2024 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "RoccatKoneProController.h"
+#include "StringUtils.h"
 
-RoccatKoneProController::RoccatKoneProController(hid_device* dev_handle, const hid_device_info& info)
+RoccatKoneProController::RoccatKoneProController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
-    version             = "";
     location            = info.path;
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 
     SetupDirectMode();
 }
@@ -37,19 +27,27 @@ RoccatKoneProController::~RoccatKoneProController()
     hid_close(dev);
 }
 
-std::string RoccatKoneProController::GetFirmwareVersion()
+std::string RoccatKoneProController::GetDeviceLocation()
 {
-    return version;
+    return("HID: " + location);
+}
+
+std::string RoccatKoneProController::GetNameString()
+{
+    return(name);
 }
 
 std::string RoccatKoneProController::GetSerialString()
 {
-    return serial_number;
-}
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-std::string RoccatKoneProController::GetDeviceLocation()
-{
-    return("HID: " + location);
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void RoccatKoneProController::SetupDirectMode()

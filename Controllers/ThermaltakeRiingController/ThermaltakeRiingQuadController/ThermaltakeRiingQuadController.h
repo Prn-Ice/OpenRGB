@@ -1,18 +1,20 @@
-/*-------------------------------------------------------------------*\
-|  ThermaltakeRiingQuadController.h                                   |
-|                                                                     |
-|  Driver for Thermaltake Riing Quad Controller                       |
-|                                                                     |
-|  Chris M (Dr_No)          15th Feb 2021                             |
-|                                                                     |
-\*-------------------------------------------------------------------*/
-
-#include "RGBController.h"
-#include <chrono>
-#include <vector>
-#include <hidapi/hidapi.h>
+/*---------------------------------------------------------*\
+| ThermaltakeRiingQuadController.h                          |
+|                                                           |
+|   Driver for Thermaltake Riing Quad                       |
+|                                                           |
+|   Chris M (Dr_No)                             15 Feb 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
+
+#include <chrono>
+#include <vector>
+#include <hidapi.h>
+#include "RGBController.h"
 
 #define THERMALTAKE_QUAD_PACKET_SIZE        193
 #define THERMALTAKE_QUAD_INTERRUPT_TIMEOUT  250
@@ -62,7 +64,6 @@ private:
     unsigned char           current_mode;
     unsigned char           current_speed;
     std::string             device_name;
-    std::string             serial;
     std::string             location;
 
     uint8_t                 tt_quad_buffer[THERMALTAKE_QUAD_NUM_CHANNELS][THERMALTAKE_QUAD_PACKET_SIZE];

@@ -6,7 +6,7 @@
 |   Jan Rettig (Klapstuhl)                      14 Feb 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_AsusAuraGPU.h"
@@ -32,7 +32,7 @@ int RGBController_AuraGPU::GetDeviceMode()
         break;
     }
 
-    for(int mode = 0; mode < modes.size(); mode++)
+    for(unsigned int mode = 0; mode < modes.size(); mode++)
     {
         if(modes[mode].value == dev_mode)
         {

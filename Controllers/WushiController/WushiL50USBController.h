@@ -1,16 +1,17 @@
-/*-------------------------------------*\
-|  WushiL50USBController.h              |
-|                                       |
-|  interface for Wushi L50 Devices      |
-\*-------------------------------------*/
+/*---------------------------------------------------------*\
+| WushiL50USBController.h                                   |
+|                                                           |
+|   Driver for Wushi L50                                    |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
-#include "RGBController.h"
-
 #include <string>
-#include <hidapi/hidapi.h>
-
+#include <hidapi.h>
+#include "RGBController.h"
 #include "hidapi_wrapper.h"
 
 #ifndef HID_MAX_STR
@@ -94,19 +95,18 @@ public:
 class WushiL50USBController
 {
 public:
-    WushiL50USBController(hidapi_wrapper hid_wrapper, hid_device* dev_handle, const char* path);
+    WushiL50USBController(hidapi_wrapper hid_wrapper, hid_device* dev_handle, const char* path, std::string dev_name);
     ~WushiL50USBController();
-
-    void        setMode(WushiL50State * in_mode);
 
     std::string getName();
     std::string getLocation();
     std::string GetSerialString();
 
+    void        setMode(WushiL50State * in_mode);
+
 private:
-    std::string     name;
     hidapi_wrapper  wrapper;
     hid_device *    dev;
     std::string     location;
-    std::string     serial_number;
+    std::string     name;
 };

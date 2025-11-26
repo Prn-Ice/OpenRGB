@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       18 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "NvidiaESAController.h"
-#include "RGBController.h"
 #include "RGBController_NvidiaESA.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,9 @@ void DetectNvidiaESAControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        NvidiaESAController*     controller      = new NvidiaESAController(dev, *info);
+        NvidiaESAController*     controller      = new NvidiaESAController(dev, *info, name);
         RGBController_NvidiaESA* rgb_controller  = new RGBController_NvidiaESA(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

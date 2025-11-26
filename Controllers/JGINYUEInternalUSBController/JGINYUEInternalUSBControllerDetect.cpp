@@ -8,16 +8,12 @@
 |   Dongguan Yonghang Electronic Technology Co., Ltd        |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController_JGINYUEInternalUSB.h"
 #include "JGINYUEInternalUSBController.h"
-#include "RGBController.h"
 #include "Detector.h"
 
 /*---------------------------------------------------------*\
@@ -42,8 +38,4 @@ void DetectJGINYUEInternalUSBController(hid_device_info* info,const std::string&
     }
 }
 
-#ifdef _WIN32
 REGISTER_HID_DETECTOR("JGINYUE Internal USB Controller", DetectJGINYUEInternalUSBController, JGINYUE_VID, JGINYUE_MOTHERBOARD_PID);
-#else
-REGISTER_HID_DETECTOR_IPU("JGINYUE Internal USB Controller", DetectJGINYUEInternalUSBController, JGINYUE_VID, JGINYUE_MOTHERBOARD_PID, 0, 0xFF00, 1);
-#endif

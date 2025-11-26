@@ -6,16 +6,17 @@
 |   Adam Honse (CalcProgrammer1)                19 Jun 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HyperXDRAMController.h"
 
-HyperXDRAMController::HyperXDRAMController(i2c_smbus_interface* bus, hyperx_dev_id dev, unsigned char slots)
+HyperXDRAMController::HyperXDRAMController(i2c_smbus_interface* bus, hyperx_dev_id dev, unsigned char slots, std::string dev_name)
 {
     this->bus   = bus;
     this->dev   = dev;
+    this->name  = dev_name;
     slots_valid = slots;
 
     led_count = 0;
@@ -45,6 +46,11 @@ std::string HyperXDRAMController::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string HyperXDRAMController::GetDeviceName()
+{
+    return(name);
 }
 
 unsigned int HyperXDRAMController::GetLEDCount()

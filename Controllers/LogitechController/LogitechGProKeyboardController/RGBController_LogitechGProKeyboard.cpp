@@ -6,7 +6,7 @@
 |   sanchezzzs                                  20 Oct 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -158,13 +158,13 @@ static const led_type led_names[] =
 
 RGBController_LogitechGProKeyboard::RGBController_LogitechGProKeyboard(LogitechGProKeyboardController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller                      = controller_ptr;
 
-    name        = "Logitech Keyboard Device";
-    vendor      = "Logitech";
-    type        = DEVICE_TYPE_KEYBOARD;
-    description = "Logitech Keyboard Device";
-    serial      = controller->GetSerialString();
+    name                            = controller->GetNameString();
+    vendor                          = "Logitech";
+    type                            = DEVICE_TYPE_KEYBOARD;
+    description                     = "Logitech Keyboard Device";
+    serial                          = controller->GetSerialString();
 
     mode Direct;
     Direct.name                     = "Direct";

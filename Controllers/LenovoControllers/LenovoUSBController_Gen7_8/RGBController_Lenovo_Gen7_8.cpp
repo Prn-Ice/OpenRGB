@@ -4,7 +4,7 @@
 |   RGBController for Lenovo Gen7 and Gen8 devices          |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <vector>
@@ -252,6 +252,10 @@ LenovoRGBController_Gen7_8::LenovoRGBController_Gen7_8(LenovoGen7And8USBControll
 
     switch (controller->getPid())
     {
+    case LEGION_S7GEN7:
+        description = "Lenovo Legion 7 Slim Generation 7";
+        break;
+
     case LEGION_7GEN7:
         description = "Lenovo Legion 7 Generation 7";
         break;
@@ -262,6 +266,11 @@ LenovoRGBController_Gen7_8::LenovoRGBController_Gen7_8(LenovoGen7And8USBControll
 
     case LEGION_7GEN8:
         description = "Lenovo Legion 7 Generation 8";
+        break;
+
+    case LEGION_7GEN9:
+    case LEGION_7GEN9_H:
+        description = "Lenovo Legion 7 Generation 9";
         break;
     }
 
@@ -423,7 +432,7 @@ void LenovoRGBController_Gen7_8::ReadDeviceSettings()
     vector<led_group> current_settings = controller->getProfileSettings(profile_id);
     if(current_settings.size() > 0)
     {
-        for(int i = 0; i < modes.size(); i++)
+        for(unsigned int i = 0; i < modes.size(); i++)
         {
             if(modes[i].value == current_settings[0].mode)
             {

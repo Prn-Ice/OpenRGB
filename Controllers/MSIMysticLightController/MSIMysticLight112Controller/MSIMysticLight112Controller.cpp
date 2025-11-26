@@ -6,13 +6,14 @@
 |   thombo                                      17 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <algorithm>
 #include <array>
 #include <bitset>
 #include "MSIMysticLight112Controller.h"
+#include "StringUtils.h"
 
 #define BITSET(val, bit, pos)       ((unsigned char)std::bitset<8>(val).set((pos), (bit)).to_ulong())
 
@@ -31,21 +32,19 @@ const std::vector<MSI_ZONE> zones_set =
     MSI_ZONE_ON_BOARD_LED_0
 };
 
-
 MSIMysticLight112Controller::MSIMysticLight112Controller
     (
     hid_device*     handle,
-    const char      *path
+    const char*     path,
+    std::string     dev_name
     )
 {
-    dev = handle;
+    dev         = handle;
+    location    = path;
+    name        = dev_name;
 
     if(dev)
     {
-        location = path;
-
-        ReadName();
-        ReadSerial();
         ReadFwVersion();
         ReadSettings();
     }
@@ -158,7 +157,15 @@ std::string MSIMysticLight112Controller::GetDeviceLocation()
 
 std::string MSIMysticLight112Controller::GetSerial()
 {
-    return chip_id;
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 bool MSIMysticLight112Controller::ReadSettings()
@@ -375,49 +382,6 @@ bool MSIMysticLight112Controller::ReadFwVersion()
     | failed                                                |
     \*-----------------------------------------------------*/
     return(ret_val > 0);
-}
-
-void MSIMysticLight112Controller::ReadSerial()
-{
-    wchar_t serial[256];
-
-    /*-----------------------------------------------------*\
-    | Get the serial number string from HID                 |
-    \*-----------------------------------------------------*/
-    hid_get_serial_number_string(dev, serial, 256);
-
-    /*-----------------------------------------------------*\
-    | Convert wchar_t into std::wstring into std::string    |
-    \*-----------------------------------------------------*/
-    std::wstring wserial = std::wstring(serial);
-    chip_id = std::string(wserial.begin(), wserial.end());
-}
-
-void MSIMysticLight112Controller::ReadName()
-{
-    wchar_t tname[256];
-
-    /*-----------------------------------------------------*\
-    | Get the manufacturer string from HID                  |
-    \*-----------------------------------------------------*/
-    hid_get_manufacturer_string(dev, tname, 256);
-
-    /*-----------------------------------------------------*\
-    | Convert wchar_t into std::wstring into std::string    |
-    \*-----------------------------------------------------*/
-    std::wstring wname = std::wstring(tname);
-    name = std::string(wname.begin(), wname.end());
-
-    /*-----------------------------------------------------*\
-    | Get the product string from HID                       |
-    \*-----------------------------------------------------*/
-    hid_get_product_string(dev, tname, 256);
-
-    /*-----------------------------------------------------*\
-    | Append the product string to the manufacturer string  |
-    \*-----------------------------------------------------*/
-    wname = std::wstring(tname);
-    name.append(" ").append(std::string(wname.begin(), wname.end()));
 }
 
 MSI_MODE MSIMysticLight112Controller::GetMode()

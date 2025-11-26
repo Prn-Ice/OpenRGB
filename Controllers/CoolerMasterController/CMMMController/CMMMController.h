@@ -7,14 +7,14 @@
 |   Dracrius                                    12 Mar 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <array>
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define CM_MM_PACKET_SIZE 65
@@ -89,12 +89,13 @@ enum
 class CMMMController
 {
 public:
-    CMMMController(hid_device* dev_handle, char *_path, uint16_t pid);
+    CMMMController(hid_device* dev_handle, char *_path, uint16_t pid, std::string dev_name);
     ~CMMMController();
 
     std::string GetDeviceVendor();
     std::string GetSerial();
     std::string GetLocation();
+    std::string GetName();
 
     uint16_t    GetProductID();
 
@@ -114,8 +115,6 @@ public:
     void        SendSavePacket();
 private:
     std::string name;
-    std::string vendor;
-    std::string serial;
     std::string location;
     hid_device* dev;
 

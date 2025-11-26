@@ -1,16 +1,18 @@
-/*-----------------------------------------*\
-|  SapphireNitroGlowV1Controller.h          |
-|                                           |
-|  Definitions and types for Sapphire Nitro |
-|  Glow V1 GPU RGB lighting controller      |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 7/15/2020   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| SapphireNitroGlowV1Controller.h                           |
+|                                                           |
+|   Driver for Sapphire Nitro Glow V1                       |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                15 Jul 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <string>
 #include "i2c_smbus.h"
-
-#pragma once
 
 #define SAPPHITE_NITRO_GLOW_V1_BRIGHTNESS_MIN 2;
 #define SAPPHITE_NITRO_GLOW_V1_BRIGHTNESS_MAX 0;
@@ -39,10 +41,11 @@ enum
 class SapphireNitroGlowV1Controller
 {
 public:
-    SapphireNitroGlowV1Controller(i2c_smbus_interface* bus, sapphire_dev_id dev);
+    SapphireNitroGlowV1Controller(i2c_smbus_interface* bus, sapphire_dev_id dev, std::string dev_name);
     ~SapphireNitroGlowV1Controller();
 
     std::string     GetDeviceLocation();
+    std::string     GetDeviceName();
 
     unsigned char   GetRed();
     unsigned char   GetGreen();
@@ -59,5 +62,5 @@ public:
 private:
     i2c_smbus_interface*    bus;
     sapphire_dev_id         dev;
-
+    std::string             name;
 };

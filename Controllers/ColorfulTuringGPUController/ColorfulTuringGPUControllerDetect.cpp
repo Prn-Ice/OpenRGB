@@ -4,15 +4,11 @@
 |   Driver for Colorful Turing GPU                          |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "ColorfulTuringGPUController.h"
-#include "RGBController.h"
 #include "RGBController_ColorfulTuringGPU.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"
@@ -21,9 +17,8 @@ void DetectColorfulTuringGPUControllers(i2c_smbus_interface* bus, uint8_t i2c_ad
 {
     if(bus->port_id == 1)
     {
-        ColorfulTuringGPUController* controller         = new ColorfulTuringGPUController(bus, i2c_addr);
+        ColorfulTuringGPUController* controller         = new ColorfulTuringGPUController(bus, i2c_addr, name);
         RGBController_ColorfulTuringGPU* rgb_controller = new RGBController_ColorfulTuringGPU(controller);
-        rgb_controller->name                            = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

@@ -1,25 +1,24 @@
-#include "RoccatEloController.h"
-#include <string.h>
-#include <cmath>
+/*---------------------------------------------------------*\
+| RoccatEloController.cpp                                   |
+|                                                           |
+|   Driver for Roccat Elo                                   |
+|                                                           |
+|   Flora Aubry                                 02 Jan 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-RoccatEloController::RoccatEloController(hid_device* dev_handle, const hid_device_info& info)
+#include <cmath>
+#include <string.h>
+#include "RoccatEloController.h"
+#include "StringUtils.h"
+
+RoccatEloController::RoccatEloController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 
     SendInit();
 }
@@ -34,9 +33,22 @@ std::string RoccatEloController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string RoccatEloController::GetNameString()
+{
+    return(name);
+}
+
 std::string RoccatEloController::GetSerialString()
 {
-    return(serial_number);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void RoccatEloController::SendInit()

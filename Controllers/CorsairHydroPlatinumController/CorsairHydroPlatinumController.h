@@ -4,16 +4,17 @@
 |   Driver for Corsair Hydro Platinum coolers               |
 |                                                           |
 |   Kasper                                      28 Mar 2021 |
+|   Nikola Jurkovic (jurkovic.nikola)           13 Aug 2025 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 #include "DeviceGuardManager.h"
 
@@ -34,19 +35,23 @@ enum
 class CorsairHydroPlatinumController
 {
 public:
-    CorsairHydroPlatinumController(hid_device* dev_handle, const char* path);
+    CorsairHydroPlatinumController(hid_device* dev_handle, const char* path, bool dev_rgb_fan, std::string dev_name);
     ~CorsairHydroPlatinumController();
 
     std::string GetLocation();
     std::string GetFirmwareString();
+    std::string GetName();
     void SetupColors(std::vector<RGBColor> colors);
+    bool HaveRgbFan();
 
 private:
     hid_device*                 dev;
     std::string                 location;
     std::string                 firmware_version;
+    std::string                 name;
     std::atomic<unsigned int>   sequence_number;
     DeviceGuardManager*         guard_manager_ptr;
+    bool                        have_rgb_fan = true;
 
     void SendMagic(const uint8_t* magic, unsigned int command);
     void SendColors(std::vector<RGBColor> colors, unsigned int start, unsigned int end, unsigned int command);

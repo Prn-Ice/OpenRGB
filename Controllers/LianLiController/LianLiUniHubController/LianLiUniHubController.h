@@ -6,7 +6,7 @@
 |   Luca Lovisa                                 20 Feb 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -14,13 +14,7 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
-
-#ifdef __FreeBSD__
 #include <libusb.h>
-#else
-#include <libusb-1.0/libusb.h>
-#endif
-
 #include "RGBController.h"
 
 /*----------------------------------------------------------------------------*\

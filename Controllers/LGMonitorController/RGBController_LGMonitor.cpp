@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       11 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -17,7 +17,7 @@ using namespace std::chrono_literals;
 
 /**------------------------------------------------------------------*\
     @name LGMonitor
-    @category Monitor
+    @category Accessory
     @type USB
     @save :robot:
     @direct :white_check_mark:
@@ -28,12 +28,13 @@ using namespace std::chrono_literals;
 RGBController_LGMonitor::RGBController_LGMonitor(LGMonitorController* controller_ptr)
 {
     controller                          = controller_ptr;
+
+    name                                = controller->GetNameString();
     vendor                              = "LG";
-    type                                = DEVICE_TYPE_LEDSTRIP;
+    type                                = DEVICE_TYPE_MONITOR;
     description                         = "LG Monitor";
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Direct;
     Direct.name                         = "Direct";

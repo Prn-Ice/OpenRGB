@@ -6,7 +6,7 @@
 |   Le Philousophe                              25 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #define NA 0xFFFFFFFF
@@ -281,12 +281,12 @@ static const char *led_endorfy[] =
       like directions for some modes.
 \*-------------------------------------------------------------------*/
 
-RGBController_EVisionV2Keyboard::RGBController_EVisionV2Keyboard(EVisionV2KeyboardController* controller_ptr, EVisionV2KeyboardPart part_)
+RGBController_EVisionV2Keyboard::RGBController_EVisionV2Keyboard(EVisionV2KeyboardController* controller_ptr, EVisionV2KeyboardPart kb_part)
 {
     controller  = controller_ptr;
-    part        = part_;
+    part        = kb_part;
 
-    name        = "EVision Keyboard Device";
+    name        = controller->GetName();
     vendor      = "Evision";
     type        = DEVICE_TYPE_KEYBOARD;
     description = "EVision Keyboard Device";
@@ -299,10 +299,17 @@ RGBController_EVisionV2Keyboard::RGBController_EVisionV2Keyboard(EVisionV2Keyboa
         case EVISION_V2_KEYBOARD_PART_KEYBOARD:
             SetupKeyboardModes();
             break;
+
         case EVISION_V2_KEYBOARD_PART_LOGO:
-        case EVISION_V2_KEYBOARD_PART_EDGE:
+            name += " Logo";
             SetupLogoEdgeModes();
             break;
+
+        case EVISION_V2_KEYBOARD_PART_EDGE:
+            name += " Edge";
+            SetupLogoEdgeModes();
+            break;
+
         case ENDORFY_KEYBOARD_PART_EDGE:
             SetupEdgeModes();
             break;
@@ -757,6 +764,7 @@ void RGBController_EVisionV2Keyboard::SetupZones()
 
     switch(layout)
     {
+        default:
         case EVISION_V2_KEYBOARD_LAYOUT:
             led_names = led_evisionv2;
             matrix_map = (unsigned int *)evisionv2_matrix;
@@ -930,18 +938,6 @@ void RGBController_EVisionV2Keyboard::UpdateSingleLED(int led)
     controller->SetLedDirect(led, colors[led]);
     has_color_set = true;
     last_update_time = std::chrono::steady_clock::now();
-}
-
-void RGBController_EVisionV2Keyboard::SetCustomMode()
-{
-    if(part == EVISION_V2_KEYBOARD_PART_KEYBOARD)
-    {
-        active_mode = EVISION_V2_MODE_DIRECT;
-    }
-    else
-    {
-        active_mode = EVISION_V2_MODE2_STATIC;
-    }
 }
 
 void RGBController_EVisionV2Keyboard::DeviceUpdateMode()

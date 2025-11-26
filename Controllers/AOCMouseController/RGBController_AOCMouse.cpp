@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                20 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_AOCMouse.h"
@@ -26,7 +26,7 @@ RGBController_AOCMouse::RGBController_AOCMouse(AOCMouseController* controller_pt
 {
     controller                      = controller_ptr;
 
-    name                            = "AOC Mouse Device";
+    name                            = controller->GetDeviceName();
     vendor                          = "AOC";
     type                            = DEVICE_TYPE_MOUSE;
     description                     = "AOC Mouse Device";

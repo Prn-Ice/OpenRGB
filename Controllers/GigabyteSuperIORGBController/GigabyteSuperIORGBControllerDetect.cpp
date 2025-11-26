@@ -6,16 +6,11 @@
 |   Ryan Frankcombe (422gRdHuX5uk)              11 Sep 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "GigabyteSuperIORGBController.h"
-#include "RGBController.h"
 #include "RGBController_GigabyteSuperIORGB.h"
 #include "super_io.h"
 #include "dmiinfo.h"
@@ -34,13 +29,13 @@ static gig_device compatible_devices[] =
 
 void DetectGigabyteSuperIORGBControllers()
 {
-    int sio_addrs[2] = {0x2E, 0x4E};
+    int sio_addrs[2]            = {0x2E, 0x4E};
 
     DMIInfo board;
-    std::string board_dmi = board.getMainboard();
-    std::string manufacturer = board.getManufacturer();
+    std::string board_dmi       = board.getMainboard();
+    std::string manufacturer    = board.getManufacturer();
 
-    if (manufacturer != "Gigabyte Technology Co., Ltd.")
+    if(manufacturer != "Gigabyte Technology Co., Ltd.")
     {
         return;
     }
@@ -58,11 +53,10 @@ void DetectGigabyteSuperIORGBControllers()
             case SIO_ITE8688_ID:
                 for(unsigned int i = 0; i < NUM_COMPATIBLE_DEVICES; i++)
                 {
-                    if (board_dmi.find(std::string(compatible_devices[i].name)) != std::string::npos)
+                    if(board_dmi.find(std::string(compatible_devices[i].name)) != std::string::npos)
                     {
-                        GigabyteSuperIORGBController*     controller     = new GigabyteSuperIORGBController(sioaddr);
+                        GigabyteSuperIORGBController*     controller     = new GigabyteSuperIORGBController(sioaddr, "Gigabyte " + board_dmi);
                         RGBController_GigabyteSuperIORGB* rgb_controller = new RGBController_GigabyteSuperIORGB(controller);
-                        rgb_controller->name                             = "Gigabyte " + board_dmi;
 
                         ResourceManager::get()->RegisterRGBController(rgb_controller);
                         break;

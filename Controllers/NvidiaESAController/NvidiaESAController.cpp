@@ -6,31 +6,18 @@
 |   Morgan Guimard (morg)                       18 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "NvidiaESAController.h"
+#include "StringUtils.h"
 
-NvidiaESAController::NvidiaESAController(hid_device* dev_handle, const hid_device_info& info)
+NvidiaESAController::NvidiaESAController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
-    dev                 = dev_handle;
-    location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
-
+    dev         = dev_handle;
+    location    = info.path;
+    name        = dev_name;
 }
 
 NvidiaESAController::~NvidiaESAController()
@@ -43,21 +30,29 @@ std::string NvidiaESAController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string NvidiaESAController::GetSerialString()
+std::string NvidiaESAController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string NvidiaESAController::GetFirmwareVersion()
+std::string NvidiaESAController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void NvidiaESAController::SetZoneColor(unsigned int zone_idx, RGBColor color)
 {
-    unsigned char red = 0x0F - 0x0F * RGBGetRValue(color) / 255.0;
-    unsigned char grn = 0x0F - 0x0F * RGBGetGValue(color) / 255.0;
-    unsigned char blu = 0x0F - 0x0F * RGBGetBValue(color) / 255.0;
+    unsigned char red = (unsigned char)(0x0F - 0x0F * RGBGetRValue(color) / 255.0f);
+    unsigned char grn = (unsigned char)(0x0F - 0x0F * RGBGetGValue(color) / 255.0f);
+    unsigned char blu = (unsigned char)(0x0F - 0x0F * RGBGetBValue(color) / 255.0f);
 
     unsigned char usb_buf[4];
 

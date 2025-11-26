@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       20 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -430,13 +430,13 @@ typedef struct
 RGBController_KeychronKeyboard::RGBController_KeychronKeyboard(KeychronKeyboardController* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "Keychron Keyboard";
+
+    name                                = controller->GetNameString();
     vendor                              = "Keychron";
     type                                = DEVICE_TYPE_KEYBOARD;
     description                         = name;
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Custom;
     Custom.name                         = "Custom";

@@ -1,32 +1,23 @@
-/*-----------------------------------------*\
-|  TrustGXT180Controller.cpp                |
-|                                           |
-|  Driver for Trust GXT 180 controller      |
-|                                           |
-|  Guimard Morgan (morg) 3/24/2022          |
-\*-----------------------------------------*/
-#include "TrustGXT180Controller.h"
-#include <string.h>
+/*---------------------------------------------------------*\
+| TrustGXT180Controller.cpp                                 |
+|                                                           |
+|   Driver for Trust GXT 180                                |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Mar 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-TrustGXT180Controller::TrustGXT180Controller(hid_device* dev_handle, const hid_device_info& info)
+#include <string.h>
+#include "StringUtils.h"
+#include "TrustGXT180Controller.h"
+
+TrustGXT180Controller::TrustGXT180Controller(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
-
+    name                = dev_name;
 }
 
 TrustGXT180Controller::~TrustGXT180Controller()
@@ -39,14 +30,22 @@ std::string TrustGXT180Controller::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string TrustGXT180Controller::GetSerialString()
+std::string TrustGXT180Controller::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string TrustGXT180Controller::GetFirmwareVersion()
+std::string TrustGXT180Controller::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void TrustGXT180Controller::SetMode(RGBColor color, unsigned char brightness, unsigned char speed, unsigned char mode_value)

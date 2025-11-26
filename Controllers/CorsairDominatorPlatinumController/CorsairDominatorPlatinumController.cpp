@@ -6,19 +6,21 @@
 |   Erik Gilling (konkers)                      25 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
+#include <chrono>
 #include "CorsairDominatorPlatinumController.h"
 
 using namespace std::chrono_literals;
 
-CorsairDominatorPlatinumController::CorsairDominatorPlatinumController(i2c_smbus_interface *bus, corsair_dev_id dev, unsigned int leds_count)
+CorsairDominatorPlatinumController::CorsairDominatorPlatinumController(i2c_smbus_interface *bus, corsair_dev_id dev, unsigned int leds_count, std::string dev_name)
 {
     this->bus           = bus;
     this->dev           = dev;
     this->leds_count    = leds_count;
+    this->name          = dev_name;
 
     led_data[0] = 0xc;
 }
@@ -40,6 +42,11 @@ std::string CorsairDominatorPlatinumController::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string CorsairDominatorPlatinumController::GetDeviceName()
+{
+    return(name);
 }
 
 void CorsairDominatorPlatinumController::SetAllColors

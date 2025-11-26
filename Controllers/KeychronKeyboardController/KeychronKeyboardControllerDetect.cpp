@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       20 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "KeychronKeyboardController.h"
-#include "RGBController.h"
 #include "RGBController_KeychronKeyboard.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,9 @@ void DetectKeychronKeyboardControllers(hid_device_info* info, const std::string&
 
     if(dev)
     {
-        KeychronKeyboardController*     controller      = new KeychronKeyboardController(dev, *info);
+        KeychronKeyboardController*     controller      = new KeychronKeyboardController(dev, *info, name);
         RGBController_KeychronKeyboard* rgb_controller  = new RGBController_KeychronKeyboard(controller);
-        rgb_controller->name                            = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

@@ -6,7 +6,7 @@
 |   TheRogueZeta                                05 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LogitechLightspeed.h"
@@ -168,13 +168,14 @@ void RGBController_LogitechLightspeed::SetupZones()
     const std::string led_string    = "LED";
     uint8_t led_count               = controller->lightspeed->getLED_count();
 
+    LOG_DEBUG("[%s] Setting up %d LEDs", name.c_str(), led_count);
     if(led_count > 0)
     {
         for(size_t i = 0; i < led_count; i++)
         {
             zone Lightspeed_logo_zone;
             led Lightspeed_logo_led;
-            logitech_led new_led                    = controller->lightspeed->getLED_info(i);
+            logitech_led new_led                    = controller->lightspeed->getLED_info((uint8_t)i);
 
             if(new_led.location < NUM_LOGITECH_LED_LOCATIONS )
             {
@@ -198,7 +199,7 @@ void RGBController_LogitechLightspeed::SetupZones()
             Lightspeed_logo_zone.matrix_map         = NULL;
             zones.push_back(Lightspeed_logo_zone);
 
-            Lightspeed_logo_led.value               = i;
+            Lightspeed_logo_led.value               = (unsigned int)i;
             leds.push_back(Lightspeed_logo_led);
         }
     }

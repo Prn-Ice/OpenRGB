@@ -6,16 +6,18 @@
 |   Mohamad Sallal (msallal)                    22 May 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "AlienwareAW510KController.h"
+#include "StringUtils.h"
 
-AlienwareAW510KController::AlienwareAW510KController(hid_device* dev_handle, const char* path)
+AlienwareAW510KController::AlienwareAW510KController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     SendCommit();
 }
@@ -30,15 +32,22 @@ std::string AlienwareAW510KController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string AlienwareAW510KController::GetDeviceName()
+{
+    return(name);
+}
+
 std::string AlienwareAW510KController::GetSerialString()
 {
     wchar_t serial_string[128];
-    hid_get_serial_number_string(dev, serial_string, 128);
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
+    if(ret != 0)
+    {
+        return("");
+    }
 
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void AlienwareAW510KController::SendCommit()

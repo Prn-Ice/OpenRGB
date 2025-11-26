@@ -6,16 +6,18 @@
 |   Adam Honse (CalcProgrammer1)                15 Mar 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "RedragonMouseController.h"
+#include "StringUtils.h"
 
-RedragonMouseController::RedragonMouseController(hid_device* dev_handle, const char* path)
+RedragonMouseController::RedragonMouseController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     unsigned char active_profile = 0x00;
 
@@ -33,6 +35,11 @@ std::string RedragonMouseController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string RedragonMouseController::GetNameString()
+{
+    return(name);
+}
+
 std::string RedragonMouseController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -43,10 +50,7 @@ std::string RedragonMouseController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void RedragonMouseController::SendMouseColor
@@ -107,7 +111,7 @@ void RedragonMouseController::SendMouseMode
 
 void RedragonMouseController::SendMouseApply()
 {
-    char usb_buf[REDRAGON_MOUSE_REPORT_SIZE];
+    unsigned char usb_buf[REDRAGON_MOUSE_REPORT_SIZE];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -125,7 +129,7 @@ void RedragonMouseController::SendMouseApply()
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_send_feature_report(dev, (unsigned char *)usb_buf, REDRAGON_MOUSE_REPORT_SIZE);
+    hid_send_feature_report(dev, usb_buf, REDRAGON_MOUSE_REPORT_SIZE);
 }
 
 void RedragonMouseController::SendWritePacket
@@ -135,7 +139,7 @@ void RedragonMouseController::SendWritePacket
     unsigned char *     data
     )
 {
-    char usb_buf[REDRAGON_MOUSE_REPORT_SIZE];
+    unsigned char usb_buf[REDRAGON_MOUSE_REPORT_SIZE];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -159,5 +163,5 @@ void RedragonMouseController::SendWritePacket
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_send_feature_report(dev, (unsigned char *)usb_buf, REDRAGON_MOUSE_REPORT_SIZE);
+    hid_send_feature_report(dev, usb_buf, REDRAGON_MOUSE_REPORT_SIZE);
 }

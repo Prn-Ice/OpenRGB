@@ -4,7 +4,7 @@
 |   RGBController for Corsair K55 RGB PRO XT keyboard       |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CorsairK55RGBPROXT.h"
@@ -202,14 +202,14 @@ std::vector<std::string> key_names =
 
 RGBController_CorsairK55RGBPROXT::RGBController_CorsairK55RGBPROXT(CorsairK55RGBPROXTController* controller_ptr)
 {
-    controller      = controller_ptr;
+    controller              = controller_ptr;
 
-    vendor          = "Corsair";
-    description     = "Corsair K55 RGB PRO XT Keyboard Device";
-    type            = DEVICE_TYPE_KEYBOARD;
-    version         = controller->GetFirmwareString();
-    location        = controller->GetDeviceLocation();
-    serial          = controller->GetSerialString();
+    name                    = controller->GetNameString();
+    vendor                  = "Corsair";
+    description             = "Corsair K55 RGB PRO XT Keyboard Device";
+    type                    = DEVICE_TYPE_KEYBOARD;
+    location                = controller->GetDeviceLocation();
+    serial                  = controller->GetSerialString();
 
     mode Direct;
     Direct.name             = "Direct";

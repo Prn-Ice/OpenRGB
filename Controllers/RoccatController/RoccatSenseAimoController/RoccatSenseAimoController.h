@@ -1,15 +1,18 @@
-/*-------------------------------------------------------------------*\
-|  RoccatSenseAimoController.cpp                                      |
-|                                                                     |
-|  Driver for Roccat Sense Aimo                                       |
-|                                                                     |
-|  Mola19 08/09/2023                                                  |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatSenseAimoController.h                               |
+|                                                           |
+|   Driver for Roccat Sense Aimo                            |
+|                                                           |
+|   Mola19                                      09 Aug 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
+#include <hidapi.h>
 #include "RGBController.h"
-#include <hidapi/hidapi.h>
 
 enum
 {
@@ -44,11 +47,12 @@ struct mode_struct
 class RoccatSenseAimoController
 {
 public:
-    RoccatSenseAimoController(hid_device* dev_handle, char *path);
+    RoccatSenseAimoController(hid_device* dev_handle, char *path, std::string dev_name);
     ~RoccatSenseAimoController();
 
-    std::string     GetSerial();
     std::string     GetLocation();
+    std::string     GetName();
+    std::string     GetSerial();
     std::string     GetVersion();
 
     mode_struct     GetMode();
@@ -59,4 +63,5 @@ public:
 private:
     hid_device*     dev;
     std::string     location;
+    std::string     name;
 };

@@ -7,7 +7,7 @@
 |   based on TheRogueZeta                       31 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LogitechG560.h"
@@ -25,13 +25,13 @@
 
 RGBController_LogitechG560::RGBController_LogitechG560(LogitechG560Controller* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller              = controller_ptr;
 
-    name        = "Logitech G560 Lightsync Speaker";
-    vendor      = "Logitech";
-    type        = DEVICE_TYPE_SPEAKER;
-    description = "Logitech G560 Lightsync Speaker";
-    location    = controller->GetDeviceLocation();
+    name                    = controller->GetDeviceName();
+    vendor                  = "Logitech";
+    type                    = DEVICE_TYPE_SPEAKER;
+    description             = "Logitech G560 Lightsync Speaker";
+    location                = controller->GetDeviceLocation();
 
     mode Off;
     Off.name                = "Off";

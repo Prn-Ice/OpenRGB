@@ -6,10 +6,9 @@
 |   Adam Honse (CalcProgrammer1)                19 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <cstring>
 #include "RGBController.h"
 #include "CrucialController.h"
 

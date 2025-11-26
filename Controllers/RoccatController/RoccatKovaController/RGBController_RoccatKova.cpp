@@ -1,10 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_RoccatKova.cpp             |
-|                                           |
-|  RGB Controller for Roccat Kova           |
-|                                           |
-|  Gustash 01/12/2022                       |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_RoccatKova.cpp                              |
+|                                                           |
+|   RGBController for Roccat Kova                           |
+|                                                           |
+|   Gustash                                     01 Dec 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_RoccatKova.h"
 
@@ -26,13 +29,13 @@ RGBController_RoccatKova::RGBController_RoccatKova(RoccatKovaController* control
 {
     controller                    = controller_ptr;
 
-    type                          = DEVICE_TYPE_MOUSE;
-    name                          = "Roccat Kova";
+    name                          = controller->GetName();
     vendor                        = "Roccat";
-    description                   = "Controller compatible with the Roccat Kova gaming mouse";
+    type                          = DEVICE_TYPE_MOUSE;
+    description                   = "Roccat Kova Mouse Device";
     serial                        = controller->GetSerial();
     location                      = controller->GetLocation();
-    version                       = controller->GetFirmwareVersion();
+    version                       = controller->GetVersion();
 
     mode Static;
     Static.name                   = "Static";

@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_ZotacTuringGPU.cpp         |
-|                                           |
-|  Generic RGB Interface for OpenRGB        |
-|  ZOTAC Turing GPU Driver                  |
-|                                           |
-|  David Henry                  1/07/2023   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_ZotacTuringGPU.cpp                          |
+|                                                           |
+|   RGBController for Zotac Turing GPU                      |
+|                                                           |
+|   David Henry                                 07 Jan 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_ZotacTuringGPU.h"
 
@@ -22,19 +24,19 @@
 
 RGBController_ZotacTuringGPU::RGBController_ZotacTuringGPU(ZotacTuringGPUController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller              = controller_ptr;
 
-    name        = "ZOTAC GPU";
-    vendor      = "ZOTAC";
-    description = "ZOTAC Turing-based RGB GPU Device";
-    location    = controller->GetDeviceLocation();
-    type        = DEVICE_TYPE_GPU;
+    name                    = controller->GetDeviceName();
+    vendor                  = "ZOTAC";
+    description             = "ZOTAC Turing-based RGB GPU Device";
+    location                = controller->GetDeviceLocation();
+    type                    = DEVICE_TYPE_GPU;
 
     mode Direct;
-    Direct.name           = "Direct";
-    Direct.value          = ZOTAC_GPU_MODE_STATIC;
-    Direct.flags          = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode     = MODE_COLORS_PER_LED;
+    Direct.name             = "Direct";
+    Direct.value            = ZOTAC_GPU_MODE_STATIC;
+    Direct.flags            = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode       = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     mode Flashing;
@@ -48,33 +50,33 @@ RGBController_ZotacTuringGPU::RGBController_ZotacTuringGPU(ZotacTuringGPUControl
     modes.push_back(Flashing);
 
     mode Wave;
-    Wave.name       = "Rainbow Wave";
-    Wave.value      = ZOTAC_GPU_MODE_WAVE;
-    Wave.flags      = MODE_FLAG_HAS_SPEED;
-    Wave.speed_min  = ZOTAC_GPU_SPEED_SLOWEST;
-    Wave.speed_max  = ZOTAC_GPU_SPEED_FASTEST;
-    Wave.speed      = ZOTAC_GPU_SPEED_NORMAL;
-    Wave.color_mode = MODE_COLORS_NONE;
+    Wave.name               = "Rainbow Wave";
+    Wave.value              = ZOTAC_GPU_MODE_WAVE;
+    Wave.flags              = MODE_FLAG_HAS_SPEED;
+    Wave.speed_min          = ZOTAC_GPU_SPEED_SLOWEST;
+    Wave.speed_max          = ZOTAC_GPU_SPEED_FASTEST;
+    Wave.speed              = ZOTAC_GPU_SPEED_NORMAL;
+    Wave.color_mode         = MODE_COLORS_NONE;
     modes.push_back(Wave);
 
     mode Breathing;
-    Breathing.name           = "Breathing";
-    Breathing.value          = ZOTAC_GPU_MODE_BREATHING;
-    Breathing.flags          = MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_PER_LED_COLOR;
-    Breathing.speed_min      = ZOTAC_GPU_SPEED_SLOWEST;
-    Breathing.speed_max      = ZOTAC_GPU_SPEED_FASTEST;
-    Breathing.speed          = ZOTAC_GPU_SPEED_NORMAL;
-    Breathing.color_mode     = MODE_COLORS_PER_LED;
+    Breathing.name          = "Breathing";
+    Breathing.value         = ZOTAC_GPU_MODE_BREATHING;
+    Breathing.flags         = MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_PER_LED_COLOR;
+    Breathing.speed_min     = ZOTAC_GPU_SPEED_SLOWEST;
+    Breathing.speed_max     = ZOTAC_GPU_SPEED_FASTEST;
+    Breathing.speed         = ZOTAC_GPU_SPEED_NORMAL;
+    Breathing.color_mode    = MODE_COLORS_PER_LED;
     modes.push_back(Breathing);
 
     mode ColorCycle;
-    ColorCycle.name       = "Spectrum Cycle";
-    ColorCycle.value      = ZOTAC_GPU_MODE_COLOR_CYCLE;
-    ColorCycle.flags      = MODE_FLAG_HAS_SPEED;
-    ColorCycle.speed_min  = ZOTAC_GPU_SPEED_SLOWEST;
-    ColorCycle.speed_max  = ZOTAC_GPU_SPEED_FASTEST;
-    ColorCycle.speed      = ZOTAC_GPU_SPEED_NORMAL;
-    ColorCycle.color_mode = MODE_COLORS_NONE;
+    ColorCycle.name         = "Spectrum Cycle";
+    ColorCycle.value        = ZOTAC_GPU_MODE_COLOR_CYCLE;
+    ColorCycle.flags        = MODE_FLAG_HAS_SPEED;
+    ColorCycle.speed_min    = ZOTAC_GPU_SPEED_SLOWEST;
+    ColorCycle.speed_max    = ZOTAC_GPU_SPEED_FASTEST;
+    ColorCycle.speed        = ZOTAC_GPU_SPEED_NORMAL;
+    ColorCycle.color_mode   = MODE_COLORS_NONE;
     modes.push_back(ColorCycle);
 
     SetupZones();
@@ -122,7 +124,7 @@ void RGBController_ZotacTuringGPU::SetupInitialValues()
 
     controller->GetMode(colors[0], active_mode, speed);
     modes[active_mode].speed = speed;
-    
+
     SignalUpdate();
 }
 

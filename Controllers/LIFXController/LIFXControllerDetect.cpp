@@ -6,15 +6,11 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      05 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "LIFXController.h"
-#include "RGBController.h"
 #include "RGBController_LIFX.h"
 #include "SettingsManager.h"
 
@@ -44,10 +40,14 @@ void DetectLIFXControllers()
         {
             if(lifx_settings["devices"][device_idx].contains("ip"))
             {
-                std::string lifx_ip = lifx_settings["devices"][device_idx]["ip"];
-                std::string name    = lifx_settings["devices"][device_idx]["name"];
+                std::string lifx_ip     = lifx_settings["devices"][device_idx]["ip"];
+                std::string name        = lifx_settings["devices"][device_idx]["name"];
+                bool multizone          = lifx_settings["devices"][device_idx]["multizone"];
+                bool extended_multizone = lifx_settings["devices"][device_idx]["extended_multizone"];
 
-                LIFXController*     controller     = new LIFXController(lifx_ip, name);
+                LIFXController* controller = new LIFXController(lifx_ip, name, multizone, extended_multizone);
+                controller->FetchZoneCount();
+
                 RGBController_LIFX* rgb_controller = new RGBController_LIFX(controller);
 
                 ResourceManager::get()->RegisterRGBController(rgb_controller);

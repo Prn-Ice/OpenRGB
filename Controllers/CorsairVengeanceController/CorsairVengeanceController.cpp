@@ -1,12 +1,13 @@
 /*---------------------------------------------------------*\
 | CorsairVengeanceController.cpp                            |
 |                                                           |
-|   Driver for Corsair Vengeance RGB RAM                    |
+|   Driver for original single-zone Corsair Vengeance DDR4  |
+|   RGB RAM                                                 |
 |                                                           |
 |   Adam Honse (CalcProgrammer1)                08 Mar 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>

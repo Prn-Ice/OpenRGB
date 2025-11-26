@@ -4,7 +4,7 @@
 |   Driver for Patriot Viper Steel RAM                      |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -13,7 +13,7 @@
 #include "i2c_smbus.h"
 
 typedef unsigned char viper_dev_id;
-typedef unsigned short viper_register;
+typedef unsigned char viper_register;
 
 enum
 {
@@ -50,5 +50,4 @@ private:
     i2c_smbus_interface *bus;
     viper_dev_id dev;
     unsigned char mode;
-    unsigned char speed;
 };

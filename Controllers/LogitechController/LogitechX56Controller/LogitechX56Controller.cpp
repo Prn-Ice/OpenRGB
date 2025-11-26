@@ -6,16 +6,18 @@
 |   Edbgon                                      11 Jun 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogitechX56Controller.h"
+#include "StringUtils.h"
 
-LogitechX56Controller::LogitechX56Controller(hid_device* dev_handle, const char* path)
+LogitechX56Controller::LogitechX56Controller(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 LogitechX56Controller::~LogitechX56Controller()
@@ -28,9 +30,9 @@ std::string LogitechX56Controller::GetDeviceLocation()
     return("HID: " + location);
 }
 
-char* LogitechX56Controller::GetDeviceName()
+std::string LogitechX56Controller::GetDeviceName()
 {
-    return device_name;
+    return(name);
 }
 
 std::string LogitechX56Controller::GetSerialString()
@@ -43,10 +45,7 @@ std::string LogitechX56Controller::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LogitechX56Controller::SetColor(RGBColor color, uint8_t brightness)

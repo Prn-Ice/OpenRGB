@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                22 Jan 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_Razer.h"
@@ -40,7 +40,7 @@ RGBController_Razer::RGBController_Razer(RazerController* controller_ptr)
     if(type == DEVICE_TYPE_KEYBOARD)
     {
         LOG_DEBUG("[%s] Checking Keyboard Layout", name.c_str());
-        std::string layout = controller->GetKeyboardLayoutName();
+        std::string layout = controller->GetKeyboardLayoutString();
 
         LOG_DEBUG("[%s] returned: %s", name.c_str(), layout.c_str());
         description.append(", ");
@@ -240,7 +240,7 @@ void RGBController_Razer::SetupZones()
                             {
                                 led new_led;
 
-                                new_led.name = new_kb.GetKeyNameAt(row, col);
+                                new_led.name = new_kb.GetKeyNameAt((unsigned int)row, (unsigned int)col);
 
                                 leds.push_back(new_led);
                             }

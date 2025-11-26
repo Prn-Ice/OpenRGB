@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       19 Jan 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define INSTANT_MOUSE_REPORT_ID                 0x07
@@ -29,7 +29,13 @@ enum
     INSTANT_MOUSE_LOOP_MODE                     = 0x04,
     INSTANT_MOUSE_SPECTRUM_CYCLE_MODE           = 0x06,
     INSTANT_MOUSE_RAINBOW_WAVE_MODE             = 0x07,
-    INSTANT_MOUSE_BREATHING_MODE                = 0x08
+    INSTANT_MOUSE_BREATHING_MODE                = 0x08,
+    ANT_MOUSE_BREATHING_MODE                    = 0x09,
+    INSTANT_MOUSE_ENRAPTURED_MODE               = 0xBB,
+    INSTANT_MOUSE_FLICKER_MODE                  = 0xB8,
+    INSTANT_MOUSE_RIPPLE_MODE                   = 0xBA,
+    INSTANT_MOUSE_STARTRECK_MODE                = 0xB9,
+
 };
 
 enum
@@ -43,12 +49,13 @@ enum
 class InstantMouseController
 {
 public:
-    InstantMouseController(hid_device* dev_handle, const hid_device_info& info);
+    InstantMouseController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~InstantMouseController();
 
+    std::string GetNameString();
     std::string GetSerialString();
     std::string GetDeviceLocation();
-    std::string GetFirmwareVersion();
+    uint16_t GetPID();
 
     void SetMode(uint8_t mode_value, uint8_t speed, uint8_t brightness, uint8_t direction);
     void SendColor(RGBColor color);
@@ -56,6 +63,6 @@ public:
 private:
     hid_device* dev;
     std::string location;
-    std::string serial_number;
-    std::string version;
+    std::string name;
+    uint16_t    pid;
 };

@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       01 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_RoccatBurst.h"
@@ -27,10 +27,12 @@ RGBController_RoccatBurst::RGBController_RoccatBurst(RoccatBurstController* cont
 {
     controller                  = controller_ptr;
 
-    name                        = "Roccat Burst Core";
+    name                        = controller->GetNameString();
     vendor                      = "Roccat";
     type                        = DEVICE_TYPE_MOUSE;
-    description                 = "Roccat Burst Core Mouse";
+    description                 = "Roccat Burst Mouse Device";
+    location                    = controller->GetDeviceLocation();
+    serial                      = controller->GetSerialString();
 
     mode Direct;
     Direct.name                 = "Direct";

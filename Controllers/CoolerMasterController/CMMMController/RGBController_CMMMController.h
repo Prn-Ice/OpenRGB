@@ -7,7 +7,7 @@
 |   Dracrius                                    12 Mar 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -33,9 +33,9 @@ public:
     void        UpdateZoneLEDs(int zone);
     void        UpdateSingleLED(int led);
 
-    void        SetCustomMode();
     void        DeviceUpdateMode();
     void        DeviceSaveMode();
+
 private:
     void        Init_Controller();
     int         GetDeviceMode();

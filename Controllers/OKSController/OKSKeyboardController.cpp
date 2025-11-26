@@ -6,16 +6,18 @@
 |   Merafour (OKS)                              24 Feb 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "OKSKeyboardController.h"
+#include "StringUtils.h"
 
-OKSKeyboardController::OKSKeyboardController(hid_device* dev_handle, const char* path, const unsigned short pid)
+OKSKeyboardController::OKSKeyboardController(hid_device* dev_handle, const char* path, const unsigned short pid, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
     usb_pid     = pid;
 
     SendInitialize();
@@ -31,6 +33,11 @@ std::string OKSKeyboardController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string OKSKeyboardController::GetNameString()
+{
+    return(name);
+}
+
 std::string OKSKeyboardController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -41,10 +48,7 @@ std::string OKSKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 unsigned short OKSKeyboardController::GetUSBPID()

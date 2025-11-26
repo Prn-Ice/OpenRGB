@@ -6,22 +6,29 @@
 |   sanchezzzs                                  20 Oct 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogitechGProKeyboardController.h"
+#include "StringUtils.h"
 
-LogitechGProKeyboardController::LogitechGProKeyboardController(hid_device* dev_handle_0x11, hid_device* dev_handle_0x12)
+LogitechGProKeyboardController::LogitechGProKeyboardController(hid_device* dev_handle_0x11, hid_device* dev_handle_0x12, std::string dev_name)
 {
-    dev_pkt_0x11 = dev_handle_0x11;
-    dev_pkt_0x12 = dev_handle_0x12;
+    dev_pkt_0x11    = dev_handle_0x11;
+    dev_pkt_0x12    = dev_handle_0x12;
+    name            = dev_name;
 }
 
 LogitechGProKeyboardController::~LogitechGProKeyboardController()
 {
     hid_close(dev_pkt_0x11);
     hid_close(dev_pkt_0x12);
+}
+
+std::string LogitechGProKeyboardController::GetNameString()
+{
+    return(name);
 }
 
 std::string LogitechGProKeyboardController::GetSerialString()
@@ -34,10 +41,7 @@ std::string LogitechGProKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LogitechGProKeyboardController::Commit()
@@ -76,7 +80,7 @@ void LogitechGProKeyboardController::SetMode
 
 void LogitechGProKeyboardController::SendCommit()
 {
-    char usb_buf[20];
+    unsigned char usb_buf[20];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -94,8 +98,8 @@ void LogitechGProKeyboardController::SendCommit()
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_write(dev_pkt_0x11, (unsigned char *)usb_buf, 20);
-    hid_read(dev_pkt_0x11, (unsigned char *)usb_buf, 20);
+    hid_write(dev_pkt_0x11, usb_buf, 20);
+    hid_read(dev_pkt_0x11, usb_buf, 20);
 }
 
 void LogitechGProKeyboardController::SendDirectFrame
@@ -105,7 +109,7 @@ void LogitechGProKeyboardController::SendDirectFrame
     unsigned char *     frame_data
     )
 {
-    char usb_buf[64];
+    unsigned char usb_buf[64];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -130,8 +134,8 @@ void LogitechGProKeyboardController::SendDirectFrame
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_write(dev_pkt_0x12, (unsigned char *)usb_buf, 64);
-    hid_read(dev_pkt_0x11, (unsigned char *)usb_buf, 20);
+    hid_write(dev_pkt_0x12, usb_buf, 64);
+    hid_read(dev_pkt_0x11, usb_buf, 20);
 }
 
 void LogitechGProKeyboardController::SendMode
@@ -144,7 +148,7 @@ void LogitechGProKeyboardController::SendMode
     unsigned char       blue
     )
 {
-    char usb_buf[20];
+    unsigned char usb_buf[20];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -183,6 +187,6 @@ void LogitechGProKeyboardController::SendMode
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_write(dev_pkt_0x11, (unsigned char *)usb_buf, 20);
-    hid_read(dev_pkt_0x11, (unsigned char *)usb_buf, 20);
+    hid_write(dev_pkt_0x11, usb_buf, 20);
+    hid_read(dev_pkt_0x11, usb_buf, 20);
 }

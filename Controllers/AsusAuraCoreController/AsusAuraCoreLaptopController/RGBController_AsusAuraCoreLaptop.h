@@ -6,11 +6,12 @@
 |   Chris M (Dr_No)                             28 Jul 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
+#include <algorithm>
 #include <vector>
 #include "RGBController.h"
 #include "AsusAuraCoreLaptopController.h"
@@ -31,7 +32,8 @@ public:
     void                DeviceUpdateMode();
 
 private:
-    void                Init_Controller();
+    RGBColor                            null_color              = 0;
+    std::vector<RGBColor *>             buffer_map;
 
-    AsusAuraCoreLaptopController*      controller;
+    AsusAuraCoreLaptopController*       controller;
 };

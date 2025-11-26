@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                11 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -37,10 +37,11 @@ enum
 class EVGAGPUv1Controller
 {
 public:
-    EVGAGPUv1Controller(i2c_smbus_interface* bus, evga_dev_id dev);
+    EVGAGPUv1Controller(i2c_smbus_interface* bus, evga_dev_id dev, std::string dev_name);
     ~EVGAGPUv1Controller();
 
     std::string     GetDeviceLocation();
+    std::string     GetDeviceName();
 
     unsigned char   GetMode();
     unsigned char   GetRed();
@@ -54,4 +55,5 @@ public:
 private:
     i2c_smbus_interface*    bus;
     evga_dev_id             dev;
+    std::string             name;
 };

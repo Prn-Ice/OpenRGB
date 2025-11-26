@@ -6,20 +6,22 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      29 Dec 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "NZXTHue2Controller.h"
 #include "LogManager.h"
+#include "NZXTHue2Controller.h"
+#include "StringUtils.h"
 
-NZXTHue2Controller::NZXTHue2Controller(hid_device* dev_handle, unsigned int rgb_channels, unsigned int fan_channels, const char* path)
+NZXTHue2Controller::NZXTHue2Controller(hid_device* dev_handle, unsigned int rgb_channels, unsigned int fan_channels, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     num_fan_channels = fan_channels;
     num_rgb_channels = rgb_channels;
@@ -58,6 +60,11 @@ std::string NZXTHue2Controller::GetLocation()
     return("HID: " + location);
 }
 
+std::string NZXTHue2Controller::GetName()
+{
+    return(name);
+}
+
 unsigned int NZXTHue2Controller::GetNumFanChannels()
 {
     return(num_fan_channels);
@@ -83,10 +90,7 @@ std::string NZXTHue2Controller::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void NZXTHue2Controller::SendFan
@@ -218,6 +222,10 @@ void NZXTHue2Controller::UpdateDeviceList()
                 num_leds_in_device = 20;
                 break;
 
+            case 0x16: //F140 RGB Duo fan (140mm)
+                num_leds_in_device = 20;
+                break;
+
             case 0x17: //F120 RGB Core fan (120mm)
                 num_leds_in_device = 8;
                 break;
@@ -228,6 +236,18 @@ void NZXTHue2Controller::UpdateDeviceList()
 
             case 0x19: //F120 RGB Core fan case version (120mm)
                 num_leds_in_device = 8;
+                break;
+
+            case 0x1D: //F360 RGB Core Fan Case Version (360mm)
+                num_leds_in_device = 24;
+                break;
+
+            case 0x1E: //Kraken Elite Ring
+                num_leds_in_device = 24;
+                break;
+
+            case 0x1F: //F420 RGB
+                num_leds_in_device = 24;
                 break;
 
             default:
@@ -300,7 +320,7 @@ void NZXTHue2Controller::SetChannelEffect
     \*-----------------------------------------------------*/
     for (std::size_t idx = 0; idx < num_colors; idx++)
     {
-        int pixel_idx = idx * 3;
+        int pixel_idx = (int)idx * 3;
         RGBColor color = colors[idx];
         color_data[pixel_idx + 0x00] = RGBGetGValue(color);
         color_data[pixel_idx + 0x01] = RGBGetRValue(color);
@@ -327,7 +347,7 @@ void NZXTHue2Controller::SetChannelLEDs
     \*-----------------------------------------------------*/
     for (std::size_t idx = 0; idx < num_colors; idx++)
     {
-        int pixel_idx = idx * 3;
+        int pixel_idx = (int)idx * 3;
         RGBColor color = colors[idx];
         color_data[pixel_idx + 0x00] = RGBGetGValue(color);
         color_data[pixel_idx + 0x01] = RGBGetRValue(color);

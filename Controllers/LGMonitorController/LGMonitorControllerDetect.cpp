@@ -6,14 +6,12 @@
 |   Morgan Guimard (morg)                       11 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "LGMonitorController.h"
-#include "RGBController.h"
 #include "RGBController_LGMonitor.h"
-#include "dmiinfo.h"
 
 /*---------------------------------------------------------*\
 | vendor ID                                                 |
@@ -26,17 +24,14 @@
 #define LG_27GN950_B_PID                               0x9A8A
 #define LG_38GL950G_PID                                0x9A57
 
-void DetectLGMonitorControllers(hid_device_info* info, const std::string& name)
+static void DetectLGMonitorControllers(hid_device_info* info, const std::string& name)
 {
     hid_device* dev = hid_open_path(info->path);
 
     if(dev)
     {
-        DMIInfo dmi;
-
-        LGMonitorController*     controller         = new LGMonitorController(dev, *info);
+        LGMonitorController*     controller         = new LGMonitorController(dev, *info, name);
         RGBController_LGMonitor* rgb_controller     = new RGBController_LGMonitor(controller);
-        rgb_controller->name                        = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

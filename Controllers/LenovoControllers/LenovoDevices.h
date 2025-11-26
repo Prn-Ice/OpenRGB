@@ -6,7 +6,7 @@
 |   Cooper Hall (geobot19)                      17 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -31,9 +31,12 @@
 #define LEGION_Y750S                            0xC957
 #define LEGION_Y760                             0xC968
 #define LEGION_Y760S                            0xC967
+#define LEGION_S7GEN7                           0xC977
 #define LEGION_7GEN7                            0xC978
 #define LEGION_7GEN8                            0xC988
 #define LEGION_SLIM_7GEN8                       0xC987
+#define LEGION_7GEN9                            0xC997
+#define LEGION_7GEN9_H                          0xC998
 
 enum LENOVO_KEYBOARD
 {

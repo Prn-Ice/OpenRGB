@@ -6,12 +6,12 @@
 |   Monks (imtherealestmonkey@gmail.com),       03 Nov 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <iostream>
 #include "ElgatoKeyLightController.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 

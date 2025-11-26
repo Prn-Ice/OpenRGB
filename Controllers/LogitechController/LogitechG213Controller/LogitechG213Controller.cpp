@@ -6,16 +6,18 @@
 |   Eric Samuelson (edbgon)                     06 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogitechG213Controller.h"
+#include "StringUtils.h"
 
-LogitechG213Controller::LogitechG213Controller(hid_device* dev_handle, const char* path)
+LogitechG213Controller::LogitechG213Controller(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 LogitechG213Controller::~LogitechG213Controller()
@@ -28,6 +30,11 @@ std::string LogitechG213Controller::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string LogitechG213Controller::GetNameString()
+{
+    return(name);
+}
+
 std::string LogitechG213Controller::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -38,10 +45,7 @@ std::string LogitechG213Controller::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LogitechG213Controller::SetDirect
@@ -76,8 +80,8 @@ void LogitechG213Controller::SetDirect
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_write(dev, (unsigned char *)usb_buf, 20);
-    hid_read(dev, (unsigned char *)usb_buf, 20);
+    hid_write(dev, usb_buf, 20);
+    hid_read(dev, usb_buf, 20);
 }
 
 void LogitechG213Controller::SetMode
@@ -104,7 +108,7 @@ void LogitechG213Controller::SendMode
     unsigned char       blue
     )
 {
-    char usb_buf[20];
+    unsigned char usb_buf[20];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -151,6 +155,6 @@ void LogitechG213Controller::SendMode
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_write(dev, (unsigned char *)usb_buf, 20);
-    hid_read(dev, (unsigned char *)usb_buf, 20);
+    hid_write(dev, usb_buf, 20);
+    hid_read(dev, usb_buf, 20);
 }

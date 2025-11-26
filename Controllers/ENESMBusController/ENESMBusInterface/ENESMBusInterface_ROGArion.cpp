@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                17 Sep 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "ENESMBusInterface_ROGArion.h"
@@ -38,7 +38,7 @@ int ENESMBusInterface_ROGArion::GetMaxBlock()
     return(24);
 }
 
-unsigned char ENESMBusInterface_ROGArion::ENERegisterRead(ene_dev_id dev, ene_register reg)
+unsigned char ENESMBusInterface_ROGArion::ENERegisterRead(ene_dev_id /*dev*/, ene_register /*reg*/)
 {
     /*-----------------------------------------------------------------------------*\
     | This interface does not support reading                                       |
@@ -46,12 +46,12 @@ unsigned char ENESMBusInterface_ROGArion::ENERegisterRead(ene_dev_id dev, ene_re
     return( 0 );
 }
 
-void ENESMBusInterface_ROGArion::ENERegisterWrite(ene_dev_id dev, ene_register reg, unsigned char val)
+void ENESMBusInterface_ROGArion::ENERegisterWrite(ene_dev_id /*dev*/, ene_register reg, unsigned char val)
 {
     SendPacket(reg, &val, sizeof(unsigned char));
 }
 
-void ENESMBusInterface_ROGArion::ENERegisterWriteBlock(ene_dev_id dev, ene_register reg, unsigned char * data, unsigned char sz)
+void ENESMBusInterface_ROGArion::ENERegisterWriteBlock(ene_dev_id /*dev*/, ene_register reg, unsigned char * data, unsigned char sz)
 {
     SendPacket(reg, data, sz);
 }

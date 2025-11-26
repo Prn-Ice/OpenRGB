@@ -6,19 +6,21 @@
 |   Adam Honse (CalcProgrammer1)                11 Jul 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HyperXAlloyOriginsController.h"
+#include "StringUtils.h"
 
 // Skip these indices in the color output
 static unsigned int skip_idx[] = { 23, 29, 41, 47, 59, 70, 71, 87, 88, 93, 99, 100, 102, 108, 113, 114, 120, 123, 124 };
 
-HyperXAlloyOriginsController::HyperXAlloyOriginsController(hid_device* dev_handle, const char* path)
+HyperXAlloyOriginsController::HyperXAlloyOriginsController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 HyperXAlloyOriginsController::~HyperXAlloyOriginsController()
@@ -31,6 +33,11 @@ std::string HyperXAlloyOriginsController::GetDeviceLocation()
     return("HID " + location);
 }
 
+std::string HyperXAlloyOriginsController::GetNameString()
+{
+    return(name);
+}
+
 std::string HyperXAlloyOriginsController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -41,10 +48,7 @@ std::string HyperXAlloyOriginsController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void HyperXAlloyOriginsController::SetLEDsDirect(std::vector<RGBColor> colors)

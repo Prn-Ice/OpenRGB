@@ -6,12 +6,11 @@
 |   thombo                                      17 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
-#include <vector>
 #include "RGBController.h"
 #include "MSIMysticLight112Controller.h"
 
@@ -32,6 +31,8 @@ public:
     void        DeviceSaveMode();
 
 private:
+    MSIMysticLight112Controller*    controller;
+
     void        SetupModes();
     void        UpdateLed
                     (
@@ -46,6 +47,4 @@ private:
                     );
     int         GetDeviceMode();
     void        GetDeviceConfig();
-
-    MSIMysticLight112Controller*    controller;
 };

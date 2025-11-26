@@ -6,13 +6,13 @@
 |   Lucas Strafe                                31 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define IONICO_REPORT_SIZE                9
@@ -41,10 +41,11 @@ enum
 class IonicoController
 {
     public:
-        IonicoController(hid_device* dev_handle, const hid_device_info& info, const unsigned short pid);
+        IonicoController(hid_device* dev_handle, const hid_device_info& info, const unsigned short pid, std::string dev_name);
         ~IonicoController();
 
         std::string GetDeviceLocation();
+        std::string GetDeviceName();
 
         void        SetMode(uint8_t mode_value, uint8_t brightness, uint8_t speed);
         void        SetColors(int device, std::vector<RGBColor> array_colors, bool is_mode);
@@ -55,7 +56,7 @@ class IonicoController
     private:
         hid_device* dev;
         std::string location;
+        std::string name;
         std::string serial_number;
-        std::string version;
         uint16_t    usb_pid;
 };

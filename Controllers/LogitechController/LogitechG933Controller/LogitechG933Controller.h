@@ -7,13 +7,13 @@
 |   Based on TheRogueZeta                       31 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define LOGI_G933_LED_PACKET_SIZE               20
@@ -30,13 +30,14 @@ enum
 class LogitechG933Controller
 {
 public:
-    LogitechG933Controller(hid_device* dev_handle, const char* path);
+    LogitechG933Controller(hid_device* dev_handle, const char* path, std::string dev_name);
     ~LogitechG933Controller();
 
     std::string GetDeviceLocation();
+    std::string GetDeviceName();
 
-    void SetDirectMode(uint8_t zone);
-    void SetOffMode(uint8_t zone);
+    void        SetDirectMode(uint8_t zone);
+    void        SetOffMode(uint8_t zone);
 
     void        SendHeadsetMode
                    (
@@ -48,10 +49,11 @@ public:
                    );
 
 private:
-    hid_device*             dev;
-    std::string             location;
+    hid_device* dev;
+    std::string location;
+    std::string name;
 
-    void fail_retry_write(hid_device *device, const unsigned char *data, size_t length);
+    void        fail_retry_write(hid_device *device, const unsigned char *data, size_t length);
 };
 
 

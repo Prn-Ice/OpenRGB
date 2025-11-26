@@ -6,12 +6,13 @@
 |   Adam Honse (CalcProgrammer1)                09 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "CorsairPeripheralController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
@@ -65,10 +66,11 @@ static unsigned int key_mapping_k70_mk2_plat_iso[] = { 0x3f, 0x41, 0x42, 0x50, 0
 
 #define CORSAIR_PERIPHERAL_CONTROLLER_NAME "Corsair peripheral"
 
-CorsairPeripheralController::CorsairPeripheralController(hid_device* dev_handle, const char* path)
+CorsairPeripheralController::CorsairPeripheralController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     ReadFirmwareInfo();
 
@@ -133,10 +135,7 @@ std::string CorsairPeripheralController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CorsairPeripheralController::SetLEDs(std::vector<RGBColor>colors)
@@ -332,11 +331,6 @@ void CorsairPeripheralController::SetLEDsKeyboardLimited(std::vector<RGBColor> c
     StreamPacket(4, 36, &data_pkt[180]);
 
     SubmitKeyboardLimitedColors(216);
-}
-
-void CorsairPeripheralController::SetName(std::string device_name)
-{
-    name = device_name;
 }
 
 void CorsairPeripheralController::SwitchMode(bool software)

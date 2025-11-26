@@ -6,13 +6,12 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      15 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "CryorigH7QuadLumiController.h"
-#include "RGBController.h"
 #include "RGBController_CryorigH7QuadLumi.h"
 
 /*-----------------------------------------------------*\
@@ -27,9 +26,8 @@ static void DetectCryorigH7QuadLumi(hid_device_info* info, const std::string& na
 
     if(dev)
     {
-        CryorigH7QuadLumiController*     controller     = new CryorigH7QuadLumiController(dev, info->path);
+        CryorigH7QuadLumiController*     controller     = new CryorigH7QuadLumiController(dev, info->path, name);
         RGBController_CryorigH7QuadLumi* rgb_controller = new RGBController_CryorigH7QuadLumi(controller);
-        rgb_controller->name                            = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

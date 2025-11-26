@@ -6,7 +6,7 @@
 |   Ryan Frankcombe (422gRdHuX5uk)              11 Sep 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -132,11 +132,11 @@ enum
 class GigabyteSuperIORGBController
 {
 public:
-    GigabyteSuperIORGBController(int sioaddr);
+    GigabyteSuperIORGBController(int sioaddr, std::string dev_name);
     ~GigabyteSuperIORGBController();
 
-    std::string     GetDeviceName();
     std::string     GetDeviceLocation();
+    std::string     GetDeviceName();
 
     unsigned int    GetMode();
     void            SetMode(int new_mode);
@@ -145,5 +145,6 @@ public:
     void            ChipEntry();
     void            ChipExit();
 private:
-    int     gig_sioaddr;
+    int             gig_sioaddr;
+    std::string     name;
 };

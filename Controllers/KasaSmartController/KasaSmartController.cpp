@@ -6,12 +6,12 @@
 |   Devin Wendt (umbreon222@gmail.com)          16 Feb 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstdint>
 #include "KasaSmartController.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "hsv.h"
 
 using json = nlohmann::json;
@@ -273,7 +273,7 @@ void KasaSmartController::SetEffect(std::string effect)
         is_initialized = false;
         return;
     }
-    
+
     std::string response;
     KasaSmartController::SendCommand(effect, response);
     port.tcp_close();
@@ -314,7 +314,7 @@ bool KasaSmartController::SendCommand(std::string command, std::string &response
 
     unsigned char* receive_buffer = new unsigned char[KASA_SMART_RECEIVE_BUFFER_SIZE];
     int response_length = port.tcp_listen((char*)receive_buffer, KASA_SMART_RECEIVE_BUFFER_SIZE);
-    if(response_length > KASA_SMART_RECEIVE_BUFFER_SIZE) {
+    if(response_length > KASA_SMART_RECEIVE_BUFFER_SIZE || response_length <= 0) {
         /*-------------------------------------------------------------*\
         | Small fail safes to prevent decrypting bad or empty responses |
         \*-------------------------------------------------------------*/

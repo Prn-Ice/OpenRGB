@@ -6,16 +6,17 @@
 |   KundaPanda                                  04 Jan 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "GainwardGPUv2Controller.h"
 
-GainwardGPUv2Controller::GainwardGPUv2Controller(i2c_smbus_interface* bus, gainward_gpu_dev_id dev)
+GainwardGPUv2Controller::GainwardGPUv2Controller(i2c_smbus_interface* bus, gainward_gpu_dev_id dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 }
 
 GainwardGPUv2Controller::~GainwardGPUv2Controller() = default;
@@ -28,6 +29,11 @@ std::string GainwardGPUv2Controller::GetDeviceLocation()
     return_string.append(", address ");
     return_string.append(addr);
     return("I2C: " + return_string);
+}
+
+std::string GainwardGPUv2Controller::GetDeviceName()
+{
+    return(name);
 }
 
 unsigned char GainwardGPUv2Controller::GetLEDRed()

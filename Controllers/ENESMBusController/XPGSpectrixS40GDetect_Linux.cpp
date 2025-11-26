@@ -4,7 +4,7 @@
 |   Detector for XPG Spectrix S40G (Linux)                  |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <dirent.h>
@@ -79,12 +79,8 @@ void DetectSpectrixS40GControllers()
             if(nvme_fd > 0)
             {
                 ENESMBusInterface_SpectrixS40G* interface      = new ENESMBusInterface_SpectrixS40G(nvme_fd, nvme_dev_buf);
-                ENESMBusController*             controller     = new ENESMBusController(interface, 0x67);
+                ENESMBusController*             controller     = new ENESMBusController(interface, 0x67, "XPG Spectrix S40G", DEVICE_TYPE_STORAGE);
                 RGBController_ENESMBus*         rgb_controller = new RGBController_ENESMBus(controller);
-
-                rgb_controller->name                           = "XPG Spectrix S40G";
-                rgb_controller->type                           = DEVICE_TYPE_STORAGE;
-                rgb_controller->vendor                         = "XPG";
 
                 ResourceManager::get()->RegisterRGBController(rgb_controller);
             }

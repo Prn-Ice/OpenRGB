@@ -1,15 +1,17 @@
-/*-----------------------------------------*\
-|  ThermaltakeRiingController.cpp           |
-|                                           |
-|  Definitions and types for Thermaltake    |
-|  Riing Plus lighting controller           |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 2/7/2020    |
-\*-----------------------------------------*/
-
-#include "ThermaltakeRiingController.h"
+/*---------------------------------------------------------*\
+| ThermaltakeRiingController.cpp                            |
+|                                                           |
+|   Driver for Thermaltake Riing                            |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                07 Feb 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "StringUtils.h"
+#include "ThermaltakeRiingController.h"
 
 ThermaltakeRiingController::ThermaltakeRiingController(hid_device* dev_handle, const char* path)
 {
@@ -39,19 +41,42 @@ std::string ThermaltakeRiingController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
+    return(StringUtils::wstring_to_string(serial_string));
+}
 
-    return(return_string);
+std::string ThermaltakeRiingController::GetFirmwareVersion()
+{
+    unsigned char usb_buf[64];
+
+    /*-----------------------------------------------------*\
+    | Zero out buffer                                       |
+    \*-----------------------------------------------------*/
+    memset(usb_buf, 0x00, sizeof(usb_buf));
+
+    /*-----------------------------------------------------*\
+    | Set up Get Firmware Version packet                    |
+    \*-----------------------------------------------------*/
+    usb_buf[0x00]   = 0x33;
+    usb_buf[0x01]   = 0x50;
+
+    /*-----------------------------------------------------*\
+    | Send packet                                           |
+    \*-----------------------------------------------------*/
+    hid_write(dev, usb_buf, 64);
+    hid_read(dev, usb_buf, 64);
+
+    std::string ret_str = std::to_string(usb_buf[2]) + "." + std::to_string(usb_buf[3]) + "." + std::to_string(usb_buf[4]);
+
+    return(ret_str);
 }
 
 void ThermaltakeRiingController::SetChannelLEDs(unsigned char channel, RGBColor * colors, unsigned int num_colors)
 {
     unsigned char* color_data = new unsigned char[3 * num_colors];
 
-    for(std::size_t color = 0; color < num_colors; color++)
+    for(unsigned int color = 0; color < num_colors; color++)
     {
-        int color_idx = color * 3;
+        unsigned int color_idx = color * 3;
         color_data[color_idx + 0] = RGBGetGValue(colors[color]);
         color_data[color_idx + 1] = RGBGetRValue(colors[color]);
         color_data[color_idx + 2] = RGBGetBValue(colors[color]);

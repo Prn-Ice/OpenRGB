@@ -6,7 +6,7 @@
 |   Nikita Rushmanov                            13 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
@@ -41,7 +41,7 @@ void DetectNanoleafControllers()
                 }
                 catch(...)
                 {
-                    LOG_DEBUG("[Nanoleaf] Could not connect to device at %s:%s using auth_token %s", device["ip"].get<std::string>().c_str(), device["port"].get<std::string>().c_str(), device["auth_token"].get<std::string>().c_str());
+                    LOG_DEBUG("[Nanoleaf] Could not connect to device at %s:%d using auth_token %s", device["ip"].get<std::string>().c_str(), device["port"].get<int>(), device["auth_token"].get<std::string>().c_str());
                 }
             }
         }

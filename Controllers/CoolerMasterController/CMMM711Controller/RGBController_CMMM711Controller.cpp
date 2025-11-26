@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             14 Feb 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CMMM711Controller.h"
@@ -182,18 +182,6 @@ void RGBController_CMMM711Controller::UpdateZoneLEDs(int /*zone*/)
 void RGBController_CMMM711Controller::UpdateSingleLED(int /*led*/)
 {
     DeviceUpdateLEDs();
-}
-
-void RGBController_CMMM711Controller::SetCustomMode()
-{
-    for(int mode_index = 0; mode_index < (int)modes.size(); mode_index++)
-    {
-        if(modes[mode_index].value == CM_MM711_MODE_CUSTOM)
-        {
-            active_mode = mode_index;
-            break;
-        }
-    }
 }
 
 void RGBController_CMMM711Controller::DeviceUpdateMode()

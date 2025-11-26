@@ -4,18 +4,16 @@
 |   Detector for XPG Spectrix S40G (Windows)                |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <windows.h>
 #include <fileapi.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "ENESMBusController.h"
 #include "ENESMBusInterface_SpectrixS40G_Windows.h"
-#include "LogManager.h"
 #include "RGBController.h"
 #include "RGBController_ENESMBus.h"
 
@@ -115,12 +113,8 @@ void DetectSpectrixS40GControllers()
         if(nvme_fd != INVALID_HANDLE_VALUE)
         {
             ENESMBusInterface_SpectrixS40G* interface      = new ENESMBusInterface_SpectrixS40G(nvme_fd, dev_name);
-            ENESMBusController*             controller     = new ENESMBusController(interface, 0x67);
+            ENESMBusController*             controller     = new ENESMBusController(interface, 0x67, "XPG Spectrix S40G", DEVICE_TYPE_STORAGE);
             RGBController_ENESMBus*         rgb_controller = new RGBController_ENESMBus(controller);
-
-            rgb_controller->name                           = "XPG Spectrix S40G";
-            rgb_controller->type                           = DEVICE_TYPE_STORAGE;
-            rgb_controller->vendor                         = "XPG";
 
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }

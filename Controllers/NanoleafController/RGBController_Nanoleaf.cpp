@@ -6,13 +6,13 @@
 |   Nikita Rushmanov                            13 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_Nanoleaf.h"
 #include "ResourceManager.h"
 #include "LogManager.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -80,7 +80,7 @@ RGBController_Nanoleaf::RGBController_Nanoleaf(std::string a_address, int a_port
         \*---------------------------------------------------------*/
         if(controller.GetSelectedEffect() == effect.name)
         {
-            active_mode         = modes.size() - 1;
+            active_mode         = (int)modes.size() - 1;
         }
     }
 
@@ -92,7 +92,7 @@ void RGBController_Nanoleaf::SetupZones()
     zone led_zone;
     led_zone.name           = "Nanoleaf Layout";
     led_zone.type           = ZONE_TYPE_LINEAR;
-    led_zone.leds_count     = controller.GetPanelIds().size();
+    led_zone.leds_count     = (unsigned int)controller.GetPanelIds().size();
     led_zone.leds_min       = led_zone.leds_count;
     led_zone.leds_max       = led_zone.leds_count;
     led_zone.matrix_map     = NULL;

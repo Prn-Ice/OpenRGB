@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       02 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -29,13 +29,13 @@
 RGBController_N5312A::RGBController_N5312A(N5312AController* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "N5312A Device";
+
+    name                                = controller->GetNameString();
     vendor                              = "Unknown";
     type                                = DEVICE_TYPE_MOUSE;
-    description                         = name;
+    description                         = "N5312A Device";
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Static;
     Static.name                         = "Direct";

@@ -6,7 +6,7 @@
 |   cafeed28                                    03 Nov 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <iostream>
@@ -15,10 +15,11 @@
 
 using namespace std::chrono_literals;
 
-RedSquareKeyroxController::RedSquareKeyroxController(hid_device *dev_handle, const hid_device_info &info, int variant)
+RedSquareKeyroxController::RedSquareKeyroxController(hid_device *dev_handle, const hid_device_info &info, int variant, std::string dev_name)
 {
     dev             = dev_handle;
     location        = info.path;
+    name            = dev_name;
     this->variant   = variant;
 }
 
@@ -35,6 +36,11 @@ int RedSquareKeyroxController::GetVariant()
 std::string RedSquareKeyroxController::GetDeviceLocation()
 {
     return("HID: " + location);
+}
+
+std::string RedSquareKeyroxController::GetNameString()
+{
+    return(name);
 }
 
 std::string RedSquareKeyroxController::GetSerialString()

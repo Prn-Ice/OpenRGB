@@ -6,10 +6,11 @@
 |   Adam Honse (CalcProgrammer1)                30 Jun 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
+#include <chrono>
 #include "CorsairVengeanceProController.h"
 
 using namespace std::chrono_literals;

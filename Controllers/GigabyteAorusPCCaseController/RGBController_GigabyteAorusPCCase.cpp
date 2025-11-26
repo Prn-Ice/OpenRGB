@@ -6,7 +6,7 @@
 |   Denis Nazarov (nenderus)                    10 Feb 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_GigabyteAorusPCCase.h"
@@ -24,16 +24,14 @@
 
 RGBController_GigabyteAorusPCCase::RGBController_GigabyteAorusPCCase(GigabyteAorusPCCaseController *controller_ptr)
 {
-    controller  = controller_ptr;
+    controller                      = controller_ptr;
 
-    name        = "Gigabyte AORUS PC Case";
-    vendor      = "Gigabyte";
-    description = "Gigabyte AORUS PC Case";
-
-    type        = DEVICE_TYPE_CASE;
-
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    name                            = controller->GetNameString();
+    vendor                          = "Gigabyte";
+    description                     = "Gigabyte AORUS PC Case Device";
+    type                            = DEVICE_TYPE_CASE;
+    location                        = controller->GetDeviceLocation();
+    serial                          = controller->GetSerialString();
 
     mode Custom;
     Custom.name                     = "Custom";

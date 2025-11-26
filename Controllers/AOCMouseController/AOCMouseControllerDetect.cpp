@@ -6,12 +6,11 @@
 |   Adam Honse (CalcProgrammer1)                20 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "AOCMouseController.h"
-#include "RGBController.h"
 #include "RGBController_AOCMouse.h"
 
 /*-----------------------------------------------------*\
@@ -34,9 +33,8 @@ void DetectAOCMouseControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        AOCMouseController*     controller     = new AOCMouseController(dev, info->path);
+        AOCMouseController*     controller     = new AOCMouseController(dev, info->path, name);
         RGBController_AOCMouse* rgb_controller = new RGBController_AOCMouse(controller);
-        rgb_controller->name                   = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

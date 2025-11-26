@@ -7,7 +7,7 @@
 |   Adam Honse (CalcProgrammer1)                15 Dec 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_ASRockPolychromeV2SMBus.h"
@@ -290,7 +290,7 @@ void RGBController_ASRockPolychromeV2SMBus::ResizeZone(int /*zone*/, int /*new_s
 
 void RGBController_ASRockPolychromeV2SMBus::DeviceUpdateLEDs()
 {
-    for(int led = 0; led < colors.size(); led++)
+    for(unsigned int led = 0; led < colors.size(); led++)
     {
         UpdateSingleLED(led);
     }

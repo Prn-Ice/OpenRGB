@@ -1,20 +1,25 @@
-/*-----------------------------------------*\
-|  SRGBmodsLEDControllerV1.cpp              |
-|                                           |
-|  Driver for SRGBmods LED Controller V1    |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 6/30/2023   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| SRGBmodsLEDControllerV1.cpp                               |
+|                                                           |
+|   Driver for SRGBmods LED Controller V1                   |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                30 Jun 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "SRGBmodsLEDControllerV1.h"
 #include <cstring>
+#include "SRGBmodsLEDControllerV1.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-SRGBmodsLEDControllerV1::SRGBmodsLEDControllerV1(hid_device* dev_handle, const char* path)
+SRGBmodsLEDControllerV1::SRGBmodsLEDControllerV1(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 SRGBmodsLEDControllerV1::~SRGBmodsLEDControllerV1()
@@ -27,6 +32,11 @@ std::string SRGBmodsLEDControllerV1::GetLocationString()
     return("HID: " + location);
 }
 
+std::string SRGBmodsLEDControllerV1::GetNameString()
+{
+    return(name);
+}
+
 std::string SRGBmodsLEDControllerV1::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -37,10 +47,7 @@ std::string SRGBmodsLEDControllerV1::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void SRGBmodsLEDControllerV1::SetChannelLEDs(unsigned char /*channel*/, RGBColor* colors, unsigned int num_colors)

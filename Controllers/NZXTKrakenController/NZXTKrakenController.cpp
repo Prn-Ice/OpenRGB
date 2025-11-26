@@ -6,19 +6,20 @@
 |   Martin Hartl (inlart)                       04 Apr 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include <string>
 #include <sstream>
 #include "NZXTKrakenController.h"
+#include "StringUtils.h"
 
 static void SetColor(const std::vector<RGBColor>& colors, unsigned char* color_data)
 {
-    for (std::size_t idx = 0; idx < colors.size(); idx++)
+    for(std::size_t idx = 0; idx < colors.size(); idx++)
     {
-        int pixel_idx = idx * 3;
+        int pixel_idx = (int)idx * 3;
         RGBColor color = colors[idx];
         color_data[pixel_idx + 0x00] = RGBGetRValue(color);
         color_data[pixel_idx + 0x01] = RGBGetGValue(color);
@@ -31,10 +32,11 @@ static RGBColor ToLogoColor(RGBColor rgb)
     return ToRGBColor(RGBGetGValue(rgb), RGBGetRValue(rgb), RGBGetBValue(rgb));
 }
 
-NZXTKrakenController::NZXTKrakenController(hid_device* dev_handle, const char* path)
+NZXTKrakenController::NZXTKrakenController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     /*-----------------------------------------------------*\
     | Get the firmware version                              |
@@ -57,6 +59,11 @@ std::string NZXTKrakenController::GetLocation()
     return("HID: " + location);
 }
 
+std::string NZXTKrakenController::GetName()
+{
+    return(name);
+}
+
 std::string NZXTKrakenController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -67,10 +74,7 @@ std::string NZXTKrakenController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void NZXTKrakenController::UpdateStatus()

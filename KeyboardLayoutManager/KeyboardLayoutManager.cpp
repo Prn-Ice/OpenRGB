@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             04 Feb 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "LogManager.h"
@@ -20,6 +20,7 @@ const char* KEYBOARD_NAME_JIS           = "JIS";
 const char* KEYBOARD_NAME_AZERTY        = "AZERTY";
 const char* KEYBOARD_NAME_QWERTY        = "QWERTY";
 const char* KEYBOARD_NAME_QWERTZ        = "QWERTZ";
+const char* KEYBOARD_NAME_ABNT2         = "ABNT2";
 
 const char* KEYBOARD_NAME_FULL          = "Full 104 key ";
 const char* KEYBOARD_NAME_TKL           = "Tenkeyless ";
@@ -56,172 +57,173 @@ const char* LOG_MSG_MISSING_OPCODE      = "[%s] Error: Opcode %d not found for %
 
 static const std::vector<keyboard_led> keyboard_zone_main =
 {
-    /*---------------------------------------------------------------------------------------------------------*\
-    |   Zone,   Row,    Column,     Value,      Key,                        OpCode,                             |
-    \*---------------------------------------------------------------------------------------------------------*/
-    {   0,      1,      0,          0,          KEY_EN_BACK_TICK,           KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      1,          0,          KEY_EN_1,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      2,          0,          KEY_EN_2,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      3,          0,          KEY_EN_3,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      4,          0,          KEY_EN_4,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      5,          0,          KEY_EN_5,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      6,          0,          KEY_EN_6,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      7,          0,          KEY_EN_7,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      8,          0,          KEY_EN_8,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      9,          0,          KEY_EN_9,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      10,         0,          KEY_EN_0,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      11,         0,          KEY_EN_MINUS,               KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      12,         0,          KEY_EN_EQUALS,              KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      13,         0,          KEY_EN_BACKSPACE,           KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      0,          0,          KEY_EN_TAB,                 KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      1,          0,          KEY_EN_Q,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      2,          0,          KEY_EN_W,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      3,          0,          KEY_EN_E,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      4,          0,          KEY_EN_R,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      5,          0,          KEY_EN_T,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      6,          0,          KEY_EN_Y,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      7,          0,          KEY_EN_U,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      8,          0,          KEY_EN_I,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      9,          0,          KEY_EN_O,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      10,         0,          KEY_EN_P,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      11,         0,          KEY_EN_LEFT_BRACKET,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      12,         0,          KEY_EN_RIGHT_BRACKET,       KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      13,         0,          KEY_EN_ANSI_BACK_SLASH,     KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      0,          0,          KEY_EN_CAPS_LOCK,           KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      1,          0,          KEY_EN_A,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      2,          0,          KEY_EN_S,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      3,          0,          KEY_EN_D,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      4,          0,          KEY_EN_F,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      5,          0,          KEY_EN_G,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      6,          0,          KEY_EN_H,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      7,          0,          KEY_EN_J,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      8,          0,          KEY_EN_K,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      9,          0,          KEY_EN_L,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      10,         0,          KEY_EN_SEMICOLON,           KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      11,         0,          KEY_EN_QUOTE,               KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      12,         0,          KEY_EN_POUND,               KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT  },
-    {   0,      3,      13,         0,          KEY_EN_ANSI_ENTER,          KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      0,          0,          KEY_EN_LEFT_SHIFT,          KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      1,          0,          KEY_EN_ISO_BACK_SLASH,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      2,          0,          KEY_EN_Z,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      3,          0,          KEY_EN_X,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      4,          0,          KEY_EN_C,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      5,          0,          KEY_EN_V,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      6,          0,          KEY_EN_B,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      7,          0,          KEY_EN_N,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      8,          0,          KEY_EN_M,                   KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      9,          0,          KEY_EN_COMMA,               KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      10,         0,          KEY_EN_PERIOD,              KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      11,         0,          KEY_EN_FORWARD_SLASH,       KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      13,         0,          KEY_EN_RIGHT_SHIFT,         KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      0,          0,          KEY_EN_LEFT_CONTROL,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      1,          0,          KEY_EN_LEFT_WINDOWS,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      2,          0,          KEY_EN_LEFT_ALT,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      6,          0,          KEY_EN_SPACE,               KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      10,         0,          KEY_EN_RIGHT_ALT,           KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      11,         0,          KEY_EN_RIGHT_FUNCTION,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      12,         0,          KEY_EN_MENU,                KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      13,         0,          KEY_EN_RIGHT_CONTROL,       KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    /*-----------------------------------------------------------------------------------------------------------------------------*\
+    |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,     OpCode                              |
+    \*-----------------------------------------------------------------------------------------------------------------------------*/
+    {   0,      1,      0,          0,          KEY_EN_BACK_TICK,           KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      1,          0,          KEY_EN_1,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      2,          0,          KEY_EN_2,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      3,          0,          KEY_EN_3,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      4,          0,          KEY_EN_4,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      5,          0,          KEY_EN_5,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      6,          0,          KEY_EN_6,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      7,          0,          KEY_EN_7,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      8,          0,          KEY_EN_8,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      9,          0,          KEY_EN_9,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      10,         0,          KEY_EN_0,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      11,         0,          KEY_EN_MINUS,               KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      12,         0,          KEY_EN_EQUALS,              KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      13,         0,          KEY_EN_BACKSPACE,           KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      0,          0,          KEY_EN_TAB,                 KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      1,          0,          KEY_EN_Q,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      2,          0,          KEY_EN_W,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      3,          0,          KEY_EN_E,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      4,          0,          KEY_EN_R,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      5,          0,          KEY_EN_T,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      6,          0,          KEY_EN_Y,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      7,          0,          KEY_EN_U,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      8,          0,          KEY_EN_I,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      9,          0,          KEY_EN_O,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      10,         0,          KEY_EN_P,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      11,         0,          KEY_EN_LEFT_BRACKET,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      12,         0,          KEY_EN_RIGHT_BRACKET,       KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      13,         0,          KEY_EN_ANSI_BACK_SLASH,     KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      0,          0,          KEY_EN_CAPS_LOCK,           KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      1,          0,          KEY_EN_A,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      2,          0,          KEY_EN_S,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      3,          0,          KEY_EN_D,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      4,          0,          KEY_EN_F,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      5,          0,          KEY_EN_G,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      6,          0,          KEY_EN_H,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      7,          0,          KEY_EN_J,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      8,          0,          KEY_EN_K,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      9,          0,          KEY_EN_L,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      10,         0,          KEY_EN_SEMICOLON,           KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      11,         0,          KEY_EN_QUOTE,               KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      12,         0,          KEY_EN_POUND,               KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT  },
+    {   0,      3,      13,         0,          KEY_EN_ANSI_ENTER,          KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      0,          0,          KEY_EN_LEFT_SHIFT,          KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      1,          0,          KEY_EN_ISO_BACK_SLASH,      KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      2,          0,          KEY_EN_Z,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      3,          0,          KEY_EN_X,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      4,          0,          KEY_EN_C,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      5,          0,          KEY_EN_V,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      6,          0,          KEY_EN_B,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      7,          0,          KEY_EN_N,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      8,          0,          KEY_EN_M,                   KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      9,          0,          KEY_EN_COMMA,               KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      10,         0,          KEY_EN_PERIOD,              KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      11,         0,          KEY_EN_FORWARD_SLASH,       KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      13,         0,          KEY_EN_RIGHT_SHIFT,         KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      0,          0,          KEY_EN_LEFT_CONTROL,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      1,          0,          KEY_EN_LEFT_WINDOWS,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      2,          0,          KEY_EN_LEFT_ALT,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      6,          0,          KEY_EN_SPACE,               KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      10,         0,          KEY_EN_RIGHT_ALT,           KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      11,         0,          KEY_EN_RIGHT_FUNCTION,      KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      12,         0,          KEY_EN_MENU,                KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      13,         0,          KEY_EN_RIGHT_CONTROL,       KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
 };
 
 static const std::vector<keyboard_led> keyboard_zone_fn_row =
 {
-    /*---------------------------------------------------------------------------------------------------------*\
-    |   Zone,   Row,    Column,     Value,      Key,                        OpCode,                             |
-    \*---------------------------------------------------------------------------------------------------------*/
-    {   0,      0,      0,          0,          KEY_EN_ESCAPE,              KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      2,          0,          KEY_EN_F1,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      3,          0,          KEY_EN_F2,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      4,          0,          KEY_EN_F3,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      5,          0,          KEY_EN_F4,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      6,          0,          KEY_EN_F5,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      7,          0,          KEY_EN_F6,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      8,          0,          KEY_EN_F7,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      9,          0,          KEY_EN_F8,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      10,         0,          KEY_EN_F9,                  KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      11,         0,          KEY_EN_F10,                 KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      12,         0,          KEY_EN_F11,                 KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      13,         0,          KEY_EN_F12,                 KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    /*-----------------------------------------------------------------------------------------------------------------------------*\
+    |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,     OpCode                              |
+    \*-----------------------------------------------------------------------------------------------------------------------------*/
+    {   0,      0,      0,          0,          KEY_EN_ESCAPE,              KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      2,          0,          KEY_EN_F1,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      3,          0,          KEY_EN_F2,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      4,          0,          KEY_EN_F3,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      5,          0,          KEY_EN_F4,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      6,          0,          KEY_EN_F5,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      7,          0,          KEY_EN_F6,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      8,          0,          KEY_EN_F7,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      9,          0,          KEY_EN_F8,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      10,         0,          KEY_EN_F9,                  KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      11,         0,          KEY_EN_F10,                 KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      12,         0,          KEY_EN_F11,                 KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      13,         0,          KEY_EN_F12,                 KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
 };
 
 static const std::vector<keyboard_led> keyboard_zone_extras =
 {
-    /*---------------------------------------------------------------------------------------------------------*\
-    |   Zone,   Row,    Column,     Value,      Key,                        OpCode,                             |
-    \*---------------------------------------------------------------------------------------------------------*/
-    {   0,      0,      14,         0,          KEY_EN_PRINT_SCREEN,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      15,         0,          KEY_EN_SCROLL_LOCK,         KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      0,      16,         0,          KEY_EN_PAUSE_BREAK,         KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      14,         0,          KEY_EN_INSERT,              KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      15,         0,          KEY_EN_HOME,                KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      16,         0,          KEY_EN_PAGE_UP,             KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      14,         0,          KEY_EN_DELETE,              KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      15,         0,          KEY_EN_END,                 KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      16,         0,          KEY_EN_PAGE_DOWN,           KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      15,         0,          KEY_EN_UP_ARROW,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      14,         0,          KEY_EN_LEFT_ARROW,          KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      15,         0,          KEY_EN_DOWN_ARROW,          KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      16,         0,          KEY_EN_RIGHT_ARROW,         KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    /*-----------------------------------------------------------------------------------------------------------------------------*\
+    |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,     OpCode                              |
+    \*-----------------------------------------------------------------------------------------------------------------------------*/
+    {   0,      0,      14,         0,          KEY_EN_PRINT_SCREEN,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      15,         0,          KEY_EN_SCROLL_LOCK,         KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      0,      16,         0,          KEY_EN_PAUSE_BREAK,         KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      14,         0,          KEY_EN_INSERT,              KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      15,         0,          KEY_EN_HOME,                KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      16,         0,          KEY_EN_PAGE_UP,             KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      14,         0,          KEY_EN_DELETE,              KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      15,         0,          KEY_EN_END,                 KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      16,         0,          KEY_EN_PAGE_DOWN,           KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      15,         0,          KEY_EN_UP_ARROW,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      14,         0,          KEY_EN_LEFT_ARROW,          KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      15,         0,          KEY_EN_DOWN_ARROW,          KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      16,         0,          KEY_EN_RIGHT_ARROW,         KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
 };
 
 static const std::vector<keyboard_led> keyboard_zone_numpad =
 {
-    /*---------------------------------------------------------------------------------------------------------*\
-    |   Zone,   Row,    Column,     Value,      Key,                        OpCode,                             |
-    \*---------------------------------------------------------------------------------------------------------*/
-    {   0,      1,      17,         0,          KEY_EN_NUMPAD_LOCK,         KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      18,         0,          KEY_EN_NUMPAD_DIVIDE,       KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      19,         0,          KEY_EN_NUMPAD_TIMES,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      1,      20,         0,          KEY_EN_NUMPAD_MINUS,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      17,         0,          KEY_EN_NUMPAD_7,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      18,         0,          KEY_EN_NUMPAD_8,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      19,         0,          KEY_EN_NUMPAD_9,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      2,      20,         0,          KEY_EN_NUMPAD_PLUS,         KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      17,         0,          KEY_EN_NUMPAD_4,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      18,         0,          KEY_EN_NUMPAD_5,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      3,      19,         0,          KEY_EN_NUMPAD_6,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      17,         0,          KEY_EN_NUMPAD_1,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      18,         0,          KEY_EN_NUMPAD_2,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      19,         0,          KEY_EN_NUMPAD_3,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      4,      20,         0,          KEY_EN_NUMPAD_ENTER,        KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      18,         0,          KEY_EN_NUMPAD_0,            KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
-    {   0,      5,      19,         0,          KEY_EN_NUMPAD_PERIOD,       KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    /*-----------------------------------------------------------------------------------------------------------------------------*\
+    |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,     OpCode                              |
+    \*-----------------------------------------------------------------------------------------------------------------------------*/
+    {   0,      1,      17,         0,          KEY_EN_NUMPAD_LOCK,         KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      18,         0,          KEY_EN_NUMPAD_DIVIDE,       KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      19,         0,          KEY_EN_NUMPAD_TIMES,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      1,      20,         0,          KEY_EN_NUMPAD_MINUS,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      17,         0,          KEY_EN_NUMPAD_7,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      18,         0,          KEY_EN_NUMPAD_8,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      19,         0,          KEY_EN_NUMPAD_9,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      2,      20,         0,          KEY_EN_NUMPAD_PLUS,         KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      17,         0,          KEY_EN_NUMPAD_4,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      18,         0,          KEY_EN_NUMPAD_5,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      3,      19,         0,          KEY_EN_NUMPAD_6,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      17,         0,          KEY_EN_NUMPAD_1,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      18,         0,          KEY_EN_NUMPAD_2,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      19,         0,          KEY_EN_NUMPAD_3,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      4,      20,         0,          KEY_EN_NUMPAD_ENTER,        KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      18,         0,          KEY_EN_NUMPAD_0,            KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+    {   0,      5,      19,         0,          KEY_EN_NUMPAD_PERIOD,       KEY_EN_UNUSED,      KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
 };
 
 keyboard_keymap_overlay iso_azerty
 {
     KEYBOARD_SIZE_FULL,
     {
-        /*---------------------------------------------------------------------------------------------------------*\
-        | Edit Keys                                                                                                 |
-        \*---------------------------------------------------------------------------------------------------------*/
-        {   0,      3,      12,         0,          KEY_FR_ASTERIX,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      1,          0,          KEY_NORD_ANGLE_BRACKET,     KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      0,          0,          KEY_FR_SUPER_2,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      1,          0,          KEY_FR_AMPERSAND,           KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      2,          0,          KEY_FR_ACUTE_E,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      3,          0,          KEY_FR_DOUBLEQUOTE,         KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      4,          0,          KEY_EN_QUOTE,               KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      5,          0,          KEY_FR_LEFT_PARENTHESIS,    KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      6,          0,          KEY_EN_MINUS,               KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      7,          0,          KEY_FR_GRAVE_E,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      8,          0,          KEY_FR_UNDERSCORE,          KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      9,          0,          KEY_FR_CEDILLA_C,           KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      10,         0,          KEY_FR_GRAVE_A,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      11,         0,          KEY_FR_RIGHT_PARENTHESIS,   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      1,          0,          KEY_EN_A,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      2,          0,          KEY_EN_Z,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      11,         0,          KEY_JP_CHEVRON,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      12,         0,          KEY_FR_DOLLAR,              KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      3,      1,          0,          KEY_EN_Q,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      3,      10,         0,          KEY_EN_M,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      3,      11,         0,          KEY_FR_GRAVE_U,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      2,          0,          KEY_EN_W,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      8,          0,          KEY_EN_COMMA,               KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      9,          0,          KEY_EN_SEMICOLON,           KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      10,         0,          KEY_JP_COLON,               KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      11,         0,          KEY_FR_EXCLAIMATION,        KEYBOARD_OPCODE_SWAP_ONLY,          },
+        /*-------------------------------------------------------------------------------------------------------------------------------------*\
+        | Edit Keys                                                                                                                             |
+        |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,             OpCode                              |
+        \*-------------------------------------------------------------------------------------------------------------------------------------*/
+        {   0,      3,      12,         0,          KEY_EN_UNUSED,              KEY_FR_ASTERIX,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      1,          0,          KEY_EN_UNUSED,              KEY_NORD_ANGLE_BRACKET,     KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      0,          0,          KEY_EN_UNUSED,              KEY_FR_SUPER_2,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      1,          0,          KEY_EN_UNUSED,              KEY_FR_AMPERSAND,           KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      2,          0,          KEY_EN_UNUSED,              KEY_FR_ACUTE_E,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      3,          0,          KEY_EN_UNUSED,              KEY_FR_DOUBLEQUOTE,         KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      4,          0,          KEY_EN_UNUSED,              KEY_EN_QUOTE,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      5,          0,          KEY_EN_UNUSED,              KEY_FR_LEFT_PARENTHESIS,    KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      6,          0,          KEY_EN_UNUSED,              KEY_EN_MINUS,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      7,          0,          KEY_EN_UNUSED,              KEY_FR_GRAVE_E,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      8,          0,          KEY_EN_UNUSED,              KEY_FR_UNDERSCORE,          KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      9,          0,          KEY_EN_UNUSED,              KEY_FR_CEDILLA_C,           KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      10,         0,          KEY_EN_UNUSED,              KEY_FR_GRAVE_A,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      11,         0,          KEY_EN_UNUSED,              KEY_FR_RIGHT_PARENTHESIS,   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      1,          0,          KEY_EN_UNUSED,              KEY_EN_A,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      2,          0,          KEY_EN_UNUSED,              KEY_EN_Z,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      11,         0,          KEY_EN_UNUSED,              KEY_JP_CHEVRON,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      12,         0,          KEY_EN_UNUSED,              KEY_FR_DOLLAR,              KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      1,          0,          KEY_EN_UNUSED,              KEY_EN_Q,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      10,         0,          KEY_EN_UNUSED,              KEY_EN_M,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      11,         0,          KEY_EN_UNUSED,              KEY_FR_GRAVE_U,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      2,          0,          KEY_EN_UNUSED,              KEY_EN_W,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      8,          0,          KEY_EN_UNUSED,              KEY_EN_COMMA,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      9,          0,          KEY_EN_UNUSED,              KEY_EN_SEMICOLON,           KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      10,         0,          KEY_EN_UNUSED,              KEY_JP_COLON,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      11,         0,          KEY_EN_UNUSED,              KEY_FR_EXCLAIMATION,        KEYBOARD_OPCODE_ADD_ALT_NAME,       },
     }
 };
 
@@ -229,11 +231,12 @@ keyboard_keymap_overlay ansi_qwerty
 {
     KEYBOARD_SIZE_FULL,
     {
-        /*---------------------------------------------------------------------------------------------------------*\
-        | Edit Keys                                                                                                 |
-        \*---------------------------------------------------------------------------------------------------------*/
-        {   0,      3,      12,         0,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      1,          0,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
+        /*-------------------------------------------------------------------------------------------------------------------------------------*\
+        | Edit Keys                                                                                                                             |
+        |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,             OpCode                              |
+        \*-------------------------------------------------------------------------------------------------------------------------------------*/
+        {   0,      3,      12,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
+        {   0,      4,      1,          0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
     }
 };
 
@@ -241,10 +244,11 @@ keyboard_keymap_overlay iso_qwerty
 {
     KEYBOARD_SIZE_FULL,
     {
-        /*---------------------------------------------------------------------------------------------------------*\
-        | Edit Keys                                                                                                 |
-        \*---------------------------------------------------------------------------------------------------------*/
-        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
+        /*-------------------------------------------------------------------------------------------------------------------------------------*\
+        | Edit Keys                                                                                                                             |
+        |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,             OpCode                              |
+        \*-------------------------------------------------------------------------------------------------------------------------------------*/
+        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
     }
 };
 
@@ -252,22 +256,23 @@ keyboard_keymap_overlay iso_qwertz
 {
     KEYBOARD_SIZE_FULL,
     {
-        /*---------------------------------------------------------------------------------------------------------*\
-        | Edit Keys                                                                                                 |
-        \*---------------------------------------------------------------------------------------------------------*/
-        {   0,      3,      12,         0,          KEY_EN_POUND,               KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      1,          0,          KEY_NORD_ANGLE_BRACKET,     KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      0,          0,          KEY_JP_CHEVRON,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      11,         0,          KEY_DE_ESZETT,              KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      12,         0,          KEY_EN_BACK_TICK,           KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      6,          0,          KEY_EN_Z,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      11,         0,          KEY_DE_DIAERESIS_U,         KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      12,         0,          KEY_EN_PLUS,                KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      3,      10,         0,          KEY_DE_DIAERESIS_O,         KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      3,      11,         0,          KEY_DE_DIAERESIS_A,         KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      2,          0,          KEY_EN_Y,                   KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      11,         0,          KEY_EN_MINUS,               KEYBOARD_OPCODE_SWAP_ONLY,          },
+        /*-------------------------------------------------------------------------------------------------------------------------------------*\
+        | Edit Keys                                                                                                                             |
+        |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,             OpCode                              |
+        \*-------------------------------------------------------------------------------------------------------------------------------------*/
+        {   0,      3,      12,         0,          KEY_EN_UNUSED,              KEY_EN_POUND,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      1,          0,          KEY_EN_UNUSED,              KEY_NORD_ANGLE_BRACKET,     KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      0,          0,          KEY_EN_UNUSED,              KEY_JP_CHEVRON,             KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      11,         0,          KEY_EN_UNUSED,              KEY_DE_ESZETT,              KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      1,      12,         0,          KEY_EN_UNUSED,              KEY_EN_BACK_TICK,           KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      6,          0,          KEY_EN_UNUSED,              KEY_EN_Z,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      11,         0,          KEY_EN_UNUSED,              KEY_DE_DIAERESIS_U,         KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      12,         0,          KEY_EN_UNUSED,              KEY_EN_PLUS,                KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      10,         0,          KEY_EN_UNUSED,              KEY_DE_DIAERESIS_O,         KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      11,         0,          KEY_EN_UNUSED,              KEY_DE_DIAERESIS_A,         KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      2,          0,          KEY_EN_UNUSED,              KEY_EN_Y,                   KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      11,         0,          KEY_EN_UNUSED,              KEY_EN_MINUS,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
     }
 };
 
@@ -275,16 +280,37 @@ keyboard_keymap_overlay jis
 {
     KEYBOARD_SIZE_FULL,
     {
-        /*---------------------------------------------------------------------------------------------------------*\
-        | Edit Keys                                                                                                 |
-        \*---------------------------------------------------------------------------------------------------------*/
-        {   0,      3,      12,         0,          KEY_EN_RIGHT_BRACKET,       KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      4,      12,         0,          KEY_EN_BACK_SLASH,          KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      1,      12,         0,          KEY_JP_CHEVRON,             KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      11,         0,          KEY_JP_AT,                  KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      12,         0,          KEY_EN_LEFT_BRACKET,        KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      3,      11,         0,          KEY_JP_COLON,               KEYBOARD_OPCODE_SWAP_ONLY,          },
-        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
+        /*-------------------------------------------------------------------------------------------------------------------------------------*\
+        | Edit Keys                                                                                                                             |
+        |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,             OpCode                              |
+        \*-------------------------------------------------------------------------------------------------------------------------------------*/
+        {   0,      3,      12,         0,          KEY_EN_RIGHT_BRACKET,       KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+        {   0,      4,      12,         0,          KEY_EN_BACK_SLASH,          KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+        {   0,      1,      12,         0,          KEY_JP_CHEVRON,             KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+        {   0,      2,      11,         0,          KEY_JP_AT,                  KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+        {   0,      2,      12,         0,          KEY_EN_LEFT_BRACKET,        KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+        {   0,      3,      11,         0,          KEY_JP_COLON,               KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_ADD_ALT_NAME,    },
+    }
+};
+
+keyboard_keymap_overlay abnt2
+{
+    KEYBOARD_SIZE_FULL,
+    {
+        /*-------------------------------------------------------------------------------------------------------------------------------------*\
+        | Edit Keys                                                                                                                             |
+        |   Zone,   Row,    Column,     Value,      Name,                       Alternate Name,             OpCode                              |
+        \*-------------------------------------------------------------------------------------------------------------------------------------*/
+        {   0,      1,       0,         0,          KEY_EN_UNUSED,              KEY_EN_QUOTE,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      11,         0,          KEY_EN_UNUSED,              KEY_NORD_ACUTE_GRAVE,       KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      2,      12,         0,          KEY_EN_UNUSED,              KEY_EN_LEFT_BRACKET,        KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      10,         0,          KEY_EN_UNUSED,              KEY_FR_CEDILLA_C,           KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      11,         0,          KEY_EN_UNUSED,              KEY_BR_TILDE,               KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      3,      12,         0,          KEY_EN_UNUSED,              KEY_EN_RIGHT_BRACKET,       KEYBOARD_OPCODE_ADD_ALT_NAME,       },
+        {   0,      4,      11,         0,          KEY_EN_SEMICOLON,           KEY_EN_UNUSED,              KEYBOARD_OPCODE_INSERT_SHIFT_RIGHT, },
+        {   0,      2,      13,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_SWAP_ONLY,          },
+        {   0,      4,      13,         0,          KEY_EN_UNUSED,              KEY_EN_UNUSED,              KEYBOARD_OPCODE_REMOVE_SHIFT_LEFT,  },
     }
 };
 
@@ -335,9 +361,9 @@ KeyboardLayoutManager::KeyboardLayoutManager(KEYBOARD_LAYOUT layout, KEYBOARD_SI
     | Add any values passed into the constructor before switching layouts   |
     |   and declare a value set for any changes afterwards                  |
     \*---------------------------------------------------------------------*/
-    for(size_t key_idx = 0; key_idx < values.ansi.size() && key_idx < keymap.size(); key_idx++)
+    for(size_t key_idx = 0; key_idx < (unsigned int)values.default_values.size() && key_idx < keymap.size(); key_idx++)
     {
-        keymap[key_idx].value = values.ansi[key_idx];
+        keymap[key_idx].value = values.default_values[key_idx];
     }
 
     /*---------------------------------------------------------------------*\
@@ -368,20 +394,25 @@ KeyboardLayoutManager::KeyboardLayoutManager(KEYBOARD_LAYOUT layout, KEYBOARD_SI
         | Non-English, non-QWERTY layouts are disabled      |
         | until proper translation feature is implemented   |
         \*-------------------------------------------------*/
-        // case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_ISO_AZERTY:
-        //     ChangeKeys(iso_azerty);
-        //     tmp_name = KEYBOARD_NAME_AZERTY;
-        //     break;
+        case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_ISO_AZERTY:
+            ChangeKeys(iso_azerty);
+            tmp_name = KEYBOARD_NAME_AZERTY;
+            break;
 
-        // case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_ISO_QWERTZ:
-        //     ChangeKeys(iso_qwertz);
-        //     tmp_name = KEYBOARD_NAME_QWERTZ;
-        //     break;
+        case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_ISO_QWERTZ:
+            ChangeKeys(iso_qwertz);
+            tmp_name = KEYBOARD_NAME_QWERTZ;
+            break;
 
-        // case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_JIS:
-        //     ChangeKeys(jis);
-        //     tmp_name = KEYBOARD_NAME_JIS;
-        //     break;
+        case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_JIS:
+            ChangeKeys(jis);
+            tmp_name = KEYBOARD_NAME_JIS;
+            break;
+
+        case KEYBOARD_LAYOUT::KEYBOARD_LAYOUT_ABNT2:
+            ChangeKeys(abnt2);
+            tmp_name = KEYBOARD_NAME_ABNT2;
+            break;
     }
 
     /*---------------------------------------------------------------------*\
@@ -464,7 +495,7 @@ void KeyboardLayoutManager::OpCodeSwitch(key_set change_keys)
 {
     LOG_DEBUG("[%s] %d keys to edit", KLM_CLASS_NAME, change_keys.size());
 
-    for(size_t chg_key_idx = 0; chg_key_idx < change_keys.size(); chg_key_idx++)
+    for(size_t chg_key_idx = 0; chg_key_idx < (unsigned int)change_keys.size(); chg_key_idx++)
     {
         switch(change_keys[chg_key_idx].opcode)
         {
@@ -496,6 +527,10 @@ void KeyboardLayoutManager::OpCodeSwitch(key_set change_keys)
                 RemoveRow(change_keys[chg_key_idx].row);
                 break;
 
+            case KEYBOARD_OPCODE_ADD_ALT_NAME:
+                AddAltName(change_keys[chg_key_idx]);
+                break;
+
             default:
                 LOG_DEBUG(LOG_MSG_MISSING_OPCODE, KLM_CLASS_NAME, change_keys[chg_key_idx].opcode,
                           change_keys[chg_key_idx].name, change_keys[chg_key_idx].row, change_keys[chg_key_idx].col);
@@ -516,7 +551,7 @@ void KeyboardLayoutManager::InsertKey(keyboard_led ins_key)
 
     unsigned int    key_idx     = 0;
 
-    for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+    for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
     {
         /*---------------------------------------------------------------------*\
         | Search through all existing keys and determine where in the list to   |
@@ -536,7 +571,7 @@ void KeyboardLayoutManager::InsertKey(keyboard_led ins_key)
     /*---------------------------------------------------------------------*\
     | If the search reached the end, put the new key at the end of the list |
     \*---------------------------------------------------------------------*/
-    if(key_idx == keymap.size())
+    if(key_idx == (unsigned int)keymap.size())
     {
         LOG_DEBUG(LOG_MSG_INSERT_BEFORE, KLM_CLASS_NAME, ins_name, "the end", ins_row, ins_col, KEY_EN_UNUSED);
         keymap.push_back(ins_key);
@@ -566,7 +601,7 @@ void KeyboardLayoutManager::InsertKey(keyboard_led ins_key)
     \*---------------------------------------------------------------------*/
     if(update_row)
     {
-        for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+        for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
         {
             if((keymap[key_idx].row == ins_row) && (keymap[key_idx].col >= ins_col))
             {
@@ -588,7 +623,7 @@ void KeyboardLayoutManager::InsertKeys(std::vector<keyboard_led> ins_keys)
     /*---------------------------------------------------------------------*\
     | Insert new keys one by one                                            |
     \*---------------------------------------------------------------------*/
-    for(unsigned int ins_key_idx = 0; ins_key_idx < ins_keys.size(); ins_key_idx++)
+    for(unsigned int ins_key_idx = 0; ins_key_idx < (unsigned int)ins_keys.size(); ins_key_idx++)
     {
         InsertKey(ins_keys[ins_key_idx]);
     }
@@ -622,7 +657,7 @@ void KeyboardLayoutManager::SwapKey(keyboard_led swp_key)
     | Otherwise, loop through and either swap an existing entry or insert   |
     | a new entry if the given location does not already have a key present |
     \*---------------------------------------------------------------------*/
-    for(unsigned int key_idx = 0; key_idx < keymap.size(); key_idx++)
+    for(unsigned int key_idx = 0; key_idx < (unsigned int)keymap.size(); key_idx++)
     {
         /*---------------------------------------------------------------------*\
         | If the row and column are identical, we've found the swap location    |
@@ -689,7 +724,7 @@ void KeyboardLayoutManager::SwapKeys(std::vector<keyboard_led> swp_keys)
     /*---------------------------------------------------------------------*\
     | Swap keys one by one                                                  |
     \*---------------------------------------------------------------------*/
-    for(unsigned int swp_key_idx = 0; swp_key_idx < swp_keys.size(); swp_key_idx++)
+    for(unsigned int swp_key_idx = 0; swp_key_idx < (unsigned int)swp_keys.size(); swp_key_idx++)
     {
         SwapKey(swp_keys[swp_key_idx]);
     }
@@ -706,7 +741,7 @@ void KeyboardLayoutManager::RemoveKey(keyboard_led rmv_key)
     /*---------------------------------------------------------------------*\
     | Loop through and find the entry to remove                             |
     \*---------------------------------------------------------------------*/
-    for(unsigned int key_idx = 0; key_idx < keymap.size(); key_idx++)
+    for(unsigned int key_idx = 0; key_idx < (unsigned int)keymap.size(); key_idx++)
     {
         /*---------------------------------------------------------------------*\
         | If the row and column are identical, we've found the swap location    |
@@ -716,7 +751,7 @@ void KeyboardLayoutManager::RemoveKey(keyboard_led rmv_key)
             LOG_DEBUG("[%s] Removing %s @ %02d, %02d and shifting keys left", KLM_CLASS_NAME, keymap[key_idx].name, rmv_row, rmv_col);
             keymap.erase(keymap.begin() + key_idx);
 
-            for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+            for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
             {
                 if(rmv_row == keymap[key_idx].row)
                 {
@@ -735,7 +770,7 @@ void KeyboardLayoutManager::RemoveKey(keyboard_led rmv_key)
         {
             LOG_DEBUG("[%s] Removing unused key @ %02d, %02d and shifting keys left", KLM_CLASS_NAME, rmv_row, rmv_col);
 
-            for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+            for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
             {
                 if(rmv_row == keymap[key_idx].row)
                 {
@@ -768,7 +803,7 @@ bool KeyboardLayoutManager::InsertRow(uint8_t ins_row)
     \*---------------------------------------------------------------------*/
     unsigned int key_idx = 0;
 
-    for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+    for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
     {
         if(ins_row <= keymap[key_idx].row)
         {
@@ -783,7 +818,7 @@ bool KeyboardLayoutManager::InsertRow(uint8_t ins_row)
     \*---------------------------------------------------------------------*/
     if(ins_row <= keymap[key_idx].row)
     {
-        for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+        for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
         {
             keymap[key_idx].row++;
         }
@@ -809,7 +844,7 @@ void KeyboardLayoutManager::RemoveRow(uint8_t rmv_row)
     \*---------------------------------------------------------------------*/
     unsigned int key_idx = 0;
 
-    while(key_idx < keymap.size() && rmv_row >= keymap[key_idx].row)
+    while(key_idx < (unsigned int)keymap.size() && rmv_row >= keymap[key_idx].row)
     {
         if(rmv_row == keymap[key_idx].row)
         {
@@ -827,7 +862,7 @@ void KeyboardLayoutManager::RemoveRow(uint8_t rmv_row)
     \*---------------------------------------------------------------------*/
     if(rmv_row < keymap[key_idx].row)
     {
-        for(/*key_idx*/; key_idx < keymap.size(); key_idx++)
+        for(/*key_idx*/; key_idx < (unsigned int)keymap.size(); key_idx++)
         {
             keymap[key_idx].row--;
         }
@@ -836,8 +871,36 @@ void KeyboardLayoutManager::RemoveRow(uint8_t rmv_row)
     }
 }
 
-std::string KeyboardLayoutManager::GetName()
+void KeyboardLayoutManager::AddAltName(keyboard_led key)
+{
+    /*---------------------------------------------------------------------*\
+    | Get the edit point                                                    |
+    \*---------------------------------------------------------------------*/
+    unsigned int    edit_row        = key.row;
+    unsigned int    edit_col        = key.col;
+    const char*     edit_alt_name   = key.alt_name;
 
+    /*---------------------------------------------------------------------*\
+    | Otherwise, loop through and find the edit location                    |
+    \*---------------------------------------------------------------------*/
+    for(unsigned int key_idx = 0; key_idx < keymap.size(); key_idx++)
+    {
+        /*---------------------------------------------------------------------*\
+        | If the row and column are identical, we've found the edit location    |
+        \*---------------------------------------------------------------------*/
+        if((edit_row == keymap[key_idx].row) && (edit_col == keymap[key_idx].col))
+        {
+            /*---------------------------------------------------------------------*\
+            | Update the entry at this position with the new translated name        |
+            \*---------------------------------------------------------------------*/
+            LOG_DEBUG("[%s] Adding alternate name %s to %s @ %02d, %02d", KLM_CLASS_NAME, edit_alt_name, keymap[key_idx].name, keymap[key_idx].row, keymap[key_idx].col);
+            keymap[key_idx].alt_name = edit_alt_name;
+            break;
+        }
+    }
+}
+
+std::string KeyboardLayoutManager::GetName()
 {
     return name;
 }
@@ -854,12 +917,12 @@ KEYBOARD_SIZE KeyboardLayoutManager::GetPhysicalSize()
 
 unsigned int KeyboardLayoutManager::GetKeyCount()
 {
-    return keymap.size();
+    return (unsigned int)keymap.size();
 }
 
 std::string KeyboardLayoutManager::GetKeyNameAt(unsigned int key_idx)
 {
-    if(key_idx < keymap.size())
+    if(key_idx < (unsigned int)keymap.size())
     {
         return keymap[key_idx].name;
     }
@@ -903,6 +966,29 @@ unsigned int KeyboardLayoutManager::GetKeyValueAt(unsigned int row, unsigned int
     return -1;
 }
 
+std::string KeyboardLayoutManager::GetKeyAltNameAt(unsigned int key_idx)
+{
+    if(key_idx < keymap.size())
+    {
+        return keymap[key_idx].alt_name;
+    }
+
+    return KEY_EN_UNUSED;
+}
+
+std::string KeyboardLayoutManager::GetKeyAltNameAt(unsigned int row, unsigned int col)
+{
+    for(std::vector<keyboard_led>::iterator key = keymap.begin(); key != keymap.end(); ++key)
+    {
+        if(key->row == row && key->col == col)
+        {
+            return key->alt_name;
+        }
+    }
+
+    return KEY_EN_UNUSED;
+}
+
 unsigned int KeyboardLayoutManager::GetRowCount()
 {
     return rows;
@@ -929,19 +1015,19 @@ void KeyboardLayoutManager::GetKeyMap(unsigned int* map_ptr, KEYBOARD_MAP_FILL_T
     width               = std::max(width, cols);
     height              = std::max(height, rows);
 
-    for(size_t r = 0; r < height; r++)
+    for(unsigned int r = 0; r < height; r++)
     {
-        size_t offset   = r * width;
+        unsigned int offset = r * width;
 
-        for(size_t c = 0; c < width; c++)
+        for(unsigned int c = 0; c < width; c++)
         {
             map_ptr[offset + c] = no_key;
         }
     }
 
-    for(size_t i = 0; i < keymap.size(); i++)
+    for(unsigned int i = 0; i < (unsigned int)keymap.size(); i++)
     {
-        size_t offset   = (keymap[i].row * width) + keymap[i].col;
+        unsigned int offset = (keymap[i].row * width) + keymap[i].col;
         switch(fill_type)
         {
             case KEYBOARD_MAP_FILL_TYPE_COUNT:
@@ -971,7 +1057,7 @@ void KeyboardLayoutManager::UpdateDimensions()
     /*---------------------------------------------------------------------*\
     | Search through the keymap and find the maximum row and column values  |
     \*---------------------------------------------------------------------*/
-    for(unsigned int key_idx = 0; key_idx < keymap.size(); key_idx++)
+    for(unsigned int key_idx = 0; key_idx < (unsigned int)keymap.size(); key_idx++)
     {
         if(keymap[key_idx].row > max_row)
         {

@@ -6,7 +6,7 @@
 |   Wojciech Lazarski                           03 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -75,10 +75,11 @@ enum
 class MSIGPUv2Controller
 {
 public:
-    MSIGPUv2Controller(i2c_smbus_interface* bus, msi_gpu_dev_id dev);
+    MSIGPUv2Controller(i2c_smbus_interface* bus, msi_gpu_dev_id dev, std::string dev_name);
     ~MSIGPUv2Controller();
 
     std::string   GetDeviceLocation();
+    std::string   GetDeviceName();
 
     void          SetRGB1(unsigned char red, unsigned char green, unsigned char blue);
     void          SetRGB1V2(unsigned char red, unsigned char green, unsigned char blue);
@@ -95,4 +96,5 @@ public:
 private:
     i2c_smbus_interface *   bus;
     msi_gpu_dev_id          dev;
+    std::string             name;
 };

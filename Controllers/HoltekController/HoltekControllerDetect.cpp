@@ -4,14 +4,12 @@
 |   Detector for Holtek devices                             |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "HoltekA070Controller.h"
-#include "RGBController.h"
 #include "RGBController_HoltekA070.h"
 #include "HoltekA1FAController.h"
 #include "RGBController_HoltekA1FA.h"
@@ -35,9 +33,8 @@ void DetectHoltekControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        HoltekA070Controller*     controller     = new HoltekA070Controller(dev, info->path);
+        HoltekA070Controller*     controller     = new HoltekA070Controller(dev, info->path, name);
         RGBController_HoltekA070* rgb_controller = new RGBController_HoltekA070(controller);
-        rgb_controller->name                     = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
@@ -49,9 +46,8 @@ void DetectHoltekMousemats(hid_device_info *info, const std::string &name)
 
     if(dev)
     {
-        HoltekA1FAController*     controller     = new HoltekA1FAController(dev, info->path);
+        HoltekA1FAController*     controller     = new HoltekA1FAController(dev, info->path, name);
         RGBController_HoltekA1FA* rgb_controller = new RGBController_HoltekA1FA(controller);
-        rgb_controller->name                     = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

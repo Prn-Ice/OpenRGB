@@ -1,32 +1,23 @@
-/*-----------------------------------------*\
-|  TrustGXT114Controller.cpp                |
-|                                           |
-|  Driver for Trust GXT 114 controller      |
-|                                           |
-|  Guimard Morgan (morg) 1/24/2022          |
-\*-----------------------------------------*/
-#include "TrustGXT114Controller.h"
+/*---------------------------------------------------------*\
+| TrustGXT114Controller.cpp                                 |
+|                                                           |
+|   Driver for Trust GXT 114                                |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include <string.h>
+#include "StringUtils.h"
+#include "TrustGXT114Controller.h"
 
-TrustGXT114Controller::TrustGXT114Controller(hid_device* dev_handle, const hid_device_info& info)
+TrustGXT114Controller::TrustGXT114Controller(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
-    dev                 = dev_handle;
-    location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
-
+    dev             = dev_handle;
+    location        = info.path;
+    name            = dev_name;
 }
 
 TrustGXT114Controller::~TrustGXT114Controller()
@@ -39,14 +30,22 @@ std::string TrustGXT114Controller::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string TrustGXT114Controller::GetSerialString()
+std::string TrustGXT114Controller::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string TrustGXT114Controller::GetFirmwareVersion()
+std::string TrustGXT114Controller::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 bool TrustGXT114Controller::Test()
@@ -61,7 +60,7 @@ bool TrustGXT114Controller::Test()
 
 void TrustGXT114Controller::SetMode(RGBColor color, unsigned char brightness, unsigned char speed, unsigned char mode_value)
 {
-    unsigned char speed_bright = mode_value == STATIC_MODE_VALUE ? brightness : speed;    
+    unsigned char speed_bright = mode_value == STATIC_MODE_VALUE ? brightness : speed;
 
     /*-----------------------------------------*\
     | Create and zero out the buffer            |

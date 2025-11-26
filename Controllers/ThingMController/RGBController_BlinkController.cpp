@@ -1,10 +1,13 @@
-/*-------------------------------------------------------------------*\
-|  RGBController_BlinkController.cpp                                  |
-|                                                                     |
-|  Driver for ThingM Blink device                                     |
-|                                                                     |
-|  Eric S (edbgon)          1st Oct 2021                              |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_BlinkController.cpp                         |
+|                                                           |
+|   RGBController for ThingM Blink                          |
+|                                                           |
+|   Eric S (edbgon)                             01 Oct 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_BlinkController.h"
 
@@ -102,9 +105,9 @@ void RGBController_BlinkController::ResizeZone(int /*zone*/, int /*new_size*/)
 
 void RGBController_BlinkController::DeviceUpdateLEDs()
 {
-    for (std::size_t led = 0; led < colors.size(); led++)
+    for(std::size_t led = 0; led < colors.size(); led++)
     {
-        UpdateSingleLED(led);
+        UpdateSingleLED((int)led);
     }
 }
 

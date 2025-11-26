@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       21 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "LexipMouseController.h"
-#include "RGBController.h"
 #include "RGBController_LexipMouse.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,9 @@ void DetectLexipMouseControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        LexipMouseController*     controller        = new LexipMouseController(dev, *info);
+        LexipMouseController*     controller        = new LexipMouseController(dev, *info, name);
         RGBController_LexipMouse* rgb_controller    = new RGBController_LexipMouse(controller);
-        rgb_controller->name                        = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

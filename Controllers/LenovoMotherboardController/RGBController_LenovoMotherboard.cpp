@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       26 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -27,13 +27,13 @@
 RGBController_LenovoMotherboard::RGBController_LenovoMotherboard(LenovoMotherboardController* controller_ptr)
 {
     controller                  = controller_ptr;
-    name                        = "Lenovo motherboard";
+
+    name                        = controller->GetNameString();
     vendor                      = "Lenovo";
     type                        = DEVICE_TYPE_MOTHERBOARD;
     description                 = name;
     location                    = controller->GetDeviceLocation();
     serial                      = controller->GetSerialString();
-    version                     = controller->GetFirmwareVersion();
 
     mode Static;
     Static.name                 = "Static";

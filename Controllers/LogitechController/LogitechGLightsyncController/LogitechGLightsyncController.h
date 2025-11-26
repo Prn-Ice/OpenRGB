@@ -6,14 +6,14 @@
 |   TheRogueZeta                                21 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <memory>
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -38,25 +38,33 @@ enum
 class LogitechGLightsyncController
 {
 public:
-    LogitechGLightsyncController(
-            hid_device* dev_cmd_handle,
-            hid_device* dev_handle,
-            const char* path,
-            unsigned char hid_dev_index,
-            unsigned char hid_feature_index,
-            unsigned char hid_fctn_ase_id);
-    LogitechGLightsyncController(
-            hid_device* dev_cmd_handle,
-            hid_device* dev_handle,
-            const char* path,
-            unsigned char hid_dev_index,
-            unsigned char hid_feature_index,
-            unsigned char hid_fctn_ase_id,
-            std::shared_ptr<std::mutex> mutex_ptr);
+    LogitechGLightsyncController
+        (
+        hid_device*                 ev_cmd_handle,
+        hid_device*                 ev_handle,
+        const char*                 ath,
+        unsigned char               id_dev_index,
+        unsigned char               id_feature_index,
+        unsigned char               id_fctn_ase_id,
+        std::string                 ev_name
+        );
+
+    LogitechGLightsyncController
+        (
+        hid_device*                 dev_cmd_handle,
+        hid_device*                 dev_handle,
+        const char*                 path,
+        unsigned char               hid_dev_index,
+        unsigned char               hid_feature_index,
+        unsigned char               hid_fctn_ase_id,
+        std::shared_ptr<std::mutex> mutex_ptr,
+        std::string                 dev_name
+        );
 
     ~LogitechGLightsyncController();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        UpdateMouseLED
@@ -75,9 +83,9 @@ private:
     hid_device*                 dev;
     hid_device*                 cmd_dev;
     std::string                 location;
+    std::string                 name;
     unsigned char               dev_index;
     unsigned char               feature_index;
     unsigned char               fctn_ase_id;
-    bool                        direct_state;
     std::shared_ptr<std::mutex> mutex;
 };

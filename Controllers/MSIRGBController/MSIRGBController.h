@@ -8,7 +8,7 @@
 |   Adam Honse (CalcProgrammer1)                11 Feb 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -42,7 +42,7 @@ enum
 class MSIRGBController
 {
 public:
-    MSIRGBController(int sioaddr, bool invert);
+    MSIRGBController(int sioaddr, bool invert, std::string dev_name);
     ~MSIRGBController();
 
     std::string     GetDeviceName();
@@ -53,5 +53,6 @@ public:
 
     void            SetColor(unsigned char red, unsigned char green, unsigned char blue);
 private:
-    int     msi_sioaddr;
+    int             msi_sioaddr;
+    std::string     name;
 };

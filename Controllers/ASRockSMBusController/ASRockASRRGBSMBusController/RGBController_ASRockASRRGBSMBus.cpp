@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                15 Dec 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_ASRockASRRGBSMBus.h"
@@ -169,7 +169,7 @@ void RGBController_ASRockASRRGBSMBus::ResizeZone(int /*zone*/, int /*new_size*/)
 
 void RGBController_ASRockASRRGBSMBus::DeviceUpdateLEDs()
 {
-    for(int led = 0; led < colors.size(); led++)
+    for(unsigned int led = 0; led < colors.size(); led++)
     {
         UpdateSingleLED(led);
     }

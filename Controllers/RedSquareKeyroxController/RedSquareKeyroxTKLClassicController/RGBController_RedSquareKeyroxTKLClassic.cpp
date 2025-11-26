@@ -6,7 +6,7 @@
 |   vlack                                       03 May 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_RedSquareKeyroxTKLClassic.h"
@@ -55,16 +55,16 @@ layout_values keyrox_tkl_offset_values =
 
 RGBController_RedSquareKeyroxTKLClassic::RGBController_RedSquareKeyroxTKLClassic(RedSquareKeyroxTKLClassicController* controller_ptr)
 {
-    controller      = controller_ptr;
+    controller              = controller_ptr;
 
-    name            = "Red Square Keyrox TKL Classic";
-    vendor          = "Red Square";
-    type            = DEVICE_TYPE_KEYBOARD;
-    description     = name;
-    location        = controller->GetDeviceLocation();
-    serial          = controller->GetSerialString();
+    name                    = controller->GetNameString();
+    vendor                  = "Red Square";
+    type                    = DEVICE_TYPE_KEYBOARD;
+    description             = "Red Square Keyrox TKL Classic Device";
+    location                = controller->GetDeviceLocation();
+    serial                  = controller->GetSerialString();
 
-    int BASE_EFFECT_FLAGS = MODE_FLAG_HAS_MODE_SPECIFIC_COLOR | MODE_FLAG_HAS_RANDOM_COLOR;
+    int BASE_EFFECT_FLAGS   = MODE_FLAG_HAS_MODE_SPECIFIC_COLOR | MODE_FLAG_HAS_RANDOM_COLOR;
 
     const int EFFECTS_COUNT = 14;
     keyrox_effect keyrox_effects[EFFECTS_COUNT] =
@@ -234,8 +234,8 @@ void RGBController_RedSquareKeyroxTKLClassic::SetupZones()
     {
         led new_led;
 
-        new_led.name                = new_kb.GetKeyNameAt(led_idx);
-        new_led.value               = new_kb.GetKeyValueAt(led_idx);
+        new_led.name                = new_kb.GetKeyNameAt((unsigned int)led_idx);
+        new_led.value               = new_kb.GetKeyValueAt((unsigned int)led_idx);
         leds.push_back(new_led);
     }
 

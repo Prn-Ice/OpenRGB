@@ -1,20 +1,18 @@
 /*---------------------------------------------------------*\
 | CorsairVengeanceControllerDetect.cpp                      |
 |                                                           |
-|   Detector for Corsair Vengeance RGB RAM                  |
+|   Detector for original single-zone Corsair Vengeance     |
+|   DDR4 RGB RAM                                            |
 |                                                           |
 |   Adam Honse (CalcProgrammer1)                08 Mar 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 #include "Detector.h"
 #include "CorsairVengeanceController.h"
-#include "RGBController.h"
 #include "RGBController_CorsairVengeance.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"
@@ -58,40 +56,41 @@ bool TestForCorsairVengeanceController(i2c_smbus_interface* bus, unsigned char a
 *                                                                                          *
 *       Detect Corsair controllers on the enumerated I2C busses.                           *
 *                                                                                          *
-*           bus - pointer to i2c_smbus_interface where Aura device is connected            *
-*           dev - I2C address of Aura device                                               *
+*           bus   - pointer to i2c_smbus_interface where device is connected               *
+*           slots - list of SPD entries with matching JEDEC ID                             *
 *                                                                                          *
 \******************************************************************************************/
 
-void DetectCorsairVengeanceControllers(std::vector<i2c_smbus_interface*> &busses)
+void DetectCorsairVengeanceControllers(i2c_smbus_interface* bus, std::vector<SPDWrapper*> &slots, const std::string &/*name*/)
 {
-    for(unsigned int bus = 0; bus < busses.size(); bus++)
+    for(SPDWrapper *slot : slots)
     {
-        IF_DRAM_SMBUS(busses[bus]->pci_vendor, busses[bus]->pci_device)
+        /*-------------------------------------------------*\
+        | Test first address range 0x58-0x5F                |
+        \*-------------------------------------------------*/
+        unsigned char address = slot->address() + 8;
+
+        if(TestForCorsairVengeanceController(bus, address))
         {
-            for(unsigned char addr = 0x58; addr <= 0x5F; addr++)
-            {
-                if(TestForCorsairVengeanceController(busses[bus], addr))
-                {
-                    CorsairVengeanceController*     new_controller    = new CorsairVengeanceController(busses[bus], addr);
-                    RGBController_CorsairVengeance* new_rgbcontroller = new RGBController_CorsairVengeance(new_controller);
+            CorsairVengeanceController*     new_controller    = new CorsairVengeanceController(bus, address);
+            RGBController_CorsairVengeance* new_rgbcontroller = new RGBController_CorsairVengeance(new_controller);
 
-                    ResourceManager::get()->RegisterRGBController(new_rgbcontroller);
-                }
-            }
-            for(unsigned char addr = 0x18; addr <= 0x1F; addr++)
-            {
-                if(TestForCorsairVengeanceController(busses[bus], addr))
-                {
-                    CorsairVengeanceController*     new_controller    = new CorsairVengeanceController(busses[bus], addr);
-                    RGBController_CorsairVengeance* new_rgbcontroller = new RGBController_CorsairVengeance(new_controller);
+            ResourceManager::get()->RegisterRGBController(new_rgbcontroller);
+        }
 
-                    ResourceManager::get()->RegisterRGBController(new_rgbcontroller);
-                }
-            }
+        /*-------------------------------------------------*\
+        | Test second address range 0x18-0x1F               |
+        \*-------------------------------------------------*/
+        address = slot->address() - 0x40 + 8;
+
+        if(TestForCorsairVengeanceController(bus, address))
+        {
+            CorsairVengeanceController*     new_controller    = new CorsairVengeanceController(bus, address);
+            RGBController_CorsairVengeance* new_rgbcontroller = new RGBController_CorsairVengeance(new_controller);
+
+            ResourceManager::get()->RegisterRGBController(new_rgbcontroller);
         }
     }
-
 }   /* DetectCorsairVengeanceControllers() */
 
-REGISTER_I2C_DETECTOR("Corsair Vengeance", DetectCorsairVengeanceControllers);
+REGISTER_I2C_DIMM_DETECTOR("Corsair Vengeance RGB DRAM", DetectCorsairVengeanceControllers, JEDEC_CORSAIR, SPD_DDR4_SDRAM);

@@ -6,14 +6,14 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      29 Dec 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -66,11 +66,12 @@ enum
 class NZXTHue2Controller
 {
 public:
-    NZXTHue2Controller(hid_device* dev_handle, unsigned int rgb_channels, unsigned int fan_channels, const char* path);
+    NZXTHue2Controller(hid_device* dev_handle, unsigned int rgb_channels, unsigned int fan_channels, const char* path, std::string dev_name);
     ~NZXTHue2Controller();
 
     std::string     GetFirmwareVersion();
     std::string     GetLocation();
+    std::string     GetName();
     std::string     GetSerialString();
 
     unsigned char   GetFanCommand
@@ -127,6 +128,7 @@ private:
 
     char            firmware_version[16];
     std::string     location;
+    std::string     name;
     unsigned int    num_fan_channels;
     unsigned int    num_rgb_channels;
 

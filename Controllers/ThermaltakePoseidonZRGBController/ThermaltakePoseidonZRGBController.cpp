@@ -1,15 +1,17 @@
-/*-----------------------------------------*\
-|  ThermaltakePoseidonZRGBController.cpp    |
-|                                           |
-|  Driver for Thermaltake Poseidon Z RGB    |
-|  Keyboard lighting controller             |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 12/25/2019  |
-\*-----------------------------------------*/
-
-#include "ThermaltakePoseidonZRGBController.h"
+/*---------------------------------------------------------*\
+| ThermaltakePoseidonZRGBController.cpp                     |
+|                                                           |
+|   Driver for Thermaltake Poseidon Z RGB                   |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                25 Dec 2019 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "StringUtils.h"
+#include "ThermaltakePoseidonZRGBController.h"
 
 using namespace std::chrono_literals;
 
@@ -48,10 +50,7 @@ std::string PoseidonZRGBController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void PoseidonZRGBController::SetMode(unsigned char mode, unsigned char direction, unsigned char speed)
@@ -121,7 +120,7 @@ void PoseidonZRGBController::SetLEDsDirect(std::vector<RGBColor> colors)
     hid_send_feature_report(dev, red_grn_buf, 264);
 
     std::this_thread::sleep_for(5ms);
-     
+
     hid_send_feature_report(dev, blu_buf, 264);
 }
 

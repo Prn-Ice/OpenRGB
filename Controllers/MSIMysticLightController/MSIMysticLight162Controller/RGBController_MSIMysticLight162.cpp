@@ -7,7 +7,7 @@
 |   Adam Honse                                  06 Mar 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_MSIMysticLight162.h"
@@ -48,7 +48,7 @@ RGBController_MSIMysticLight162::RGBController_MSIMysticLight162
     MSIMysticLight162Controller* controller_ptr
     )
 {
-    controller = controller_ptr;
+    controller  = controller_ptr;
 
     name        = controller->GetDeviceName();
     vendor      = "MSI";

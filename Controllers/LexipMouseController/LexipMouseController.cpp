@@ -6,31 +6,18 @@
 |   Morgan Guimard (morg)                       21 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "LexipMouseController.h"
+#include "StringUtils.h"
 
-LexipMouseController::LexipMouseController(hid_device* dev_handle, const hid_device_info& info)
+LexipMouseController::LexipMouseController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
-
+    name                = dev_name;
 }
 
 LexipMouseController::~LexipMouseController()
@@ -43,14 +30,22 @@ std::string LexipMouseController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string LexipMouseController::GetSerialString()
+std::string LexipMouseController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string LexipMouseController::GetFirmwareVersion()
+std::string LexipMouseController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LexipMouseController::SetDirect(RGBColor color)

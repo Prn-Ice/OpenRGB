@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      Dec 11 2016 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -41,15 +41,15 @@ struct LEDStripDevice
 {
     std::string     name;
     std::string     port;
-    unsigned int    baud;
-    unsigned int    num_leds;
+    unsigned int    baud        = 0;
+    unsigned int    num_leds    = 0;
     led_protocol    protocol;
 };
 
 class LEDStripController
 {
 public:
-    LEDStripController();
+    LEDStripController(std::string dev_name);
     ~LEDStripController();
 
     void        Initialize(char* ledstring, led_protocol proto);
@@ -60,6 +60,7 @@ public:
 
     char*       GetLEDString();
     std::string GetLocation();
+    std::string GetName();
 
     void        SetLEDs(std::vector<RGBColor> colors);
 
@@ -76,6 +77,7 @@ private:
     char led_string[1024];
     std::string port_name;
     std::string client_name;
+    std::string name;
     serial_port *serialport;
     net_port *udpport;
     i2c_smbus_interface *i2cport;

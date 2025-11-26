@@ -6,7 +6,7 @@
 |   Balázs Triszka (balika011)                  21 May 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_EVGAACX30SMBus.h"
@@ -130,7 +130,7 @@ void RGBController_EVGAACX30SMBus::ResizeZone(int /*zone*/, int /*new_size*/)
 
 void RGBController_EVGAACX30SMBus::DeviceUpdateLEDs()
 {
-    for(int led = 0; led < colors.size(); led++)
+    for(unsigned int led = 0; led < colors.size(); led++)
     {
         UpdateSingleLED(led);
     }

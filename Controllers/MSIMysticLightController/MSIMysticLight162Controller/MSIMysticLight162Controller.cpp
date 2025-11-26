@@ -7,13 +7,14 @@
 |   Adam Honse                                  06 Mar 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <algorithm>
 #include <array>
 #include <bitset>
 #include "MSIMysticLight162Controller.h"
+#include "StringUtils.h"
 
 #define BITSET(val, bit, pos)       ((unsigned char)std::bitset<8>(val).set((pos), (bit)).to_ulong())
 
@@ -56,7 +57,6 @@ const std::vector<MSI_ZONE> zones_set3 =
     MSI_ZONE_ON_BOARD_LED_0
 };
 
-
 /*-----------------------------------------------------------------------------------------------------------------------------*\
 | Definition of the board sepcific configurations (number of onboard LEDs and supported zones).                                 |
 |                                                                                                                               |
@@ -75,6 +75,7 @@ static const mystic_light_162_config board_configs[] =
     { 0x7B18, 6,  &zones_set1 },        // MAG Z390 TOMAHAWK
     { 0x7B50, 6,  &zones_set2 },        // MPG Z390M GAMING EDGE AC
     { 0x7B85, 7,  &zones_set0 },        // B450 GAMING PRO CARBON
+    { 0x7B92, 10, &zones_set0 },        // MEG X399 CREATION
     { 0xB926, 3,  &zones_set3 },        // MPG B460 TRIDENT AS
 };
 
@@ -82,18 +83,17 @@ static const mystic_light_162_config board_configs[] =
 MSIMysticLight162Controller::MSIMysticLight162Controller
     (
     hid_device*     handle,
-    const char      *path,
-    unsigned short  pid
+    const char*     path,
+    unsigned short  pid,
+    std::string     dev_name
     )
 {
-    dev = handle;
+    dev         = handle;
+    location    = path;
+    name        = dev_name;
 
     if(dev)
     {
-        location = path;
-
-        ReadName();
-        ReadSerial();
         ReadFwVersion();
         ReadSettings();
     }
@@ -204,7 +204,15 @@ std::string MSIMysticLight162Controller::GetDeviceLocation()
 
 std::string MSIMysticLight162Controller::GetSerial()
 {
-    return chip_id;
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 bool MSIMysticLight162Controller::ReadSettings()
@@ -398,49 +406,6 @@ bool MSIMysticLight162Controller::ReadFwVersion()
     | failed                                                |
     \*-----------------------------------------------------*/
     return(ret_val > 0);
-}
-
-void MSIMysticLight162Controller::ReadSerial()
-{
-    wchar_t serial[256];
-
-    /*-----------------------------------------------------*\
-    | Get the serial number string from HID                 |
-    \*-----------------------------------------------------*/
-    hid_get_serial_number_string(dev, serial, 256);
-
-    /*-----------------------------------------------------*\
-    | Convert wchar_t into std::wstring into std::string    |
-    \*-----------------------------------------------------*/
-    std::wstring wserial = std::wstring(serial);
-    chip_id = std::string(wserial.begin(), wserial.end());
-}
-
-void MSIMysticLight162Controller::ReadName()
-{
-    wchar_t tname[256];
-
-    /*-----------------------------------------------------*\
-    | Get the manufacturer string from HID                  |
-    \*-----------------------------------------------------*/
-    hid_get_manufacturer_string(dev, tname, 256);
-
-    /*-----------------------------------------------------*\
-    | Convert wchar_t into std::wstring into std::string    |
-    \*-----------------------------------------------------*/
-    std::wstring wname = std::wstring(tname);
-    name = std::string(wname.begin(), wname.end());
-
-    /*-----------------------------------------------------*\
-    | Get the product string from HID                       |
-    \*-----------------------------------------------------*/
-    hid_get_product_string(dev, tname, 256);
-
-    /*-----------------------------------------------------*\
-    | Append the product string to the manufacturer string  |
-    \*-----------------------------------------------------*/
-    wname = std::wstring(tname);
-    name.append(" ").append(std::string(wname.begin(), wname.end()));
 }
 
 MSI_MODE MSIMysticLight162Controller::GetMode()

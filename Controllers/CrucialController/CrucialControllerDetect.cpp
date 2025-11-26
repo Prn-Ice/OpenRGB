@@ -6,16 +6,14 @@
 |   Adam Honse (CalcProgrammer1)                19 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 #include "Detector.h"
 #include "CrucialController.h"
 #include "LogManager.h"
-#include "RGBController.h"
 #include "RGBController_Crucial.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"
@@ -235,4 +233,4 @@ void DetectCrucialControllers(std::vector<i2c_smbus_interface*> &busses)
 
 }   /* DetectCrucialControllers() */
 
-REGISTER_I2C_DETECTOR("Crucial", DetectCrucialControllers);
+REGISTER_I2C_DETECTOR("Crucial Ballistix", DetectCrucialControllers);

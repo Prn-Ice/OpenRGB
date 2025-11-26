@@ -6,14 +6,14 @@
 |   Cooper Hall (geobot19)                      17 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <array>
 #include <string>
 #include <utility>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 #include "LogManager.h"
 
@@ -36,7 +36,7 @@ class LenovoUSBController
     /*--------------*\
     |ctor(s) and dtor|
     \*--------------*/
-    LenovoUSBController(hid_device* dev_handle, const char* path, uint16_t in_pid);
+    LenovoUSBController(hid_device* dev_handle, const char* path, uint16_t in_pid, std::string dev_name);
     ~LenovoUSBController();
 
     /*--------------*\

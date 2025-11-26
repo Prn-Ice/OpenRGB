@@ -7,14 +7,14 @@
 |   DomePlaysHD                                 14 Mar 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <sstream>
 #include <thread>
 #include <vector>
 #include "ElgatoLightStripController.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "LogManager.h"
 
 using json = nlohmann::json;
@@ -99,11 +99,6 @@ std::string ElgatoLightStripController::GetUniqueID()
 
 void ElgatoLightStripController::SetColor(hsv_t hsv_color)
 {
-    if(hsv_color.hue < 0)
-    {
-        hsv_color.hue = 0;
-    }
-
     if(hsv_color.hue > 360)
     {
         hsv_color.hue = 360;

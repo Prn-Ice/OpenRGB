@@ -6,16 +6,18 @@
 |   Santeri Pikarinen (santeri3700)             01 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HoltekA070Controller.h"
+#include "StringUtils.h"
 
-HoltekA070Controller::HoltekA070Controller(hid_device* dev_handle, const char* path)
+HoltekA070Controller::HoltekA070Controller(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 HoltekA070Controller::~HoltekA070Controller()
@@ -28,6 +30,11 @@ std::string HoltekA070Controller::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string HoltekA070Controller::GetNameString()
+{
+    return(name);
+}
+
 std::string HoltekA070Controller::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -38,10 +45,7 @@ std::string HoltekA070Controller::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 /*-------------------------------------------------------------------------------------------------*\

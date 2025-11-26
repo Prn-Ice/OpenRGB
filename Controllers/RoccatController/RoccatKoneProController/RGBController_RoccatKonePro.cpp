@@ -1,10 +1,13 @@
-/*---------------------------------------------*\
-|  RGBController_RoccatKonePro.cpp              |
-|                                               |
-|  RGB Controller for Roccat Kone Pro           |
-|                                               |
-|  Garrett Denham (GardenOfWyers) 01/12/2024    |
-\*---------------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_RoccatKonePro.cpp                           |
+|                                                           |
+|   RGBController for Roccat Kone Pro                       |
+|                                                           |
+|   Garrett Denham (GardenOfWyers)              12 Jan 2024 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_RoccatKonePro.h"
 
@@ -23,13 +26,12 @@ RGBController_RoccatKonePro::RGBController_RoccatKonePro(RoccatKoneProController
 {
     controller                  = controller_ptr;
 
-    name                        = "Roccat Kone Pro";
+    name                        = controller->GetNameString();
     vendor                      = "Roccat";
     type                        = DEVICE_TYPE_MOUSE;
-    description                 = "Roccat Kone Pro Mouse";
+    description                 = "Roccat Kone Pro Mouse Device";
     serial                      = controller->GetSerialString();
     location                    = controller->GetDeviceLocation();
-    version                     = controller->GetFirmwareVersion();
 
     // Also known as "Intelligent Lighting System" mode in Roccat Swarm
     mode Direct;
@@ -164,7 +166,7 @@ void RGBController_RoccatKonePro::DeviceUpdateLEDs()
 }
 
 void RGBController_RoccatKonePro::UpdateZoneLEDs(int /*zone_idx*/)
-{   
+{
     DeviceUpdateLEDs();
 }
 

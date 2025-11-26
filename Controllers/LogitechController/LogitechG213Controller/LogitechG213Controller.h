@@ -6,13 +6,13 @@
 |   Eric Samuelson (edbgon)                     06 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController.h"
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 #pragma once
 
@@ -52,10 +52,11 @@ enum
 class LogitechG213Controller
 {
 public:
-    LogitechG213Controller(hid_device* dev_handle, const char* path);
+    LogitechG213Controller(hid_device* dev_handle, const char* path, std::string dev_name);
     ~LogitechG213Controller();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        SetDirect
@@ -79,6 +80,7 @@ public:
 private:
     hid_device* dev;
     std::string location;
+    std::string name;
 
     void        SendMode
                     (

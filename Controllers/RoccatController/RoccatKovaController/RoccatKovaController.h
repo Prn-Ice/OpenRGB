@@ -1,15 +1,18 @@
-/*-----------------------------------------*\
-|  RoccatKovaController.h                   |
-|                                           |
-|  Controller for Roccat Kova               |
-|                                           |
-|  Gustash 01/12/2022                       |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatKovaController.h                                    |
+|                                                           |
+|   Driver for Roccat Kova                                  |
+|                                                           |
+|   Gustash                                     01 Dec 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
+#include <hidapi.h>
 #include "RGBController.h"
-#include <hidapi/hidapi.h>
 
 #define ROCCAT_KOVA_HID_MAX_STR               255
 #define ROCCAT_KOVA_LED_COUNT                 2
@@ -62,12 +65,13 @@ enum
 class RoccatKovaController
 {
 public:
-    RoccatKovaController(hid_device* dev_handle, char *path);
+    RoccatKovaController(hid_device* dev_handle, char *path, std::string dev_name);
     ~RoccatKovaController();
 
     std::string GetLocation();
+    std::string GetName();
     std::string GetSerial();
-    std::string GetFirmwareVersion();
+    std::string GetVersion();
 
     void SetColor(RGBColor color_wheel,
                   RGBColor color_stripe,
@@ -78,7 +82,8 @@ public:
 private:
     hid_device* dev;
     std::string location;
-    std::string firmware_version;
+    std::string name;
+    std::string version;
 
     void SendInitialPacket();
     void FetchProfileData(uint8_t *buf);

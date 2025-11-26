@@ -6,14 +6,13 @@
 |   Santeri Pikarinen (santeri3700)             01 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
-#include "RGBController.h"
+#include <hidapi.h>
 
 enum
 {
@@ -26,10 +25,11 @@ enum
 class HoltekA070Controller
 {
 public:
-    HoltekA070Controller(hid_device* dev_handle, const char* path);
+    HoltekA070Controller(hid_device* dev_handle, const char* path, std::string dev_name);
     ~HoltekA070Controller();
 
     std::string GetDeviceLocation();
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        SendCustomColor
@@ -47,4 +47,5 @@ public:
 private:
     hid_device*             dev;
     std::string             location;
+    std::string             name;
 };

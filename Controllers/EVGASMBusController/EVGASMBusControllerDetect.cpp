@@ -6,16 +6,13 @@
 |   Balázs Triszka (balika011)                  21 May 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 #include "Detector.h"
 #include "EVGAACX30SMBusController.h"
 #include "LogManager.h"
-#include "RGBController.h"
 #include "RGBController_EVGAACX30SMBus.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"

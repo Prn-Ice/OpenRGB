@@ -6,7 +6,7 @@
 |   TheRogueZeta                                21 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LogitechGLightsync.h"
@@ -26,7 +26,7 @@ RGBController_LogitechGLightsync::RGBController_LogitechGLightsync(LogitechGLigh
 {
     controller              = controller_ptr;
 
-    name                    = "Logitech G Lightsync Mouse";
+    name                    = controller->GetNameString();
     vendor                  = "Logitech";
     type                    = DEVICE_TYPE_MOUSE;
     description             = "Logitech G Lightsync Mouse";

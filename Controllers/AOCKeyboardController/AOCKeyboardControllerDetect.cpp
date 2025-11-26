@@ -6,12 +6,11 @@
 |   Adam Honse (CalcProgrammer1)                10 May 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "AOCKeyboardController.h"
-#include "RGBController.h"
 #include "RGBController_AOCKeyboard.h"
 
 /*-----------------------------------------------------*\
@@ -35,9 +34,8 @@ void DetectAOCKeyboardControllers(hid_device_info* info, const std::string& name
 
     if(dev)
     {
-        AOCKeyboardController*     controller     = new AOCKeyboardController(dev, info->path);
+        AOCKeyboardController*     controller     = new AOCKeyboardController(dev, info->path, name);
         RGBController_AOCKeyboard* rgb_controller = new RGBController_AOCKeyboard(controller);
-        rgb_controller->name                      = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

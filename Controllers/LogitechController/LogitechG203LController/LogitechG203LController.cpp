@@ -4,18 +4,20 @@
 |   Driver for Logitech G203L                               |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogitechG203LController.h"
+#include "StringUtils.h"
 
 #define PACKET_SIZE     20
 
-LogitechG203LController::LogitechG203LController(hid_device* dev_handle, const char* path)
+LogitechG203LController::LogitechG203LController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     // enable software control
     unsigned char usb_buf[PACKET_SIZE];
@@ -46,6 +48,11 @@ std::string LogitechG203LController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string LogitechG203LController::GetNameString()
+{
+    return(name);
+}
+
 std::string LogitechG203LController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -56,10 +63,7 @@ std::string LogitechG203LController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LogitechG203LController::SendApply()

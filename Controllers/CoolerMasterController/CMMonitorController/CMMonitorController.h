@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       18 Sep 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define CM_MONITOR_PACKET_LENGTH     65
@@ -41,17 +41,20 @@ enum
 class CMMonitorController
 {
 public:
-    CMMonitorController(hid_device* dev_handle, const hid_device_info& info);
+    CMMonitorController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~CMMonitorController();
 
-    std::string     GetSerialString();
     std::string     GetDeviceLocation();
+    std::string     GetNameString();
+    std::string     GetSerialString();
+
     void            SendDirect(const std::vector<RGBColor>& colors);
     void            SetMode(uint8_t mode_value, const RGBColor& color, uint8_t speed, uint8_t brightness);
     void            SetCustomMode(const std::vector<RGBColor>& colors, uint8_t brightnesss);
+
 private:
-    std::string     serial_number;
     std::string     location;
+    std::string     name;
     hid_device*     dev;
     bool            software_mode_enabled = false;
     void            SetSoftwareModeEnabled(bool value);

@@ -4,15 +4,12 @@
 |   Detector for ASUS ROG Arion                             |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
 #include "Detector.h"
 #include "ENESMBusController.h"
 #include "ENESMBusInterface_ROGArion.h"
-#include "LogManager.h"
-#include "RGBController.h"
 #include "RGBController_ENESMBus.h"
 #include "scsiapi.h"
 
@@ -37,7 +34,7 @@ void DetectROGArionControllers()
             if(dev)
             {
                 ENESMBusInterface_ROGArion* interface      = new ENESMBusInterface_ROGArion(dev, info->path);
-                ENESMBusController*         controller     = new ENESMBusController(interface, 0x67);
+                ENESMBusController*         controller     = new ENESMBusController(interface, 0x67, "Asus ROG Strix Arion", DEVICE_TYPE_STORAGE);
                 RGBController_ENESMBus*     rgb_controller = new RGBController_ENESMBus(controller);
 
                 ResourceManager::get()->RegisterRGBController(rgb_controller);

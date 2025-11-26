@@ -6,12 +6,13 @@
 |   An Yang                                     24 Jun 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include <thread>
 #include "GaiZhongGaiController.h"
+#include "StringUtils.h"
 
 /*---------------------------------------------------------------*\
 | https://oshwlab.com/yangdsada/GaiZhongGai-Keyboard-68-4PRO      |
@@ -21,10 +22,11 @@
 | https://oshwhub.com/morempty/CH552gyin-liang-xuan-niu           |
 \*---------------------------------------------------------------*/
 
-GaiZhongGaiKeyboardController::GaiZhongGaiKeyboardController(hid_device* dev_handle, hid_device_info* info)
+GaiZhongGaiKeyboardController::GaiZhongGaiKeyboardController(hid_device* dev_handle, hid_device_info* info, std::string dev_name)
 {
     dev         = dev_handle;
     location    = info->path;
+    name        = dev_name;
     usb_pid     = info->product_id;
     /*-----------------------------------------------------*\
     | Obtaining the Firmware Version                        |
@@ -162,6 +164,11 @@ std::string GaiZhongGaiKeyboardController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string GaiZhongGaiKeyboardController::GetNameString()
+{
+    return(name);
+}
+
 std::string GaiZhongGaiKeyboardController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -172,10 +179,7 @@ std::string GaiZhongGaiKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string GaiZhongGaiKeyboardController::GetVersion()

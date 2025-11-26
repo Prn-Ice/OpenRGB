@@ -4,7 +4,7 @@
 |   Detector for MSI Mystic Light motherboards              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
@@ -12,10 +12,12 @@
 #include "MSIMysticLight112Controller.h"
 #include "MSIMysticLight162Controller.h"
 #include "MSIMysticLight185Controller.h"
+#include "MSIMysticLight761Controller.h"
 #include "RGBController_MSIMysticLight64.h"
 #include "RGBController_MSIMysticLight112.h"
 #include "RGBController_MSIMysticLight162.h"
 #include "RGBController_MSIMysticLight185.h"
+#include "RGBController_MSIMysticLight761.h"
 #include "dmiinfo.h"
 #include "LogManager.h"
 
@@ -48,40 +50,84 @@ void DetectMSIMysticLightControllers
     if(dev != nullptr)
     {
         unsigned char temp_buffer[200];
-        temp_buffer[0] = 0x52;
-        size_t packet_length = hid_get_feature_report(dev, temp_buffer, 200);
-        DMIInfo dmi;
+        temp_buffer[0]              = 0x52;
 
-        if((packet_length >= sizeof(FeaturePacket_185)) && (packet_length <= (sizeof(FeaturePacket_185) + 1)))
+        size_t      packet_length   = hid_get_feature_report(dev, temp_buffer, 200);
+
+        DMIInfo     dmi;
+        std::string dmi_name        = "MSI " + dmi.getMainboard();
+
+        if((packet_length >= sizeof(FeaturePacket_185)) && (packet_length <= (sizeof(FeaturePacket_185) + 1)))  //WHY r we doing this ? why not ==
         {
-            MSIMysticLight185Controller*     controller     = new MSIMysticLight185Controller(dev, info->path, info->product_id);
+            MSIMysticLight185Controller*     controller     = new MSIMysticLight185Controller(dev, info->path, info->product_id, dmi_name);
             RGBController_MSIMysticLight185* rgb_controller = new RGBController_MSIMysticLight185(controller);
-            rgb_controller->name = "MSI " + dmi.getMainboard();
+
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }
         else if((packet_length >= sizeof(FeaturePacket_162)) && (packet_length <= (sizeof(FeaturePacket_162) + 1)))
         {
-            MSIMysticLight162Controller*     controller     = new MSIMysticLight162Controller(dev, info->path, info->product_id);
+            MSIMysticLight162Controller*     controller     = new MSIMysticLight162Controller(dev, info->path, info->product_id, dmi_name);
             RGBController_MSIMysticLight162* rgb_controller = new RGBController_MSIMysticLight162(controller);
-            rgb_controller->name = "MSI " + dmi.getMainboard();
+
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }
         else if((packet_length >= sizeof(FeaturePacket_112)) && (packet_length <= (sizeof(FeaturePacket_112) + 1)))
         {
-            MSIMysticLight112Controller*     controller     = new MSIMysticLight112Controller(dev, info->path);
+            MSIMysticLight112Controller*     controller     = new MSIMysticLight112Controller(dev, info->path, dmi_name);
             RGBController_MSIMysticLight112* rgb_controller = new RGBController_MSIMysticLight112(controller);
-            rgb_controller->name = "MSI " + dmi.getMainboard();
+
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }
         else    // no supported length returned
         {
-            std::string name = "MSI " + dmi.getMainboard();
-            LOG_INFO("No matching driver found for %s, packet length = %d", name.c_str(), packet_length);
-            return;
+
+            unsigned char second_buffer [761];
+            second_buffer[0] = 0x50;
+
+            memset(second_buffer + sizeof(unsigned char), 0x0, sizeof(second_buffer) - sizeof(unsigned char));
+
+            //Using this enables subsequent reads to work for some reason
+            size_t enable_reading_packet = hid_get_feature_report(dev, second_buffer, 290);
+            LOG_INFO("Read %i bytes from read enable packet, subsequent get reports should work", enable_reading_packet);
+
+            memset(second_buffer + sizeof(unsigned char), 0x0, sizeof(second_buffer) - sizeof(unsigned char));
+
+
+            second_buffer[0] = 0x51;
+
+            size_t packet_length_new_attempt = hid_send_feature_report(dev, second_buffer, 761);
+
+            if(packet_length_new_attempt > 0)
+            {
+
+                try
+                {
+                    MSIMysticLight761Controller*     controller     = new MSIMysticLight761Controller(dev, (const char *) info->path, info->product_id, dmi_name);
+                    RGBController_MSIMysticLight761* rgb_controller = new RGBController_MSIMysticLight761(controller);
+                    ResourceManager::get()->RegisterRGBController(rgb_controller);
+                }
+                catch(const std::runtime_error& e)
+                {
+                    if (strcmp(e.what(), BOARD_UNSUPPORTED_ERROR) != 0)
+                    {
+                        throw e;
+                    }
+                    else
+                    {
+                        LOG_INFO("Found Board %s but does not have valid config", dmi_name.c_str());
+                    }
+                }
+
+
+            }
+            else
+            {
+                LOG_INFO("No matching driver found for %s, packet length = %d", dmi_name.c_str(), packet_length);
+                return;
+            }
         }
     }
 }
-
 
 void DetectMSIMysticLight64Controllers
     (
@@ -90,10 +136,12 @@ void DetectMSIMysticLight64Controllers
     )
 {
     hid_device* dev = hid_open_path(info->path);
+
     if(dev != nullptr)
     {
         MSIMysticLight64Controller*     controller     = new MSIMysticLight64Controller(dev, info->path);
         RGBController_MSIMysticLight64* rgb_controller = new RGBController_MSIMysticLight64(controller);
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
@@ -109,6 +157,7 @@ REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7B17",    DetectMSIMysticLightCont
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7B18",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7B18,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7B50",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7B50,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7B85",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7B85,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7B92",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7B92,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7B93",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7B93,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7C34",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7C34,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7C35",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7C35,   0x0001, 0x00);
@@ -144,6 +193,7 @@ REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D07",    DetectMSIMysticLightCont
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D08",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D08,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D09",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D09,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D13",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D13,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D14",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D14,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D15",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D15,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D17",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D17,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D18",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D18,   0x0001, 0x00);
@@ -156,6 +206,7 @@ REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D29",    DetectMSIMysticLightCont
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D30",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D30,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D31",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D31,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D32",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D32,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D33",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D33,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D36",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D36,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D38",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D38,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D40",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D40,   0x0001, 0x00);
@@ -182,16 +233,33 @@ REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D86",    DetectMSIMysticLightCont
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D89",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D89,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D90",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D90,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D91",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D91,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D93",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D93,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D96",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D96,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D97",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D97,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D98",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D98,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7D99",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7D99,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E01",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E01,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E03",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E03,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E06",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E06,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E07",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E07,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E09",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E09,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E10",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E10,   0x0001, 0x00);
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_B926",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0xB926,   0x0001, 0x00);
-// Detector for set of common boards
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E81",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E81,   0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light MS_7E34",    DetectMSIMysticLightControllers,   MSI_USB_VID,    0x7E34,   0x0001, 0x00);
+// Detector for the set of common boards
 REGISTER_HID_DETECTOR_PU("MSI Mystic Light Common",     DetectMSIMysticLightControllers,   MSI_USB_VID_COMMON,  MSI_USB_PID_COMMON, 0x0001, 0x00);
+REGISTER_HID_DETECTOR_PU("MSI Mystic Light X870",     DetectMSIMysticLightControllers,   MSI_USB_VID_COMMON,  MSI_USB_PID_COMMON, 0xFF00, 0x01);
+/*---------------------------------------------------------------------------------------------------------*\
+| Dummy entries for boards using common VID and PID                                                         |
+|                                                                                                           |
+| DUMMY_DEVICE_DETECTOR("MSI Mystic Light MS_7E12", DetectMSIMysticLightControllers, 0x1462, 0x7E12 )       |
+| DUMMY_DEVICE_DETECTOR("MSI Mystic Light MS_7E16", DetectMSIMysticLightControllers, 0x1462, 0x7E16 )       |
+| DUMMY_DEVICE_DETECTOR("MSI Mystic Light MS_7E24", DetectMSIMysticLightControllers, 0x1462, 0x7E24 )       |
+| DUMMY_DEVICE_DETECTOR("MSI Mystic Light MS_7E26", DetectMSIMysticLightControllers, 0x1462, 0x7E26 )       |
+| DUMMY_DEVICE_DETECTOR("MSI Mystic Light MS_7E27", DetectMSIMysticLightControllers, 0x1462, 0x7E27 )       |
+| DUMMY_DEVICE_DETECTOR("MSI Mystic Light MS_7E49", DetectMSIMysticLightControllers, 0x1462, 0x7E49 )       |
+\*---------------------------------------------------------------------------------------------------------*/
 
 
 #ifdef ENABLE_UNTESTED_MYSTIC_LIGHT

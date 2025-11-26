@@ -6,13 +6,11 @@
 |   Adam Honse (CalcProgrammer1)                25 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
 #include "Detector.h"
 #include "HyperXMousematController.h"
-#include "RGBController.h"
 #include "RGBController_HyperXMousemat.h"
 #include "hidapi_wrapper.h"
 
@@ -43,9 +41,8 @@ void DetectHyperXMousematControllers(hidapi_wrapper wrapper, hid_device_info* in
         int first_zone_leds_count   = info->product_id == HYPERX_FURY_A_XL_PID ? 2 : 15;
         int second_zone_leds_count  = info->product_id == HYPERX_FURY_A_XL_PID ? 0 : 5;
 
-        HyperXMousematController*     controller     = new HyperXMousematController(wrapper, dev, info->path);
+        HyperXMousematController*     controller     = new HyperXMousematController(wrapper, dev, info->path, name);
         RGBController_HyperXMousemat* rgb_controller = new RGBController_HyperXMousemat(controller, first_zone_leds_count, second_zone_leds_count);
-        rgb_controller->name                         = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

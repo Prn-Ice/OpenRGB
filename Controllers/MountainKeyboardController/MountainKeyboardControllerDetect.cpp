@@ -6,13 +6,12 @@
 |   Wojciech Lazarski                              Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "MountainKeyboardController.h"
-#include "RGBController.h"
 #include "RGBController_MountainKeyboard.h"
 
 /*----------------------------------------------------------------------------------------*\
@@ -29,9 +28,9 @@ void DetectMountainKeyboardControllers(hid_device_info* info, const std::string&
 
     if(dev)
     {
-        MountainKeyboardController*     controller     = new MountainKeyboardController(dev, info->path);
+        MountainKeyboardController*     controller     = new MountainKeyboardController(dev, info->path, name);
         RGBController_MountainKeyboard* rgb_controller = new RGBController_MountainKeyboard(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }   /* DetectMountainKeyboardControllers() */

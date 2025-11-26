@@ -6,7 +6,7 @@
 |   Tam D (too.manyhobbies)                     30 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -30,7 +30,7 @@ struct stCMKeyboardV2_mode
 class CMKeyboardV2Controller : public CMKeyboardAbstractController
 {
 public:
-    CMKeyboardV2Controller(hid_device* dev_handle, hid_device_info* dev_info);
+    CMKeyboardV2Controller(hid_device* dev_handle, hid_device_info* dev_info, std::string dev_name);
     ~CMKeyboardV2Controller();
 
     /*---------------------------------------------------------*\

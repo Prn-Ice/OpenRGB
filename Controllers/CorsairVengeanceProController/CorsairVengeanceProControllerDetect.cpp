@@ -6,15 +6,12 @@
 |   Adam Honse (CalcProgrammer1)                30 Jun 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 #include "Detector.h"
 #include "CorsairVengeanceProController.h"
-#include "RGBController.h"
 #include "RGBController_CorsairVengeancePro.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"

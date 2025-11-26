@@ -6,17 +6,21 @@
 |   Adam Honse (CalcProgrammer1)                23 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "AsusAuraMouseController.h"
+#include "StringUtils.h"
 
-AuraMouseController::AuraMouseController(hid_device* dev_handle, const char* path, uint16_t pid)
+#define HID_MAX_STR 255
+
+AuraMouseController::AuraMouseController(hid_device* dev_handle, const char* path, uint16_t pid, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
     device_pid  = pid;
+    name        = dev_name;
 }
 
 AuraMouseController::~AuraMouseController()
@@ -29,30 +33,9 @@ std::string AuraMouseController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string AuraMouseController::CleanSerial(const std::wstring& wstr)
+std::string AuraMouseController::GetName()
 {
-    /*---------------------------------------------------------------*\
-    | Cleans garbage at the end of serial numbers                     |
-    | (apparently 2 characters too much, but maybe variable)          |
-    | Limited to new devices, old ones don't even have serial numbers |
-    \*---------------------------------------------------------------*/
-    std::string result;
-    for(wchar_t c : wstr)
-    {
-        /*-----------------------------------------------------*\
-        | Forbid anything besides digits and upper case letters |
-        \*-----------------------------------------------------*/
-        bool isUpperCaseLetter = (c >= 64 && c <= 90);
-        bool isDigit           = (c >= 48 && c <= 57);
-        if(!isUpperCaseLetter && !isDigit)
-        {
-            break;
-        }
-
-        result += (char)c;
-    }
-
-    return(result);
+    return(name);
 }
 
 std::string AuraMouseController::GetSerialString()
@@ -65,10 +48,7 @@ std::string AuraMouseController::GetSerialString()
         return("");
     }
 
-    std::wstring serial_wstring = serial_string;
-    std::string return_string = CleanSerial(serial_wstring);
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string AuraMouseController::GetVersion(bool wireless, int protocol)
@@ -123,6 +103,32 @@ std::string AuraMouseController::GetVersion(bool wireless, int protocol)
     }
 
     return str;
+}
+
+std::string AuraMouseController::CleanSerial(const std::wstring& wstr)
+{
+    /*---------------------------------------------------------------*\
+    | Cleans garbage at the end of serial numbers                     |
+    | (apparently 2 characters too much, but maybe variable)          |
+    | Limited to new devices, old ones don't even have serial numbers |
+    \*---------------------------------------------------------------*/
+    std::string result;
+    for(wchar_t c : wstr)
+    {
+        /*-----------------------------------------------------*\
+        | Forbid anything besides digits and upper case letters |
+        \*-----------------------------------------------------*/
+        bool isUpperCaseLetter = (c >= 64 && c <= 90);
+        bool isDigit           = (c >= 48 && c <= 57);
+        if(!isUpperCaseLetter && !isDigit)
+        {
+            break;
+        }
+
+        result += (char)c;
+    }
+
+    return(result);
 }
 
 void AuraMouseController::SaveMode()

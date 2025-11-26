@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                09 May 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -31,12 +31,18 @@ using namespace std::chrono_literals;
 
 NetworkClient::NetworkClient(std::vector<RGBController *>& control) : controllers(control)
 {
-    port_ip                 = "127.0.0.1";
-    port_num                = OPENRGB_SDK_PORT;
-    client_sock             = -1;
-    server_connected        = false;
-    server_controller_count = 0;
-    change_in_progress      = false;
+    port_ip                             = "127.0.0.1";
+    port_num                            = OPENRGB_SDK_PORT;
+    client_string_sent                  = false;
+    client_sock                         = -1;
+    protocol_initialized                = false;
+    server_connected                    = false;
+    server_controller_count             = 0;
+    server_controller_count_requested   = false;
+    server_controller_count_received    = false;
+    server_protocol_version             = 0;
+    server_reinitialize                 = false;
+    change_in_progress                  = false;
 
     ListenThread            = NULL;
     ConnectionThread        = NULL;
@@ -103,7 +109,7 @@ bool NetworkClient::GetConnected()
 
 bool NetworkClient::GetOnline()
 {
-    return(server_connected && server_initialized);
+    return(server_connected && client_string_sent && protocol_initialized && server_initialized);
 }
 
 void NetworkClient::RegisterClientInfoChangeCallback(NetClientCallback new_callback, void * new_callback_arg)
@@ -196,6 +202,7 @@ void NetworkClient::StopClient()
     \*---------------------------------------------------------*/
     if(ConnectionThread)
     {
+        connection_cv.notify_all();
         ConnectionThread->join();
         delete ConnectionThread;
         ConnectionThread = nullptr;
@@ -209,7 +216,7 @@ void NetworkClient::StopClient()
 
 void NetworkClient::ConnectionThreadFunction()
 {
-    unsigned int requested_controllers;
+    std::unique_lock<std::mutex> lock(connection_mutex);
 
     /*---------------------------------------------------------*\
     | This thread manages the connection to the server          |
@@ -257,108 +264,152 @@ void NetworkClient::ConnectionThreadFunction()
             }
         }
 
-        if(server_initialized == false && server_connected == true)
+        /*-------------------------------------------------------------*\
+        | Double-check client_active as it could have changed           |
+        \*-------------------------------------------------------------*/
+        if(client_active && ( protocol_initialized == false || client_string_sent == false || server_initialized == false ) && server_connected == true)
         {
-            unsigned int timeout_counter     = 0;
-            requested_controllers            = 0;
-            server_controller_count          = 0;
-            server_controller_count_received = false;
-            server_protocol_version_received = false;
-
             /*---------------------------------------------------------*\
-            | Wait for server to connect                                |
+            | Initialize protocol version if it hasn't already been     |
+            | initialized                                               |
             \*---------------------------------------------------------*/
-            std::this_thread::sleep_for(100ms);
-
-            /*---------------------------------------------------------*\
-            | Request protocol version                                  |
-            \*---------------------------------------------------------*/
-            SendRequest_ProtocolVersion();
-
-            /*---------------------------------------------------------*\
-            | Wait up to 1s for protocol version reply                  |
-            \*---------------------------------------------------------*/
-            while(!server_protocol_version_received)
+            if(!protocol_initialized)
             {
-                std::this_thread::sleep_for(5ms);
+                /*-----------------------------------------------------*\
+                | Request protocol version                              |
+                \*-----------------------------------------------------*/
+                SendRequest_ProtocolVersion();
 
-                timeout_counter++;
+                /*-----------------------------------------------------*\
+                | Wait up to 1s for protocol version reply              |
+                \*-----------------------------------------------------*/
+                unsigned int timeout_counter = 0;
 
-                /*---------------------------------------------------------*\
-                | If no protocol version received within 1s, assume the     |
-                | server doesn't support protocol versioning and use        |
-                | protocol version 0                                        |
-                \*---------------------------------------------------------*/
-                if(timeout_counter > 200)
+                while(!server_protocol_version_received)
                 {
-                    server_protocol_version          = 0;
-                    server_protocol_version_received = true;
+                    connection_cv.wait_for(lock, 5ms);
+                    if(!client_active)
+                    {
+                        break;
+                    }
+
+                    timeout_counter++;
+
+                    /*-------------------------------------------------*\
+                    | If no protocol version received within 1s, assume |
+                    | the server doesn't support protocol versioning    |
+                    | and use protocol version 0                        |
+                    \*-------------------------------------------------*/
+                    if(timeout_counter > 200)
+                    {
+                        server_protocol_version          = 0;
+                        server_protocol_version_received = true;
+                    }
+                }
+
+                protocol_initialized = true;
+            }
+
+            /*---------------------------------------------------------*\
+            | Send client string if it hasn't already been sent         |
+            \*---------------------------------------------------------*/
+            if(!client_string_sent)
+            {
+                /*-----------------------------------------------------*\
+                | Once server is connected, send client string          |
+                \*-----------------------------------------------------*/
+                SendData_ClientString();
+
+                client_string_sent = true;
+            }
+
+            /*---------------------------------------------------------*\
+            | Initialize the server device list if it hasn't already    |
+            | been initialized                                          |
+            \*---------------------------------------------------------*/
+            if(!server_initialized)
+            {
+                /*-----------------------------------------------------*\
+                | Request the server controller count                   |
+                \*-----------------------------------------------------*/
+                if(!server_controller_count_requested)
+                {
+                    SendRequest_ControllerCount();
+
+                    server_controller_count_requested = true;
+                }
+                else
+                {
+                    /*-------------------------------------------------*\
+                    | Wait for the server controller count to be        |
+                    | received                                          |
+                    \*-------------------------------------------------*/
+                    if(server_controller_count_received)
+                    {
+                        /*---------------------------------------------*\
+                        | Once count is received, request controllers   |
+                        | When data is received, increment count of     |
+                        | requested controllers until all controllers   |
+                        | have been received                            |
+                        \*---------------------------------------------*/
+                        if(requested_controllers < server_controller_count)
+                        {
+                            if(!controller_data_requested)
+                            {
+                                printf("Client: Requesting controller %d\r\n", requested_controllers);
+
+                                controller_data_received = false;
+                                SendRequest_ControllerData(requested_controllers);
+
+                                controller_data_requested = true;
+                            }
+
+                            if(controller_data_received)
+                            {
+                                requested_controllers++;
+                                controller_data_requested = false;
+                            }
+                        }
+                        else
+                        {
+                            ControllerListMutex.lock();
+
+                            /*-----------------------------------------*\
+                            | All controllers received, add them to     |
+                            | master list                               |
+                            \*-----------------------------------------*/
+                            printf("Client: All controllers received, adding them to master list\r\n");
+                            for(std::size_t controller_idx = 0; controller_idx < server_controllers.size(); controller_idx++)
+                            {
+                                controllers.push_back(server_controllers[controller_idx]);
+                            }
+
+                            ControllerListMutex.unlock();
+
+                            /*-----------------------------------------*\
+                            | Client info has changed, call the         |
+                            | callbacks                                 |
+                            \*-----------------------------------------*/
+                            ClientInfoChanged();
+
+                            server_initialized = true;
+                        }
+                    }
                 }
             }
 
             /*---------------------------------------------------------*\
-            | Once server is connected, send client string              |
+            | Wait 1 ms or until the thread is requested to stop        |
             \*---------------------------------------------------------*/
-            SendData_ClientString();
-
-            /*---------------------------------------------------------*\
-            | Request number of controllers                             |
-            \*---------------------------------------------------------*/
-            SendRequest_ControllerCount();
-
-            /*---------------------------------------------------------*\
-            | Wait for server controller count                          |
-            \*---------------------------------------------------------*/
-            while(!server_controller_count_received)
-            {
-                std::this_thread::sleep_for(5ms);
-            }
-
-            printf("Client: Received controller count from server: %d\r\n", server_controller_count);
-
-            /*---------------------------------------------------------*\
-            | Once count is received, request controllers               |
-            \*---------------------------------------------------------*/
-            while(requested_controllers < server_controller_count)
-            {
-                printf("Client: Requesting controller %d\r\n", requested_controllers);
-
-                controller_data_received = false;
-                SendRequest_ControllerData(requested_controllers);
-
-                /*---------------------------------------------------------*\
-                | Wait until controller is received                         |
-                \*---------------------------------------------------------*/
-                while(controller_data_received == false)
-                {
-                    std::this_thread::sleep_for(5ms);
-                }
-
-                requested_controllers++;
-            }
-
-            ControllerListMutex.lock();
-
-            /*---------------------------------------------------------*\
-            | All controllers received, add them to master list         |
-            \*---------------------------------------------------------*/
-            printf("Client: All controllers received, adding them to master list\r\n");
-            for(std::size_t controller_idx = 0; controller_idx < server_controllers.size(); controller_idx++)
-            {
-                controllers.push_back(server_controllers[controller_idx]);
-            }
-
-            ControllerListMutex.unlock();
-
-            server_initialized = true;
-
-            /*---------------------------------------------------------*\
-            | Client info has changed, call the callbacks               |
-            \*---------------------------------------------------------*/
-            ClientInfoChanged();
+            connection_cv.wait_for(lock, 1ms);
         }
-
-        std::this_thread::sleep_for(1s);
+        else
+        {
+            /*---------------------------------------------------------*\
+            | Wait 1 sec or until the thread is requested to stop       |
+            \*---------------------------------------------------------*/
+            connection_cv.wait_for(lock, 1s);
+        }
     }
 }
 
@@ -375,7 +426,7 @@ int NetworkClient::recv_select(SOCKET s, char *buf, int len, int flags)
         FD_ZERO(&set);
         FD_SET(s, &set);
 
-        int rv = select(s + 1, &set, NULL, NULL, &timeout);
+        int rv = select((int)s + 1, &set, NULL, NULL, &timeout);
 
         if(rv == SOCKET_ERROR || server_connected == false)
         {
@@ -499,8 +550,16 @@ void NetworkClient::ListenThreadFunction()
 
 listen_done:
     printf( "Client socket has been closed");
-    server_initialized = false;
-    server_connected = false;
+    client_string_sent                  = false;
+    controller_data_requested           = false;
+    controller_data_received            = false;
+    protocol_initialized                = false;
+    requested_controllers               = 0;
+    server_controller_count             = 0;
+    server_controller_count_requested   = false;
+    server_controller_count_received    = false;
+    server_initialized                  = false;
+    server_connected                    = false;
 
     ControllerListMutex.lock();
 
@@ -552,35 +611,61 @@ void NetworkClient::ProcessReply_ControllerCount(unsigned int data_size, char * 
     if(data_size == sizeof(unsigned int))
     {
         memcpy(&server_controller_count, data, sizeof(unsigned int));
-        server_controller_count_received = true;
+
+        server_controller_count_received    = true;
+        requested_controllers               = 0;
+        controller_data_requested           = false;
+
+        printf("Client: Received controller count from server: %d\r\n", server_controller_count);
     }
 }
 
-void NetworkClient::ProcessReply_ControllerData(unsigned int /*data_size*/, char * data, unsigned int dev_idx)
+void NetworkClient::ProcessReply_ControllerData(unsigned int data_size, char * data, unsigned int dev_idx)
 {
-    RGBController_Network * new_controller   = new RGBController_Network(this, dev_idx);
-
-    new_controller->ReadDeviceDescription((unsigned char *)data, GetProtocolVersion());
-
-    ControllerListMutex.lock();
-
-    if(dev_idx >= server_controllers.size())
+    /*---------------------------------------------------------*\
+    | Verify the controller description size (first 4 bytes of  |
+    | data) matches the packet size in the header               |
+    \*---------------------------------------------------------*/
+    if(data_size == *((unsigned int*)data))
     {
-        server_controllers.push_back(new_controller);
-    }
-    else
-    {
-        server_controllers[dev_idx]->active_mode = new_controller->active_mode;
-        for(unsigned int i = 0; i < server_controllers[dev_idx]->zones.size(); i++)
+        RGBController_Network * new_controller   = new RGBController_Network(this, dev_idx);
+
+        new_controller->ReadDeviceDescription((unsigned char *)data, GetProtocolVersion());
+
+        /*-----------------------------------------------------*\
+        | Mark this controller as remote owned                  |
+        \*-----------------------------------------------------*/
+        new_controller->flags &= ~CONTROLLER_FLAG_LOCAL;
+        new_controller->flags |= CONTROLLER_FLAG_REMOTE;
+
+        ControllerListMutex.lock();
+
+        if(dev_idx >= server_controllers.size())
         {
-            server_controllers[dev_idx]->zones[i].leds_count = new_controller->zones[i].leds_count;
+            server_controllers.push_back(new_controller);
         }
-        delete new_controller;
+        else
+        {
+            server_controllers[dev_idx]->active_mode = new_controller->active_mode;
+            server_controllers[dev_idx]->leds.clear();
+            server_controllers[dev_idx]->leds        = new_controller->leds;
+            server_controllers[dev_idx]->colors.clear();
+            server_controllers[dev_idx]->colors      = new_controller->colors;
+            for(unsigned int i = 0; i < server_controllers[dev_idx]->zones.size(); i++)
+            {
+                server_controllers[dev_idx]->zones[i].leds_count = new_controller->zones[i].leds_count;
+                server_controllers[dev_idx]->zones[i].segments.clear();
+                server_controllers[dev_idx]->zones[i].segments = new_controller->zones[i].segments;
+            }
+            server_controllers[dev_idx]->SetupColors();
+
+            delete new_controller;
+        }
+
+        ControllerListMutex.unlock();
+
+        controller_data_received = true;
     }
-
-    ControllerListMutex.unlock();
-
-    controller_data_received = true;
 }
 
 void NetworkClient::ProcessReply_ProtocolVersion(unsigned int data_size, char * data)
@@ -596,6 +681,9 @@ void NetworkClient::ProcessRequest_DeviceListChanged()
 {
     change_in_progress = true;
 
+    /*---------------------------------------------------------*\
+    | Delete all controllers from the server's controller list  |
+    \*---------------------------------------------------------*/
     ControllerListMutex.lock();
 
     for(size_t server_controller_idx = 0; server_controller_idx < server_controllers.size(); server_controller_idx++)
@@ -627,9 +715,17 @@ void NetworkClient::ProcessRequest_DeviceListChanged()
     ClientInfoChanged();
 
     /*---------------------------------------------------------*\
-    | Mark server as uninitialized and delete the list          |
+    | Mark server as uninitialized and reset server             |
+    | initialization state so that it restarts the list         |
+    | requesting process                                        |
     \*---------------------------------------------------------*/
-    server_initialized = false;
+    controller_data_requested           = false;
+    controller_data_received            = false;
+    requested_controllers               = 0;
+    server_controller_count             = 0;
+    server_controller_count_requested   = false;
+    server_controller_count_received    = false;
+    server_initialized                  = false;
 
     change_in_progress = false;
 }
@@ -638,10 +734,12 @@ void NetworkClient::SendData_ClientString()
 {
     NetPacketHeader reply_hdr;
 
-    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_SET_CLIENT_NAME, strlen(client_name.c_str()) + 1);
+    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_SET_CLIENT_NAME, (unsigned int)strlen(client_name.c_str()) + 1);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&reply_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)client_name.c_str(), reply_hdr.pkt_size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_ControllerCount()
@@ -650,7 +748,9 @@ void NetworkClient::SendRequest_ControllerCount()
 
     InitNetPacketHeader(&request_hdr, 0, NET_PACKET_ID_REQUEST_CONTROLLER_COUNT, 0);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_ControllerData(unsigned int dev_idx)
@@ -669,7 +769,9 @@ void NetworkClient::SendRequest_ControllerData(unsigned int dev_idx)
     {
         request_hdr.pkt_size     = 0;
 
+        send_in_progress.lock();
         send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+        send_in_progress.unlock();
     }
     else
     {
@@ -688,8 +790,10 @@ void NetworkClient::SendRequest_ControllerData(unsigned int dev_idx)
             protocol_version = server_protocol_version;
         }
 
+        send_in_progress.lock();
         send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
         send(client_sock, (char *)&protocol_version, sizeof(unsigned int), MSG_NOSIGNAL);
+        send_in_progress.unlock();
     }
 }
 
@@ -702,8 +806,61 @@ void NetworkClient::SendRequest_ProtocolVersion()
 
     request_data             = OPENRGB_SDK_PROTOCOL_VERSION;
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)&request_data, sizeof(unsigned int), MSG_NOSIGNAL);
+    send_in_progress.unlock();
+}
+
+void NetworkClient::SendRequest_RescanDevices()
+{
+    if(GetProtocolVersion() >= 5)
+    {
+        NetPacketHeader request_hdr;
+
+        InitNetPacketHeader(&request_hdr, 0, NET_PACKET_ID_REQUEST_RESCAN_DEVICES, 0);
+
+        send_in_progress.lock();
+        send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+        send_in_progress.unlock();
+    }
+}
+
+void NetworkClient::SendRequest_RGBController_ClearSegments(unsigned int dev_idx, int zone)
+{
+    if(change_in_progress)
+    {
+        return;
+    }
+
+    NetPacketHeader request_hdr;
+    int             request_data[1];
+
+    InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_CLEARSEGMENTS, sizeof(request_data));
+
+    request_data[0]          = zone;
+
+    send_in_progress.lock();
+    send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+    send(client_sock, (char *)&request_data, sizeof(request_data), MSG_NOSIGNAL);
+    send_in_progress.unlock();
+}
+
+void NetworkClient::SendRequest_RGBController_AddSegment(unsigned int dev_idx, unsigned char * data, unsigned int size)
+{
+    if(change_in_progress)
+    {
+        return;
+    }
+
+    NetPacketHeader request_hdr;
+
+    InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_ADDSEGMENT, size);
+
+    send_in_progress.lock();
+    send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+    send(client_sock, (char *)data, size, 0);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_ResizeZone(unsigned int dev_idx, int zone, int new_size)
@@ -721,8 +878,10 @@ void NetworkClient::SendRequest_RGBController_ResizeZone(unsigned int dev_idx, i
     request_data[0]          = zone;
     request_data[1]          = new_size;
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)&request_data, sizeof(request_data), MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_UpdateLEDs(unsigned int dev_idx, unsigned char * data, unsigned int size)
@@ -736,8 +895,10 @@ void NetworkClient::SendRequest_RGBController_UpdateLEDs(unsigned int dev_idx, u
 
     InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_UPDATELEDS, size);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)data, size, 0);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_UpdateZoneLEDs(unsigned int dev_idx, unsigned char * data, unsigned int size)
@@ -751,8 +912,10 @@ void NetworkClient::SendRequest_RGBController_UpdateZoneLEDs(unsigned int dev_id
 
     InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_UPDATEZONELEDS, size);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)data, size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_UpdateSingleLED(unsigned int dev_idx, unsigned char * data, unsigned int size)
@@ -766,8 +929,10 @@ void NetworkClient::SendRequest_RGBController_UpdateSingleLED(unsigned int dev_i
 
     InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_UPDATESINGLELED, size);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)data, size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_SetCustomMode(unsigned int dev_idx)
@@ -781,7 +946,9 @@ void NetworkClient::SendRequest_RGBController_SetCustomMode(unsigned int dev_idx
 
     InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_SETCUSTOMMODE, 0);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_UpdateMode(unsigned int dev_idx, unsigned char * data, unsigned int size)
@@ -795,8 +962,10 @@ void NetworkClient::SendRequest_RGBController_UpdateMode(unsigned int dev_idx, u
 
     InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_UPDATEMODE, size);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)data, size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_RGBController_SaveMode(unsigned int dev_idx, unsigned char * data, unsigned int size)
@@ -810,38 +979,46 @@ void NetworkClient::SendRequest_RGBController_SaveMode(unsigned int dev_idx, uns
 
     InitNetPacketHeader(&request_hdr, dev_idx, NET_PACKET_ID_RGBCONTROLLER_SAVEMODE, size);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&request_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)data, size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_LoadProfile(std::string profile_name)
 {
     NetPacketHeader reply_hdr;
 
-    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_LOAD_PROFILE, strlen(profile_name.c_str()) + 1);
+    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_LOAD_PROFILE, (unsigned int)strlen(profile_name.c_str()) + 1);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&reply_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)profile_name.c_str(), reply_hdr.pkt_size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_SaveProfile(std::string profile_name)
 {
     NetPacketHeader reply_hdr;
 
-    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_SAVE_PROFILE, strlen(profile_name.c_str()) + 1);
+    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_SAVE_PROFILE, (unsigned int)strlen(profile_name.c_str()) + 1);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&reply_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)profile_name.c_str(), reply_hdr.pkt_size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_DeleteProfile(std::string profile_name)
 {
     NetPacketHeader reply_hdr;
 
-    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_DELETE_PROFILE, strlen(profile_name.c_str()) + 1);
+    InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_DELETE_PROFILE, (unsigned int)strlen(profile_name.c_str()) + 1);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&reply_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
     send(client_sock, (char *)profile_name.c_str(), reply_hdr.pkt_size, MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 void NetworkClient::SendRequest_GetProfileList()
@@ -850,7 +1027,9 @@ void NetworkClient::SendRequest_GetProfileList()
 
     InitNetPacketHeader(&reply_hdr, 0, NET_PACKET_ID_REQUEST_PROFILE_LIST, 0);
 
+    send_in_progress.lock();
     send(client_sock, (char *)&reply_hdr, sizeof(NetPacketHeader), MSG_NOSIGNAL);
+    send_in_progress.unlock();
 }
 
 std::vector<std::string> * NetworkClient::ProcessReply_ProfileList(unsigned int data_size, char * data)

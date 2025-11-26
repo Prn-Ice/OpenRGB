@@ -6,13 +6,12 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      16 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "NZXTHue1Controller.h"
-#include "RGBController.h"
 #include "RGBController_NZXTHue1.h"
 
 /*-----------------------------------------------------*\
@@ -35,9 +34,8 @@ void DetectNZXTHue1Controllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        NZXTHue1Controller*     controller     = new NZXTHue1Controller(dev, 3, info->path);
+        NZXTHue1Controller*     controller     = new NZXTHue1Controller(dev, 3, info->path, name);
         RGBController_NZXTHue1* rgb_controller = new RGBController_NZXTHue1(controller);
-        rgb_controller->name                   = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

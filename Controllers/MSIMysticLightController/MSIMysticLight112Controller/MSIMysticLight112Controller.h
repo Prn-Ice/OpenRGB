@@ -6,14 +6,14 @@
 |   thombo                                      17 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <cstring>
 #include <limits>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "MSIMysticLightCommon.h"
 #include "RGBController.h"
 
@@ -21,10 +21,12 @@ class MSIMysticLight112Controller
 {
 public:
     MSIMysticLight112Controller
-        (
-        hid_device*     handle,
-        const char      *path
-        );
+                        (
+                        hid_device*     handle,
+                        const char*     path,
+                        std::string     dev_name
+                        );
+
     ~MSIMysticLight112Controller();
 
     void            SetMode
@@ -77,37 +79,34 @@ public:
     std::string     GetFWVersion();
     std::string     GetSerial();
 
-
     void            SetDirectMode
                         (
                         bool mode
                         );
+
     bool            IsDirectModeActive() { return direct_mode; }
     size_t          GetMaxOnboardLeds();
     const std::vector<MSI_ZONE>*
                     GetSupportedZones() { return supported_zones; }
 
 private:
-    bool            ReadSettings();
-    bool            ReadFwVersion();
-    void            ReadSerial();
-    void            ReadName();
-    ZoneData*       GetZoneData
-                        (
-                        FeaturePacket_112&  dataPacket,
-                        MSI_ZONE            zone
-                        );
-
     hid_device*                     dev;
     std::string                     name;
     std::string                     location;
     std::string                     version_APROM;
     std::string                     version_LDROM;
-    std::string                     chip_id;
 
     FeaturePacket_112               data;
     FeaturePacket_112               zone_based_per_led_data;
     bool                            direct_mode;
     size_t                          numof_onboard_leds;
     const std::vector<MSI_ZONE>*    supported_zones;
+
+    bool            ReadSettings();
+    bool            ReadFwVersion();
+    ZoneData*       GetZoneData
+                        (
+                        FeaturePacket_112&  dataPacket,
+                        MSI_ZONE            zone
+                        );
 };

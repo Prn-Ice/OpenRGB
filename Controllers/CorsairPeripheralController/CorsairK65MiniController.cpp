@@ -4,16 +4,18 @@
 |   Driver for Corsair K65 Mini keyboard                    |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "CorsairK65MiniController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
-CorsairK65MiniController::CorsairK65MiniController(hid_device* dev_handle, const char* path)
+CorsairK65MiniController::CorsairK65MiniController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev             = dev_handle;
     location        = path;
+    name            = dev_name;
 
     LightingControl();
 }
@@ -28,9 +30,9 @@ std::string CorsairK65MiniController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string CorsairK65MiniController::GetFirmwareString()
+std::string CorsairK65MiniController::GetName()
 {
-    return "";
+    return(name);
 }
 
 std::string CorsairK65MiniController::GetSerialString()
@@ -43,10 +45,7 @@ std::string CorsairK65MiniController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CorsairK65MiniController::LightingControl()

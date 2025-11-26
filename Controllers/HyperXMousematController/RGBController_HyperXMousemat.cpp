@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                25 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_HyperXMousemat.h"
@@ -24,29 +24,24 @@ using namespace std::chrono_literals;
     @comment
 \*-------------------------------------------------------------------*/
 
-RGBController_HyperXMousemat::RGBController_HyperXMousemat
-(
-    HyperXMousematController* controller_ptr,
-    unsigned int first_zone_leds_count_arg,
-    unsigned int second_zone_leds_count_arg
-)
+RGBController_HyperXMousemat::RGBController_HyperXMousemat(HyperXMousematController* controller_ptr, unsigned int first_zone_leds_count_arg, unsigned int second_zone_leds_count_arg)
 {
     controller              = controller_ptr;
     first_zone_leds_count   = first_zone_leds_count_arg;
     second_zone_leds_count  = second_zone_leds_count_arg;
 
-    name        = "HyperX Mousemat Device";
-    vendor      = "HyperX";
-    type        = DEVICE_TYPE_MOUSEMAT;
-    description = "HyperX Mousemat Device";
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    name                    = controller->GetNameString();
+    vendor                  = "HyperX";
+    type                    = DEVICE_TYPE_MOUSEMAT;
+    description             = "HyperX Mousemat Device";
+    location                = controller->GetDeviceLocation();
+    serial                  = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0xFFFF;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name             = "Direct";
+    Direct.value            = 0xFFFF;
+    Direct.flags            = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode       = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();

@@ -6,13 +6,13 @@
 |   Adam Honse (CalcProgrammer1)                10 May 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 /*-----------------------------------------*\
@@ -64,10 +64,11 @@ enum
 class AOCKeyboardController
 {
 public:
-    AOCKeyboardController(hid_device* dev_handle, const char* path);
+    AOCKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~AOCKeyboardController();
 
     std::string GetDeviceLocation();
+    std::string GetDeviceName();
     std::string GetSerialString();
 
     void SetLightingConfig
@@ -88,6 +89,7 @@ public:
 private:
     hid_device*             dev;
     std::string             location;
+    std::string             name;
 
     void SendStartPacket();
     void SendEndPacket();

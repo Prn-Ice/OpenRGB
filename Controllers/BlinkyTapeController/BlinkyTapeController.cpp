@@ -6,7 +6,7 @@
 |   Matt Mets (matt@blinkinlabs.com)            01 Jul 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <algorithm>
@@ -93,9 +93,9 @@ void BlinkyTapeController::SetLEDs(std::vector<RGBColor> colors)
     {
         const unsigned int color_offset = color_idx * 3;
 
-        serial_buf[0x00 + color_offset] = std::min((unsigned int)254, RGBGetRValue(colors[color_idx]));
-        serial_buf[0x01 + color_offset] = std::min((unsigned int)254, RGBGetGValue(colors[color_idx]));
-        serial_buf[0x02 + color_offset] = std::min((unsigned int)254, RGBGetBValue(colors[color_idx]));
+        serial_buf[0x00 + color_offset] = (unsigned char)std::min((unsigned int)254, RGBGetRValue(colors[color_idx]));
+        serial_buf[0x01 + color_offset] = (unsigned char)std::min((unsigned int)254, RGBGetGValue(colors[color_idx]));
+        serial_buf[0x02 + color_offset] = (unsigned char)std::min((unsigned int)254, RGBGetBValue(colors[color_idx]));
     }
 
     /*-------------------------------------------------------------*\

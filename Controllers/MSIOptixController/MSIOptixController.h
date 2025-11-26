@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       10 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define MSI_OPTIX_REPORT_SIZE 168
@@ -67,12 +67,12 @@ enum
 class MSIOptixController
 {
 public:
-    MSIOptixController(hid_device* dev_handle, const hid_device_info& info);
+    MSIOptixController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~MSIOptixController();
 
-    std::string                 GetSerialString();
     std::string                 GetDeviceLocation();
-    std::string                 GetFirmwareVersion();
+    std::string                 GetNameString();
+    std::string                 GetSerialString();
 
     void                        SetDirect(std::vector<RGBColor> colors, unsigned char brightness);
     void                        SetMode(std::vector<RGBColor> colors, unsigned char brightness, unsigned char speed, unsigned char mode_value, unsigned int mode_flags);
@@ -82,8 +82,7 @@ protected:
 
 private:
     std::string                 location;
-    std::string                 serial_number;
-    std::string                 version;
+    std::string                 name;
 
     unsigned char               GetMysteriousFlag(unsigned char mode_value);
 };

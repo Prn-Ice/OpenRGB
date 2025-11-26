@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       18 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -14,7 +14,7 @@
 #include "RGBController_NvidiaESA.h"
 
 /**------------------------------------------------------------------*\
-    @name NVidia ESA
+    @name Nvidia ESA
     @category Case
     @type USB
     @save :x:
@@ -27,13 +27,13 @@
 RGBController_NvidiaESA::RGBController_NvidiaESA(NvidiaESAController* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "Nvidia ESA USB Device";
+
+    name                                = controller->GetNameString();
     vendor                              = "NVIDIA";
     type                                = DEVICE_TYPE_CASE;
-    description                         = name;
+    description                         = "Nvidia ESA USB Device";;
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Static;
     Static.name                         = "Static";

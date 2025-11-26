@@ -6,11 +6,12 @@
 |   Adam Honse (CalcProgrammer1)                30 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HyperXAlloyEliteController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
@@ -28,10 +29,11 @@ static unsigned int extended_red[] = {0x08, 0x48, 0x88, 0x09, 0x89, 0x0A, 0x8A, 
 static unsigned int extended_grn[] = {0x29, 0x28, 0x78, 0x19, 0x79, 0x1A, 0x7A, 0x1B, 0x7B, 0x1C, 0x7C, 0x1D, 0x7D, 0x1E, 0x6E, 0x7E, 0x1F, 0x6F, 0x82, 0x23, 0x83, 0x22 };
 static unsigned int extended_blu[] = {0x39, 0x38, 0x68, 0x3A, 0x69, 0x2A, 0x6A, 0x2B, 0x6B, 0x2C, 0x6C, 0x2D, 0x6D, 0x2E, 0x5E, 0x5D, 0x2F, 0x5F, 0x72, 0x33, 0x73, 0x32 };
 
-HyperXAlloyEliteController::HyperXAlloyEliteController(hid_device* dev_handle, const char* path)
+HyperXAlloyEliteController::HyperXAlloyEliteController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 HyperXAlloyEliteController::~HyperXAlloyEliteController()
@@ -44,6 +46,11 @@ std::string HyperXAlloyEliteController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string HyperXAlloyEliteController::GetNameString()
+{
+    return(name);
+}
+
 std::string HyperXAlloyEliteController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -54,10 +61,7 @@ std::string HyperXAlloyEliteController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void HyperXAlloyEliteController::SetMode

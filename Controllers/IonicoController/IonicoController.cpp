@@ -6,17 +6,18 @@
 |   Lucas Strafe                                31 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "IonicoController.h"
 
-IonicoController::IonicoController(hid_device* dev_handle, const hid_device_info& info, const unsigned short pid)
+IonicoController::IonicoController(hid_device* dev_handle, const hid_device_info& info, const unsigned short pid, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
     usb_pid             = pid;
+    name                = dev_name;
 }
 
 IonicoController::~IonicoController()
@@ -27,6 +28,11 @@ IonicoController::~IonicoController()
 std::string IonicoController::GetDeviceLocation()
 {
     return("HID: " + location);
+}
+
+std::string IonicoController::GetDeviceName()
+{
+    return(name);
 }
 
 uint16_t IonicoController::GetUSBPID()

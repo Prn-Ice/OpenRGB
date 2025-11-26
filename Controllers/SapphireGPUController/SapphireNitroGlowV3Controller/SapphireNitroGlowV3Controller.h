@@ -1,16 +1,18 @@
-/*-----------------------------------------*\
-|  SapphireNitroGlowV3Controller.h          |
-|                                           |
-|  Definitions and types for Sapphire Nitro |
-|  Glow V3 GPU RGB lighting controller      |
-|                                           |
-|  K900 2/3/2021                            |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| SapphireNitroGlowV3Controller.h                           |
+|                                                           |
+|   Driver for Sapphire Nitro Glow V3                       |
+|                                                           |
+|   K900                                        03 Feb 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <string>
 #include "i2c_smbus.h"
-
-#pragma once
 
 typedef unsigned char	sapphire_dev_id;
 
@@ -46,10 +48,11 @@ enum
 class SapphireNitroGlowV3Controller
 {
 public:
-    SapphireNitroGlowV3Controller(i2c_smbus_interface* bus, sapphire_dev_id dev);
+    SapphireNitroGlowV3Controller(i2c_smbus_interface* bus, sapphire_dev_id dev, std::string dev_name);
     ~SapphireNitroGlowV3Controller();
 
     std::string     GetDeviceLocation();
+    std::string     GetDeviceName();
 
     unsigned char   GetRed();
     unsigned char   GetGreen();
@@ -84,5 +87,5 @@ public:
 private:
     i2c_smbus_interface*    bus;
     sapphire_dev_id         dev;
-
+    std::string             name;
 };

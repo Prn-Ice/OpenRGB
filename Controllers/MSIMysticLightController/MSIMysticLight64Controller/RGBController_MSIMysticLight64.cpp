@@ -8,7 +8,7 @@
 |   Elchanan Haas                               23 Aug 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_MSIMysticLight64.h"
@@ -85,7 +85,7 @@ void RGBController_MSIMysticLight64::DeviceUpdateLEDs()
     unsigned int num_colors = 0;
     if(Mode.flags & MODE_FLAG_HAS_MODE_SPECIFIC_COLOR)
     {
-        num_colors = Mode.colors.size();
+        num_colors = (unsigned int)Mode.colors.size();
         for(unsigned int i = 0; i < num_colors; i++)
         {
             led_colors[i].R = RGBGetRValue(Mode.colors[i]);

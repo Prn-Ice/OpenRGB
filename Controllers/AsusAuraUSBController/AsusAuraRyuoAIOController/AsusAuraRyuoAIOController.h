@@ -7,13 +7,13 @@
 |   using snipets from Chris M (Dr.No)                      |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 #include "AsusAuraUSBController.h"
 
@@ -60,7 +60,7 @@ public:
         SPEED_FASTEST     = 0x00, // Fastest speed
     };
 
-    AsusAuraRyuoAIOController(hid_device* dev_handle, const char* path);
+    AsusAuraRyuoAIOController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~AsusAuraRyuoAIOController();
 
     std::string             GetLocation();

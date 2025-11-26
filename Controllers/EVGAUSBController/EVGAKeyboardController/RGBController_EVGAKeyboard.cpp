@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             25 Nov 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <time.h>
@@ -201,14 +201,14 @@ RGBController_EVGAKeyboard::RGBController_EVGAKeyboard(EVGAKeyboardController* c
     /*-----------------------------------------------------*\
     | Initialise the random functions from the clock        |
     \*-----------------------------------------------------*/
-    std::srand(time(NULL));
+    std::srand((unsigned int)time(NULL));
 
     controller                      = controller_ptr;
 
-    name                            = "EVGA USB Keyboard";
+    name                            = controller->GetName();
     vendor                          = "EVGA";
     type                            = DEVICE_TYPE_KEYBOARD;
-    description                     = controller->GetDeviceName();
+    description                     = "EVGA Keyboard Device";
     serial                          = controller->GetSerial();
     location                        = controller->GetLocation();
 
@@ -415,7 +415,7 @@ void RGBController_EVGAKeyboard::SetupZones()
     /*-------------------------------------------------*\
     | Add configuration for the Z20                     |
     \*-------------------------------------------------*/
-    if(controller->GetPid() == 0x260A)
+    if(controller->GetPid() == 0x260A || controller->GetPid() == 0x2610)
     {
 
         for(uint8_t i = 0; i < EVGA_KEYBOARD_Z20_EXTRA_ZONES; i++)

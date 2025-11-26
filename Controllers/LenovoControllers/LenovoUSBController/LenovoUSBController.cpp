@@ -6,30 +6,21 @@
 |   Cooper Hall (geobot19)                      17 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "LenovoUSBController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
 using namespace std;
 
-LenovoUSBController::LenovoUSBController(hid_device* dev_handle, const char* path, uint16_t in_pid)
+LenovoUSBController::LenovoUSBController(hid_device* dev_handle, const char* path, uint16_t in_pid, std::string dev_name)
 {
-    const uint8_t   sz      = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
     dev                     = dev_handle;
     location                = path;
     pid                     = in_pid;
-
-    hid_get_manufacturer_string(dev, tmp, sz);
-    std::wstring w_tmp      = wstring(tmp);
-    name                    = string(w_tmp.begin(), w_tmp.end());
-
-    hid_get_product_string(dev, tmp, sz);
-    w_tmp                   = wstring(tmp);
-    name.append(" ").append(string(w_tmp.begin(), w_tmp.end()));
+    name                    = dev_name;
 
     setDeviceSoftwareMode();
 }

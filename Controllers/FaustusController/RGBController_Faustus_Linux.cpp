@@ -4,7 +4,7 @@
 |   RGBController for Faustus devices                       |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <dirent.h>
@@ -25,9 +25,9 @@
 
 RGBController_Faustus::RGBController_Faustus(const std::string& dev_path)
 {
-    name        = "ASUS TUF Keyboard";
+    name        = "ASUS TUF Laptop Keyboard";
     vendor      = "ASUS";
-    type        = DEVICE_TYPE_KEYBOARD;
+    type        = DEVICE_TYPE_LAPTOP;
     description = "Faustus Device";
 
     modes.resize(4);

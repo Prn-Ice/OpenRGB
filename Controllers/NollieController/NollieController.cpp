@@ -6,25 +6,32 @@
 |   Name (cnn1236661)                           25 Jun 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "NollieController.h"
-#include "RGBController_Nollie.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-NollieController::NollieController(hid_device* dev_handle, const char* path, unsigned short pid)
+NollieController::NollieController(hid_device* dev_handle, const char* path, unsigned short vid, unsigned short pid, std::string dev_name)
 {
-    dev            = dev_handle;
-    location       = path;
-    usb_pid        = pid;
+    dev         = dev_handle;
+    location    = path;
+    name        = dev_name;
+    usb_vid     = vid;
+    usb_pid     = pid;
 }
 
 std::string NollieController::GetLocationString()
 {
     return("HID: " + location);
+}
+
+std::string NollieController::GetNameString()
+{
+    return(name);
 }
 
 std::string NollieController::GetSerialString()
@@ -37,14 +44,31 @@ std::string NollieController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 unsigned short NollieController::GetUSBPID()
 {
     return(usb_pid);
+}
+
+unsigned short NollieController::GetUSBVID()
+{
+    return(usb_vid);
+}
+
+void NollieController::InitChLEDs(int *led_num_list,int ch_num)
+{
+    unsigned char   usb_buf[65];
+    memset(usb_buf, 0x00, sizeof(usb_buf));
+    usb_buf[1] = 0xFE;
+    usb_buf[2] = 0x03;
+    for(int i = 0; i < ch_num; i++)
+    {
+        usb_buf[3+(i*2)] = led_num_list[i]& 0xFF;
+        usb_buf[4+(i*2)] = (led_num_list[i] >> 8) & 0xFF;
+    }
+    hid_write(dev, usb_buf, 65);
 }
 
 void NollieController::SetMos(bool mos)
@@ -90,31 +114,40 @@ void NollieController::SendUpdate()
 
 void NollieController::SendPacket(unsigned char channel,RGBColor* colors,unsigned int num_colors)
 {
-
     unsigned char   usb_buf[1025];
     memset(usb_buf, 0x00, sizeof(usb_buf));
     usb_buf[1] = channel;
     usb_buf[2] = 0;
     usb_buf[3] = num_colors / 256;
     usb_buf[4] = num_colors % 256;
-    if(!num_colors)
+    if(num_colors)
     {
-        hid_write(dev, usb_buf, 1025);
-        return;
+        for(unsigned int color_idx = 0; color_idx < num_colors; color_idx++)
+        {
+            usb_buf[0x05 + (color_idx * 3)] = RGBGetGValue(colors[color_idx]);
+            usb_buf[0x06 + (color_idx * 3)] = RGBGetRValue(colors[color_idx]);
+            usb_buf[0x07 + (color_idx * 3)] = RGBGetBValue(colors[color_idx]);
+        }
     }
-    for(unsigned int color_idx = 0; color_idx < num_colors; color_idx++)
-    {
-        usb_buf[0x05 + (color_idx * 3)] = RGBGetGValue(colors[color_idx]);
-        usb_buf[0x06 + (color_idx * 3)] = RGBGetRValue(colors[color_idx]);
-        usb_buf[0x07 + (color_idx * 3)] = RGBGetBValue(colors[color_idx]);
-    }
+
     /*-----------------------------------------------------*\
     | Send packet                                           |
     \*-----------------------------------------------------*/
-    hid_write(dev, usb_buf, 1025);
-    if(channel == NOLLIE32_FLAG1_CHANNEL || channel == NOLLIE32_FLAG2_CHANNEL)
+    if(channel == NOLLIE32_FLAG1_CHANNEL)
     {
+        usb_buf[2] = 1;
+        hid_write(dev, usb_buf, 1025);
         std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    }
+    else if(channel == NOLLIE32_FLAG2_CHANNEL)
+    {
+        usb_buf[2] = 2;
+        hid_write(dev, usb_buf, 1025);
+        std::this_thread::sleep_for(std::chrono::milliseconds(8));
+    }
+    else
+    {
+        hid_write(dev, usb_buf, 1025);
     }
 }
 

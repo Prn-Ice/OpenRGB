@@ -6,18 +6,12 @@
 |   Tim Demand (tim.dmd)                        10 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
-#ifdef __FreeBSD__
 #include <libusb.h>
-#else
-#include <libusb-1.0/libusb.h>
-#endif
 #include "Detector.h"
 #include "CorsairHydro2Controller.h"
-#include "RGBController.h"
 #include "RGBController_CorsairHydro2.h"
 
 #define CORSAIR_VID     0x1B1C
@@ -40,7 +34,6 @@ void DetectCorsairHydro2Controllers()
 
         CorsairHydro2Controller*     controller     = new CorsairHydro2Controller(dev);
         RGBController_CorsairHydro2* rgb_controller = new RGBController_CorsairHydro2(controller);
-        rgb_controller->name                        = "Corsair H100i v2";
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

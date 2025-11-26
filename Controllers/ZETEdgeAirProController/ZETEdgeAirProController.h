@@ -1,16 +1,19 @@
-/*-----------------------------------------*\
-|  ZETEdgeAirProController.h                |
-|                                           |
-|  Driver for ZET Edge Air Pro mouse        |
-|  lighting  controller - header file       |
-|                                           |
-|  Guimard Morgan (morg) 1/29/2022          |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| ZETEdgeAirProController.h                                 |
+|                                                           |
+|   Driver for ZET Edge Air Pro                             |
+|                                                           |
+|   Morgan Guimard (morg)                       29 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #pragma once
 
-#include "RGBController.h"
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
+#include "RGBController.h"
 
 #define ZET_EDGE_AIR_PRO_PACKET_SIZE    17
 #define ZET_EDGE_AIR_PRO_REPORT_ID      0x08
@@ -35,12 +38,12 @@ enum
 class ZETEdgeAirProController
 {
 public:
-    ZETEdgeAirProController(hid_device* dev_handle, const hid_device_info& info);
+    ZETEdgeAirProController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~ZETEdgeAirProController();
 
-    std::string                 GetSerialString();
     std::string                 GetDeviceLocation();
-    std::string                 GetFirmwareVersion();
+    std::string                 GetNameString();
+    std::string                 GetSerialString();
 
     void                        SetMode(RGBColor color, unsigned char brightness, unsigned char speed, unsigned char mode_value);
 
@@ -49,6 +52,5 @@ protected:
 
 private:
     std::string                 location;
-    std::string                 serial_number;
-    std::string                 version;
+    std::string                 name;
 };

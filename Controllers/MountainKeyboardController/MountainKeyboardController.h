@@ -6,13 +6,13 @@
 |   Wojciech Lazarski                              Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 /*-----------------------------------------------------*\
 | Mountain vendor ID                                    |
@@ -34,6 +34,11 @@
 #define MOUNTAIN_KEYBOARD_USB_BUFFER_HEADER_SIZE          8
 #define MOUNTAIN_KEYBOARD_USB_MAX_DIRECT_PAYLOAD_SIZE    \
         (MOUNTAIN_KEYBOARD_USB_BUFFER_SIZE-MOUNTAIN_KEYBOARD_USB_BUFFER_HEADER_SIZE)
+#define MOUNTAIN_KEYBOARD_WHEEL_CONFIG_BUFFER_SIZE 65
+#define MOUNTAIN_KEYBOARD_WHEEL_CONFIG_FIRST_BYTE 0x11
+#define MOUNTAIN_KEYBOARD_WHEEL_CONFIG_SECOND_BYTE 0x14
+#define MOUNTAIN_KEYBOARD_WHEEL_CONFIG_FIXED_BYTE_1 0x01
+#define MOUNTAIN_KEYBOARD_WHEEL_CONFIG_FIXED_BYTE_2 0x02
 
 enum
 {
@@ -120,13 +125,31 @@ typedef struct
     } mode;
 } color_setup;
 
+
+typedef struct
+{
+    unsigned char report_size;
+    unsigned char config_start_first;
+    unsigned char config_start_second;
+    unsigned char zero_byte;
+    unsigned char fixed_byte_1;
+    unsigned char fixed_byte_2;
+    unsigned char config_intermediate_values [2];
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+    unsigned char config_end_values [54];
+
+} wheel_config;
+
 class MountainKeyboardController
 {
 public:
-    MountainKeyboardController(hid_device* dev_handle, const char* path);
+    MountainKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~MountainKeyboardController();
 
     std::string     GetDeviceLocation();
+    std::string     GetNameString();
     std::string     GetSerialString();
 
     void SendOffCmd();
@@ -140,16 +163,20 @@ public:
     void SendDirectColorCmd(bool quick_mode, unsigned char brightness, unsigned char *color_data, unsigned int color_count);
     void SendDirectColorEdgeCmd(bool quick_mode, unsigned char brightness, unsigned char *color_data, unsigned int data_size);
 
+
+    void SendWheelColorChange(unsigned char color_data [3]);
+    wheel_config * GetWheelConfig();
+
     void SaveData(unsigned char mode_idx);
     void SelectMode(unsigned char mode_idx);
 
 private:
+    hid_device*             dev;
+    std::string             location;
+    std::string             name;
+
     void SendColorStartPacketCmd(unsigned char brightness);
     void SendColorPacketCmd(unsigned char pkt_no,unsigned char brightness, unsigned char *data, unsigned int data_size);
     void SendColorEdgePacketCmd(unsigned char pkt_no, unsigned char *data, unsigned int data_size);
     void SendColorPacketFinishCmd();
-
-    hid_device*             dev;
-    std::string             location;
-    unsigned short          usb_pid;
 };

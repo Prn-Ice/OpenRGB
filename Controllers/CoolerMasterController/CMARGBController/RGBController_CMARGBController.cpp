@@ -6,7 +6,7 @@
 |   Chris M (Dr_No)                             14 Oct 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CMARGBController.h"
@@ -398,18 +398,6 @@ void RGBController_CMARGBController::UpdateZoneLEDs(int zone)
 void RGBController_CMARGBController::UpdateSingleLED(int led)
 {
     UpdateZoneLEDs(GetLED_Zone(led));
-}
-
-void RGBController_CMARGBController::SetCustomMode()
-{
-    for(int mode_idx = 0; mode_idx < (int)modes.size() ; mode_idx++)
-    {
-        if (modes[mode_idx].value == CM_ARGB_MODE_DIRECT)
-        {
-            active_mode = mode_idx;
-            break;
-        }
-    }
 }
 
 void RGBController_CMARGBController::DeviceUpdateMode()

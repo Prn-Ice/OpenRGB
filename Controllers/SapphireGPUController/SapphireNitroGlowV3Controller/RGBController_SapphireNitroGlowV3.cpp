@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_SapphireNitroGlowV3.cpp    |
-|                                           |
-|  Generic RGB Interface for OpenRGB        |
-|  Sapphire Nitro Glow V3 GPU Driver        |
-|                                           |
-|  K900 2/3/2021                            |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_SapphireNitroGlowV3.cpp                     |
+|                                                           |
+|   RGBController for Sapphire Nitro Glow V3                |
+|                                                           |
+|   K900                                        03 Feb 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_SapphireNitroGlowV3.h"
 
@@ -24,7 +26,7 @@ RGBController_SapphireNitroGlowV3::RGBController_SapphireNitroGlowV3(SapphireNit
 {
     controller              = controller_ptr;
 
-    name                    = "Sapphire Nitro Glow V3 Device";
+    name                    = controller->GetDeviceName();
     vendor                  = "Sapphire";
     description             = "Sapphire Nitro Glow V3 Device";
     location                = controller->GetDeviceLocation();
@@ -79,6 +81,13 @@ RGBController_SapphireNitroGlowV3::RGBController_SapphireNitroGlowV3(SapphireNit
     External.flags          = 0;
     External.color_mode     = MODE_COLORS_NONE;
     modes.push_back(External);
+
+    mode Off;
+    Off.name                = "Off";
+    Off.value               = SAPPHIRE_NITRO_GLOW_V3_MODE_OFF;
+    Off.flags               = 0;
+    Off.color_mode          = MODE_COLORS_NONE;
+    modes.push_back(Off);
 
     SetupZones();
 
@@ -159,7 +168,7 @@ void RGBController_SapphireNitroGlowV3::ReadConfiguration()
             break;
 
         case SAPPHIRE_NITRO_GLOW_V3_MODE_OFF:
-            active_mode = 0;
+            active_mode = 6;
             colors[0] = ToRGBColor(0, 0, 0);
             break;
 
@@ -233,6 +242,12 @@ void RGBController_SapphireNitroGlowV3::DeviceUpdateMode()
 
         case SAPPHIRE_NITRO_GLOW_V3_MODE_EXTERNAL_CONTROL:
             controller->SetExternalControl(true);
+            break;
+
+        case SAPPHIRE_NITRO_GLOW_V3_MODE_OFF:
+            controller->SetExternalControl(false);
+            controller->SetColor(0, 0, 0);
+            controller->SetMode(mode.value);
             break;
     }
 }

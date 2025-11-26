@@ -7,7 +7,7 @@
 |   Dracrius                                    12 Mar 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CMMMController.h"
@@ -29,10 +29,10 @@ RGBController_CMMMController::RGBController_CMMMController(CMMMController* contr
 {
     controller                      = controller_ptr;
 
-    name                            = "Cooler Master MasterMouse";
+    name                            = controller->GetName();
     vendor                          = controller->GetDeviceVendor();
     type                            = DEVICE_TYPE_MOUSE;
-    description                     = "Cooler Master MasterMouse";
+    description                     = "Cooler Master MasterMouse Device";
     serial                          = controller->GetSerial();
     location                        = controller->GetLocation();
 
@@ -247,18 +247,6 @@ void RGBController_CMMMController::UpdateZoneLEDs(int /*zone*/)
 void RGBController_CMMMController::UpdateSingleLED(int /*led*/)
 {
     DeviceUpdateLEDs();
-}
-
-void RGBController_CMMMController::SetCustomMode()
-{
-    for(int mode_index = 0; mode_index < (int)modes.size(); mode_index++)
-    {
-        if(modes[mode_index].value == CM_MM_MODE_CUSTOM)
-        {
-            active_mode = mode_index;
-            break;
-        }
-    }
 }
 
 void RGBController_CMMMController::DeviceUpdateMode()

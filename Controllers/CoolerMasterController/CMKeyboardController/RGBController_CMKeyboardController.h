@@ -6,7 +6,7 @@
 |   Tam D (too.manyhobbies)                     30 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -38,7 +38,5 @@ private:
     CMKeyboardAbstractController*   m_pController;;
     KeyboardLayoutManager*          m_pLayoutManager;
     KEYBOARD_LAYOUT                 m_keyboardLayout;
-    KEYBOARD_SIZE                   m_keyboardSize;
     layout_values                   m_layoutValues;
-    std::vector<char *>             m_pUnknownKeyNames;
 };

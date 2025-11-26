@@ -1,6 +1,16 @@
+/*---------------------------------------------------------*\
+| ZotacTuringGPUControllerDetect.cpp                        |
+|                                                           |
+|   Detector for Zotac Turing GPU                           |
+|                                                           |
+|   David Henry                                 07 Jan 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include "Detector.h"
 #include "ZotacTuringGPUController.h"
-#include "RGBController.h"
 #include "RGBController_ZotacTuringGPU.h"
 #include "i2c_smbus.h"
 #include "pci_ids.h"
@@ -41,9 +51,8 @@ void DetectZotacTuringGPUControllers(i2c_smbus_interface* bus, u8 i2c_addr, cons
 {
     if(TestForZotacTuringGPUController(bus, i2c_addr))
     {
-        ZotacTuringGPUController*     controller     = new ZotacTuringGPUController(bus, i2c_addr);
+        ZotacTuringGPUController*     controller     = new ZotacTuringGPUController(bus, i2c_addr, name);
         RGBController_ZotacTuringGPU* rgb_controller = new RGBController_ZotacTuringGPU(controller);
-        rgb_controller->name                         = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
@@ -51,3 +60,5 @@ void DetectZotacTuringGPUControllers(i2c_smbus_interface* bus, u8 i2c_addr, cons
 
 REGISTER_I2C_PCI_DETECTOR("ZOTAC GAMING GeForce RTX 2070 SUPER Twin Fan", DetectZotacTuringGPUControllers, NVIDIA_VEN, NVIDIA_RTX2070S_OC_DEV, ZOTAC_SUB_VEN, ZOTAC_RTX2070S_GAMING_SUB_DEV, 0x49);
 REGISTER_I2C_PCI_DETECTOR("ZOTAC GAMING GeForce RTX 2080 SUPER Twin Fan", DetectZotacTuringGPUControllers, NVIDIA_VEN, NVIDIA_RTX2080S_DEV, ZOTAC_SUB_VEN, ZOTAC_RTX2080S_SUB_DEV, 0x49);
+REGISTER_I2C_PCI_DETECTOR("ZOTAC GAMING GeForce RTX 2080 AMP", DetectZotacTuringGPUControllers, NVIDIA_VEN, NVIDIA_RTX2080_A_DEV, ZOTAC_SUB_VEN, ZOTAC_RTX2080_AMP_SUB_DEV, 0x49);
+REGISTER_I2C_PCI_DETECTOR("ZOTAC GAMING GeForce RTX 2080 Ti AMP", DetectZotacTuringGPUControllers, NVIDIA_VEN, NVIDIA_RTX2080TI_A_DEV, ZOTAC_SUB_VEN, ZOTAC_RTX2080_AMP_TI_SUB_DEV, 0x49);

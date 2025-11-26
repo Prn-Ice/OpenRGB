@@ -1,22 +1,21 @@
-/*---------------------------------------------*\
-|  WinbondGamingKeyboardController.h            |
-|                                               |
-|  Driver for "Winbond Gaming Keyboard" boards, |
-|  like Pulsar PCMK TKL Keyboard                |
-|                                               |
-|  Daniel Gibson  3 December 2023               |
-\*---------------------------------------------*/
+/*---------------------------------------------------------*\
+| WinbondGamingKeyboardController.h                         |
+|                                                           |
+|   Driver for Winbond Gaming Keyboard                      |
+|                                                           |
+|   Daniel Gibson                               03 Dec 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
-#include "RGBController.h"
-#include "KeyboardLayoutManager.h"
-
 #include <string>
 #include <vector>
-
-#include <hidapi/hidapi.h>
-
+#include <hidapi.h>
+#include "RGBController.h"
+#include "KeyboardLayoutManager.h"
 
 class WinbondGamingKeyboardController
 {
@@ -27,7 +26,7 @@ class WinbondGamingKeyboardController
 public:
     WinbondGamingKeyboardController(hid_device *dev_handle, const hid_device_info &info, const std::string& name);
 
-    std::string GetSerialString() const;
+    std::string GetSerialString();
 
     const char* GetDeviceLocation() const
     {

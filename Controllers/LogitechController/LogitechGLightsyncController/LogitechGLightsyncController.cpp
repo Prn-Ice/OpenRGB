@@ -6,13 +6,14 @@
 |   TheRogueZeta                                21 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogitechGLightsyncController.h"
+#include "StringUtils.h"
 
-LogitechGLightsyncController::LogitechGLightsyncController(hid_device* dev_cmd_handle, hid_device *dev_handle, const char *path, unsigned char hid_dev_index, unsigned char hid_feature_index, unsigned char hid_fctn_ase_id)
+LogitechGLightsyncController::LogitechGLightsyncController(hid_device* dev_cmd_handle, hid_device *dev_handle, const char *path, unsigned char hid_dev_index, unsigned char hid_feature_index, unsigned char hid_fctn_ase_id, std::string dev_name)
 {
     dev             = dev_handle;
     cmd_dev         = dev_cmd_handle;
@@ -21,9 +22,10 @@ LogitechGLightsyncController::LogitechGLightsyncController(hid_device* dev_cmd_h
     feature_index   = hid_feature_index;
     fctn_ase_id     = hid_fctn_ase_id;
     mutex           = nullptr;
+    name            = dev_name;
 }
 
-LogitechGLightsyncController::LogitechGLightsyncController(hid_device* dev_cmd_handle, hid_device *dev_handle, const char *path, unsigned char hid_dev_index, unsigned char hid_feature_index, unsigned char hid_fctn_ase_id, std::shared_ptr<std::mutex> mutex_ptr)
+LogitechGLightsyncController::LogitechGLightsyncController(hid_device* dev_cmd_handle, hid_device *dev_handle, const char *path, unsigned char hid_dev_index, unsigned char hid_feature_index, unsigned char hid_fctn_ase_id, std::shared_ptr<std::mutex> mutex_ptr, std::string dev_name)
 {
     dev             = dev_handle;
     cmd_dev         = dev_cmd_handle;
@@ -32,6 +34,7 @@ LogitechGLightsyncController::LogitechGLightsyncController(hid_device* dev_cmd_h
     feature_index   = hid_feature_index;
     fctn_ase_id     = hid_fctn_ase_id;
     mutex           = mutex_ptr;
+    name            = dev_name;
 }
 
 LogitechGLightsyncController::~LogitechGLightsyncController()
@@ -44,6 +47,11 @@ std::string LogitechGLightsyncController::GetDeviceLocation()
     return ("HID: " + location);
 }
 
+std::string LogitechGLightsyncController::GetNameString()
+{
+    return(name);
+}
+
 std::string LogitechGLightsyncController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -54,10 +62,7 @@ std::string LogitechGLightsyncController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LogitechGLightsyncController::UpdateMouseLED(
@@ -133,8 +138,8 @@ void LogitechGLightsyncController::UpdateMouseLED(
 
 void LogitechGLightsyncController::SetDirectMode(bool direct)
 {
-    char cmd_buf[7];
-    char usb_buf[20];
+    unsigned char cmd_buf[7];
+    unsigned char usb_buf[20];
 
     /*-----------------------------------------------------*\
     | Zero out buffer                                       |
@@ -171,12 +176,12 @@ void LogitechGLightsyncController::SetDirectMode(bool direct)
     {
         std::lock_guard<std::mutex> guard(*mutex);
 
-        hid_write(cmd_dev, (unsigned char *)cmd_buf, 7);
-        hid_read(dev, (unsigned char *)usb_buf, 20);
+        hid_write(cmd_dev, cmd_buf, 7);
+        hid_read(dev, usb_buf, 20);
     }
     else
     {
-        hid_write(cmd_dev, (unsigned char *)cmd_buf, 7);
-        hid_read(dev, (unsigned char *)usb_buf, 20);
+        hid_write(cmd_dev, cmd_buf, 7);
+        hid_read(dev, usb_buf, 20);
     }
 }

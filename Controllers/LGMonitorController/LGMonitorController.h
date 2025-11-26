@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       11 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define LG_MONITOR_LEDS                 48
@@ -44,12 +44,13 @@ enum
 class LGMonitorController
 {
 public:
-    LGMonitorController(hid_device* dev_handle, const hid_device_info& info);
+    LGMonitorController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~LGMonitorController();
 
-    std::string GetSerialString();
     std::string GetDeviceLocation();
     std::string GetFirmwareVersion();
+    std::string GetNameString();
+    std::string GetSerialString();
 
     void SetDirect(const std::vector<RGBColor> colors);
     void SetMode(uint8_t mode_value, uint8_t brightness, const std::vector<RGBColor> colors);
@@ -58,8 +59,8 @@ private:
     hid_device* dev;
     std::string description;
     std::string location;
+    std::string name;
     std::string version;
-    std::string serial_number;
     bool        on = false;
     bool        direct_mode_enabled = false;
 

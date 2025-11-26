@@ -6,17 +6,18 @@
 |   Chris M (Dr_No)                             30 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "BloodyMouseController.h"
-#include "LogManager.h"
+#include "StringUtils.h"
 
-BloodyMouseController::BloodyMouseController(hid_device* dev_handle, const char* path, uint16_t product_id)
+BloodyMouseController::BloodyMouseController(hid_device* dev_handle, const char* path, uint16_t product_id, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = path;
     pid                 = product_id;
+    name                = dev_name;
 
     InitDevice();
 }
@@ -33,26 +34,25 @@ uint16_t BloodyMouseController::GetPid()
 
 std::string BloodyMouseController::GetSerial()
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
+    wchar_t serial_string[HID_MAX_STR];
+    int ret = hid_get_serial_number_string(dev, serial_string, HID_MAX_STR);
 
-    int ret             = hid_get_serial_number_string(dev, tmp, sz);
-
-    if (ret != 0)
+    if(ret != 0)
     {
-        LOG_DEBUG("[BloodyMouse] Get HID Serial string failed");
         return("");
     }
 
-    std::wstring w_tmp  = std::wstring(tmp);
-    std::string serial  = std::string(w_tmp.begin(), w_tmp.end());
-
-    return(serial);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string BloodyMouseController::GetLocation()
 {
     return("HID: " + location);
+}
+
+std::string BloodyMouseController::GetName()
+{
+    return(name);
 }
 
 void BloodyMouseController::InitDevice()

@@ -7,13 +7,13 @@
 |   Shady Nawara (ShadyNawara)                  16 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 /*----------------------------------------------------------------------------------------------*\
@@ -156,7 +156,6 @@ protected:
         );
 
 private:
-    unsigned int  led_count;
     std::string   device_name;
     unsigned char configtable[12];
     bool          rgswapconfig[8] = { 0 };

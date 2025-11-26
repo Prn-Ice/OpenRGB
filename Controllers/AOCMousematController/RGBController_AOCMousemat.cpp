@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                15 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_AOCMousemat.h"
@@ -26,7 +26,7 @@ RGBController_AOCMousemat::RGBController_AOCMousemat(AOCMousematController* cont
 {
     controller                      = controller_ptr;
 
-    name                            = "AOC Mousemat Device";
+    name                            = controller->GetDeviceName();
     vendor                          = "AOC";
     type                            = DEVICE_TYPE_MOUSEMAT;
     description                     = "AOC Mousemat Device";

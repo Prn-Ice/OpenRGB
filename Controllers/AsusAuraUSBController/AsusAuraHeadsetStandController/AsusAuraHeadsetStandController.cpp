@@ -6,16 +6,18 @@
 |   Mola19                                      06 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "AsusAuraHeadsetStandController.h"
+#include "StringUtils.h"
 
-AuraHeadsetStandController::AuraHeadsetStandController(hid_device* dev_handle, const char* path)
+AuraHeadsetStandController::AuraHeadsetStandController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 AuraHeadsetStandController::~AuraHeadsetStandController()
@@ -28,6 +30,11 @@ std::string AuraHeadsetStandController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string AuraHeadsetStandController::GetName()
+{
+    return(name);
+}
+
 std::string AuraHeadsetStandController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -38,10 +45,7 @@ std::string AuraHeadsetStandController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string AuraHeadsetStandController::GetVersion()

@@ -6,13 +6,13 @@
 |   Chris M (DrNo)                              05 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define COUGARKEYBOARDCONTROLLER_WRITE_PACKET_SIZE  65      //Buffer requires a prepended ReportID hence + 1
@@ -66,7 +66,7 @@ enum Cougar_Keyboard_Controller_Speeds
 class CougarKeyboardController
 {
 public:
-    CougarKeyboardController(hid_device* dev_handle, const char* path);
+    CougarKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~CougarKeyboardController();
 
     std::string     GetDeviceName();
@@ -78,8 +78,8 @@ public:
     void            Save(uint8_t flag);
     void            SendProfile(uint8_t profile, uint8_t light);
 private:
-    std::string     device_name;
     std::string     serial;
     std::string     location;
+    std::string     name;
     hid_device*     dev;
 };

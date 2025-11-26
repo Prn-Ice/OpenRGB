@@ -6,30 +6,19 @@
 |   Morgan Guimard (morg)                       19 Jan 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "InstantMouseController.h"
+#include "StringUtils.h"
 
-InstantMouseController::InstantMouseController(hid_device* dev_handle, const hid_device_info& info)
+InstantMouseController::InstantMouseController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    pid                 = info.product_id;
+    name                = dev_name;
 }
 
 InstantMouseController::~InstantMouseController()
@@ -42,14 +31,27 @@ std::string InstantMouseController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string InstantMouseController::GetSerialString()
+std::string InstantMouseController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string InstantMouseController::GetFirmwareVersion()
+std::string InstantMouseController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
+}
+
+uint16_t InstantMouseController::GetPID()
+{
+    return pid;
 }
 
 void InstantMouseController::SendColor(RGBColor color)
@@ -82,7 +84,7 @@ void InstantMouseController::SetMode(uint8_t mode_value, uint8_t speed, uint8_t 
 {
     /*---------------------------------------------------------*\
     | Packet details:                                           |
-    | 07 13 FF MS DN -B -- --                                   |
+    | 07 13 FF MS DN -B M- --                                   |
     |                                                           |
     | 07 = report id                                            |
     | 13 = set mode function                                    |
@@ -107,7 +109,7 @@ void InstantMouseController::SetMode(uint8_t mode_value, uint8_t speed, uint8_t 
     pkt[4] = (direction << 4) | led_mask;
     pkt[5] = 0xF - (brightness & 0xF);
 
-    pkt[6] = 0x00;
+    pkt[6] = mode_value & 0xF0;
     pkt[7] = 0x00;
 
     hid_send_feature_report(dev, pkt, INSTANT_MOUSE_REPORT_SIZE);

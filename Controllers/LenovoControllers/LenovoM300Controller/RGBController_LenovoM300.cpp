@@ -6,7 +6,7 @@
 |   Wayne Riordan                               09 Jan 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LenovoM300.h"
@@ -26,10 +26,10 @@ RGBController_LenovoM300::RGBController_LenovoM300(LenovoM300Controller* control
 {
     controller                  = controller_ptr;
 
-    name                        = "Lenovo Legion M300";
+    name                        = controller->GetDeviceName();
     vendor                      = "Lenovo";
     type                        = DEVICE_TYPE_MOUSE;
-    description                 = name;
+    description                 = "Lenovo M300 Device";
     location                    = controller->GetDeviceLocation();
 
     mode Static;

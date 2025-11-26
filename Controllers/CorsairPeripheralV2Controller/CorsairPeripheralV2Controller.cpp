@@ -6,28 +6,19 @@
 |   Chris M (Dr_No)                             07 Aug 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "CorsairPeripheralV2Controller.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-CorsairPeripheralV2Controller::CorsairPeripheralV2Controller(hid_device* dev_handle, const char* path, std::string /*name*/)
+CorsairPeripheralV2Controller::CorsairPeripheralV2Controller(hid_device* dev_handle, const char* path, std::string name)
 {
-    const uint8_t sz    = HID_MAX_STR;
-    wchar_t       tmp[sz];
-
     dev                 = dev_handle;
     location            = path;
-
-    hid_get_manufacturer_string(dev, tmp, sz);
-    std::wstring wName = std::wstring(tmp);
-    device_name = std::string(wName.begin(), wName.end());
-
-    hid_get_product_string(dev, tmp, sz);
-    wName = std::wstring(tmp);
-    device_name.append(" ").append(std::string(wName.begin(), wName.end()));
+    device_name         = name;
 
     /*---------------------------------------------------------*\
     | Get PID                                                   |
@@ -66,7 +57,7 @@ CorsairPeripheralV2Controller::CorsairPeripheralV2Controller(hid_device* dev_han
     hid_write(dev, buffer, CORSAIR_V2_WRITE_SIZE);
     uint16_t result = hid_read_timeout(dev, buffer, CORSAIR_V2_PACKET_SIZE, CORSAIR_V2_TIMEOUT);
     result++;
-    pkt_sze = result;
+    pkt_sze = std::max(result, (uint16_t)CORSAIR_V2_WRITE_SIZE);
     LOG_DEBUG("[%s] Packet length set to %d", device_name.c_str(), pkt_sze);
 
     /*---------------------------------------------------------*\
@@ -77,6 +68,8 @@ CorsairPeripheralV2Controller::CorsairPeripheralV2Controller(hid_device* dev_han
 
     for(uint16_t i = 0; i < CORSAIR_V2_DEVICE_COUNT; i++)
     {
+        LOG_DEBUG("[%s] Checking PID %04X against index %d with %04X - %smatch", device_name.c_str(),
+                  pid, i, corsair_v2_device_list[i]->pid, corsair_v2_device_list[i]->pid == pid ? "" : "no ");
         if(corsair_v2_device_list[i]->pid == pid)
         {
             /*---------------------------------------------------------*\
@@ -151,21 +144,15 @@ std::string CorsairPeripheralV2Controller::GetName()
 
 std::string CorsairPeripheralV2Controller::GetSerialString()
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
-    int ret             = hid_get_serial_number_string(dev, tmp, sz);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
     if(ret != 0)
     {
-        LOG_DEBUG("[%s] Get HID Serial string failed", device_name.c_str());
         return("");
     }
 
-    std::wstring w_tmp  = std::wstring(tmp);
-    std::string serial  = std::string(w_tmp.begin(), w_tmp.end());
-
-    return serial;
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CorsairPeripheralV2Controller::SetRenderMode(corsair_v2_device_mode mode)

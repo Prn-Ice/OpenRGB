@@ -6,11 +6,12 @@
 |   Chris M (DrNo)                              08 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include "LogManager.h"
 #include "DarkProjectKeyboardController.h"
+#include "LogManager.h"
+#include "StringUtils.h"
 
 static uint8_t packet_map[88] =
 {
@@ -44,10 +45,11 @@ static uint8_t packet_map[88] =
 /* Missing Indexes 9, 22, 28, 40, 46, 70, 74, 75, 82, 86, 87, 92, 98, 99, 101 */
 };
 
-DarkProjectKeyboardController::DarkProjectKeyboardController(hid_device* dev_handle, const char* path)
+DarkProjectKeyboardController::DarkProjectKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = path;
+    name                = dev_name;
 }
 
 DarkProjectKeyboardController::~DarkProjectKeyboardController()
@@ -55,33 +57,27 @@ DarkProjectKeyboardController::~DarkProjectKeyboardController()
     hid_close(dev);
 }
 
-std::string DarkProjectKeyboardController::GetDeviceName()
+std::string DarkProjectKeyboardController::GetLocation()
 {
-    const int szTemp    = HID_MAX_STR;
-    wchar_t tmpName[szTemp];
+    return("HID: " + location);
+}
 
-    hid_get_manufacturer_string(dev, tmpName, szTemp);
-    std::wstring wName  = std::wstring(tmpName);
-    std::string name    = std::string(wName.begin(), wName.end());
-
-    return name;
+std::string DarkProjectKeyboardController::GetName()
+{
+    return(name);
 }
 
 std::string DarkProjectKeyboardController::GetSerial()
 {
-    const int szTemp    = HID_MAX_STR;
-    wchar_t   tmpName[szTemp];
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-    hid_get_serial_number_string(dev, tmpName, szTemp);
-    std::wstring wName  = std::wstring(tmpName);
-    std::string serial  = std::string(wName.begin(), wName.end());
+    if(ret != 0)
+    {
+        return("");
+    }
 
-    return serial;
-}
-
-std::string DarkProjectKeyboardController::GetLocation()
-{
-    return("HID: " + location);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void DarkProjectKeyboardController::SetLedsDirect(std::vector<RGBColor> colors)

@@ -1,13 +1,16 @@
-/*-------------------------------------------------------------------*\
-|  WootingTwoKeyboardController.cpp                                   |
-|                                                                     |
-|  OpenRGB driver for Wooting RGB keyboardlighting controller         |
-|      https://github.com/WootingKb/wooting-rgb-sdk                   |
-|                                                                     |
-|  Chris M (Dr_No)         9th July 2021                              |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| WootingTwoKeyboardController.cpp                          |
+|                                                           |
+|   Driver for Wooting Two keyboard                         |
+|                                                           |
+|   Chris M (Dr_No)                             09 Jul 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "StringUtils.h"
 #include "WootingTwoKeyboardController.h"
 
 #define WOOTING_TWO_REPORT_SIZE         257
@@ -25,35 +28,33 @@ typedef uint16_t R5G6B5_color;
 
 static unsigned int matrix_to_led_index_map_full[WOOTING_RGB_ROWS * WOOTING_TWO_RGB_COLUMNS] =
 {
-   0,  21,  42,  63,  84, 105,  NA,  22,  43,  64,  85, 106,   2,  23,  44,  65,  86, 107,   3,  24,  45,
+   0,  21,  42,  63,  84, 105,  1,  22,  43,  64,  85, 106,   2,  23,  44,  65,  86, 107,   3,  24,  45,
   66,  87,  NA,   4,  25,  46,  67,  88,  NA,   5,  26,  47,  68,  89,  NA,   6,  27,  48,  69,  90, 111,
    7,  28,  49,  70,  91,  NA,   8,  29,  50,  71,  92,  NA,   9,  30,  51,  72,  93,  NA,  10,  31,  52,
   73,  94, 115,  11,  32,  53,  74,  95, 116,  12,  33,  54,  75,  NA, 117,  13,  34,  55,  76,  97, 118,
-  14,  35,  56,  NA,  NA, 119,  15,  36,  57,  NA,  99, 120,  NA,  37,  58,  NA,  16, 121,  17,  38,  59,
+  14,  35,  56,  77,  98, 119,  15,  36,  57,  NA,  99, 120,  16,  37,  58,  NA,  16, 121,  17,  38,  59,
   80, 101,  NA,  18,  39,  60,  81, 102, 123,  19,  40,  61,  82, 103, 124,  20,  41,  62,  NA, 104,  NA
 };
 
-WootingTwoKeyboardController::WootingTwoKeyboardController(hid_device* dev_handle, const char *path, uint8_t wooting_type)
+WootingTwoKeyboardController::WootingTwoKeyboardController(hid_device* dev_handle, const char *path, uint8_t wooting_type, std::string dev_name)
 {
-    const int szTemp = 256;
-    wchar_t tmpName[szTemp];
-
     dev                 = dev_handle;
     location            = path;
+    name                = dev_name;
     this->wooting_type  = wooting_type;
     key_code_limit      = (wooting_type == WOOTING_KB_TKL) ? WOOTING_ONE_KEY_CODE_LIMIT : WOOTING_TWO_KEY_CODE_LIMIT;
 
+    /*---------------------------------------------------------*\
+    | Get device HID manufacturer and product strings           |
+    \*---------------------------------------------------------*/
+    const int szTemp = 256;
+    wchar_t tmpName[szTemp];
+
     hid_get_manufacturer_string(dev, tmpName, szTemp);
-    std::wstring wName = std::wstring(tmpName);
-    vendor = std::string(wName.begin(), wName.end());
+    vendor = std::string(StringUtils::wstring_to_string(tmpName));
 
     hid_get_product_string(dev, tmpName, szTemp);
-    wName = std::wstring(tmpName);
-    description = std::string(wName.begin(), wName.end());
-
-    hid_get_serial_number_string(dev, tmpName, szTemp);
-    wName = std::wstring(tmpName);
-    serial = std::string(wName.begin(), wName.end());
+    description = std::string(StringUtils::wstring_to_string(tmpName));
 
     SendInitialize();
 }

@@ -6,7 +6,7 @@
 |   cafeed28                                    03 Nov 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -161,10 +161,10 @@ RGBController_RedSquareKeyrox::RGBController_RedSquareKeyrox(RedSquareKeyroxCont
 {
     controller      = controller_ptr;
 
-    name            = "Red Square Keyrox";
+    name            = controller->GetNameString();
     vendor          = "Red Square";
     type            = DEVICE_TYPE_KEYBOARD;
-    description     = name;
+    description     = "Red Square Keyrox Device";
     location        = controller->GetDeviceLocation();
     serial          = controller->GetSerialString();
 

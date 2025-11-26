@@ -6,10 +6,10 @@
 |   Adam Honse (CalcProgrammer1)                08 May 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "CorsairWirelessController.h"
 #include "RGBController.h"

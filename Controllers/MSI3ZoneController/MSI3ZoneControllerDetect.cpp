@@ -6,13 +6,12 @@
 |   Adam Honse (CalcProgrammer1)                25 Dec 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "MSI3ZoneController.h"
-#include "RGBController.h"
 #include "RGBController_MSI3Zone.h"
 
 #define MSI_3_ZONE_KEYBOARD_VID 0x1770

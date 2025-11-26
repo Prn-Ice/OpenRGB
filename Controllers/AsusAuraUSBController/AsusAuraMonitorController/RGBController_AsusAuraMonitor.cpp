@@ -6,14 +6,14 @@
 |   Mola19                                      08 Mar 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_AsusAuraMonitor.h"
 
 /**------------------------------------------------------------------*\
     @name Asus Aura Monitor
-    @category LEDStrip
+    @category Accessory
     @type USB
     @save :x:
     @direct :white_check_mark:
@@ -24,20 +24,20 @@
 
 RGBController_AuraMonitor::RGBController_AuraMonitor(AuraMonitorController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "ASUS Aura Monitor";
-    vendor      = "ASUS";
-    type        = DEVICE_TYPE_LEDSTRIP;
-    description = "ASUS Aura Monitor Device";
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    name                = controller->GetNameString();
+    vendor              = "ASUS";
+    type                = DEVICE_TYPE_MONITOR;
+    description         = "ASUS Aura Monitor Device";
+    location            = controller->GetDeviceLocation();
+    serial              = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();

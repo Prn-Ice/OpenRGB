@@ -6,7 +6,7 @@
 |   Volodymyr Nazarchuk (Vavooon)               28 Apr 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -14,6 +14,9 @@
 #include <chrono>
 #include "RGBController.h"
 #include "HyperXAlloyOriginsCoreController.h"
+
+#define HYPERX_ALLOY_ORIGINS_CORE_ANSI      0x09
+#define HYPERX_ALLOY_ORIGINS_CORE_ABNT2     0x10
 
 class RGBController_HyperXAlloyOriginsCore : public RGBController
 {
@@ -38,4 +41,5 @@ private:
     std::thread*                                        keepalive_thread;
     std::atomic<bool>                                   keepalive_thread_run;
     std::chrono::time_point<std::chrono::steady_clock>  last_update_time;
+    unsigned int                                        variant;
 };

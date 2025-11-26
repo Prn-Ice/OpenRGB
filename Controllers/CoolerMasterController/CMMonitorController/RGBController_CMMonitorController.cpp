@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       18 Sep 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -15,7 +15,7 @@
 
 /**------------------------------------------------------------------*\
     @name Coolermaster Gaming Monitor
-    @category LEDStrip
+    @category Accessory
     @type USB
     @save :robot:
     @direct :white_check_mark:
@@ -27,13 +27,13 @@
 RGBController_CMMonitorController::RGBController_CMMonitorController(CMMonitorController* controller_ptr)
 {
     controller                  = controller_ptr;
-    name                        = "CoolerMaster LED Controller A1";
+
+    name                        = controller->GetNameString();
     vendor                      = "CoolerMaster";
-    type                        = DEVICE_TYPE_LEDSTRIP;
-    description                 = name;
+    type                        = DEVICE_TYPE_MONITOR;
+    description                 = "CoolerMaster Monitor Device";
     location                    = controller->GetDeviceLocation();
     serial                      = controller->GetSerialString();
-    version                     = "";
 
     mode Direct;
     Direct.name                 = "Direct";
@@ -195,11 +195,6 @@ void RGBController_CMMonitorController::UpdateZoneLEDs(int /*zone*/)
 void RGBController_CMMonitorController::UpdateSingleLED(int /*led*/)
 {
     DeviceUpdateLEDs();
-}
-
-void RGBController_CMMonitorController::SetCustomMode()
-{
-    active_mode = 0;
 }
 
 void RGBController_CMMonitorController::DeviceUpdateMode()

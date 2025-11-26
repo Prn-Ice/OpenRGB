@@ -6,13 +6,13 @@
 |   Chris M (DrNo)                              08 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define NA                                      0xFFFFFFFF
@@ -37,15 +37,16 @@ enum
 class DarkProjectKeyboardController
 {
 public:
-    DarkProjectKeyboardController(hid_device* dev_handle, const char* path);
+    DarkProjectKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~DarkProjectKeyboardController();
 
-    std::string     GetDeviceName();
-    std::string     GetSerial();
     std::string     GetLocation();
+    std::string     GetName();
+    std::string     GetSerial();
 
     void            SetLedsDirect(std::vector<RGBColor> colors);
 private:
-    std::string     location;
     hid_device*     dev;
+    std::string     location;
+    std::string     name;
 };

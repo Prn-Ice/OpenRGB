@@ -6,18 +6,20 @@
 |   Frank Niessen (denk_mal)                    16 Dec 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "DasKeyboardController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-DasKeyboardController::DasKeyboardController(hid_device *dev_handle, const char *path)
+DasKeyboardController::DasKeyboardController(hid_device *dev_handle, const char *path, std::string dev_name)
 {
     dev                    = dev_handle;
     location               = path;
+    name                   = dev_name;
     version                = "";
     useTraditionalSendData = false;
 
@@ -29,29 +31,47 @@ DasKeyboardController::~DasKeyboardController()
     hid_close(dev);
 }
 
-std::string DasKeyboardController::GetDeviceLocation()
+std::string DasKeyboardController::GetLayoutString()
+{
+    /*-----------------------------------------------------------*\
+    | Experimental for now; should be '16 or 63' for US and '28'  |
+    | for EU layout                                               |
+    \*-----------------------------------------------------------*/
+    if(version.length() < 17)
+    {
+        return("NONE");
+    }
+    std::string layout_id = version.substr(3, 2);
+
+    if(layout_id == "16" || layout_id == "63")
+    {
+        return("US");
+    }
+
+    return("EU");
+}
+
+std::string DasKeyboardController::GetLocationString()
 {
     return("HID: " + location);
 }
 
+std::string DasKeyboardController::GetNameString()
+{
+    return(name);
+}
+
 std::string DasKeyboardController::GetSerialString()
 {
-    wchar_t serial_string[128] = {};
-    int     err                = hid_get_serial_number_string(dev, serial_string, 128);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-    std::string return_string;
-    if(err == 0)
+    if(ret != 0)
     {
-        std::wstring return_wstring = serial_string;
-        return_string = std::string(return_wstring.begin(), return_wstring.end());
+        return("");
     }
 
-    if(return_string.empty())
-    {
-        return_string = version;
-    }
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string DasKeyboardController::GetVersionString()
@@ -68,26 +88,6 @@ std::string DasKeyboardController::GetVersionString()
     fw_version             += ".0";
 
     return(fw_version);
-}
-
-std::string DasKeyboardController::GetLayoutString()
-{
-    /*-----------------------------------------------------*\
-    | Experimental for now; should be '16' for US and '28'  |
-    | for EU layout                                         |
-    \*-----------------------------------------------------*/
-    if(version.length() < 17)
-    {
-        return("NONE");
-    }
-    std::string layout_id = version.substr(3, 2);
-
-    if(layout_id == "16")
-    {
-        return("US");
-    }
-
-    return("EU");
 }
 
 void DasKeyboardController::SendColors(unsigned char key_id, unsigned char mode,
@@ -327,23 +327,24 @@ int DasKeyboardController::ReceiveData(unsigned char *data, const unsigned int m
         return(-1);
     }
 
-    int response_size = 0;
+    unsigned int response_size = 0;
     if(receive_buf.size() > 1)
     {
         response_size = receive_buf.at(1);
+
         if(response_size + 2 > receive_buf.size())
         {
             return(-1);
         }
-        if(response_size > (int)max_length)
+        if(response_size > max_length)
         {
-            response_size = (int)max_length;
+            response_size = max_length;
         }
 
         /*-----------------------------------------------------*\
         | Remove first two bytes (signature?) and content length|
         \*-----------------------------------------------------*/
-        for(size_t ii = 0; ii < response_size - 1; ii++)
+        for(unsigned int ii = 0; ii < response_size - 1; ii++)
         {
             data[ii] = receive_buf.at(ii + 2);
         }

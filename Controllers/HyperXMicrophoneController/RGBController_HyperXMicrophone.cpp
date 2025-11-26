@@ -6,7 +6,7 @@
 |   Matt Silva (thesilvanator)                              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 /**------------------------------------------------------------------*\
@@ -57,6 +57,7 @@ RGBController_HyperXMicrophone::RGBController_HyperXMicrophone(HyperXMicrophoneC
 {
     controller              = controller_ptr;
 
+    name                    = controller->GetNameString();
     vendor                  = "HyperX";
     type                    = DEVICE_TYPE_MICROPHONE;
     description             = "HyperX Microphone Device";
@@ -99,7 +100,7 @@ void RGBController_HyperXMicrophone::SetupZones()
 
     zone Mic;
     Mic.name       = "Microphone";
-    Mic.type       = ZONE_TYPE_LINEAR;
+    Mic.type       = ZONE_TYPE_SINGLE;
     Mic.leds_min   = 2;
     Mic.leds_max   = 2;
     Mic.leds_count = 2;

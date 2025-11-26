@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       06 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define HYPERX_PULSFIRE_RAID_PACKET_DATA_LENGTH         264
@@ -30,12 +30,13 @@ enum
 class HyperXPulsefireRaidController
 {
 public:
-    HyperXPulsefireRaidController(hid_device* dev_handle, const hid_device_info& info);
+    HyperXPulsefireRaidController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~HyperXPulsefireRaidController();
 
+    std::string GetNameString();
     std::string GetSerialString();
     std::string GetDeviceLocation();
-    std::string GetFirmwareVersion();
+
     void        SendColors(std::vector<RGBColor> colors);
     void        SetBrightness(unsigned char brightness);
 
@@ -44,8 +45,7 @@ protected:
 
 private:
     std::string location;
-    std::string serial_number;
-    std::string version;
+    std::string name;
 
     void        Send(unsigned char* packet);
 };

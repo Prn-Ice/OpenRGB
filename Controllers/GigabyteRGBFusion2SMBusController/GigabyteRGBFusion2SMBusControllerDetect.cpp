@@ -7,17 +7,14 @@
 |   Matt Harper                                 05 May 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
 #include <vector>
 #include "Detector.h"
 #include "GigabyteRGBFusion2SMBusController.h"
 #include "LogManager.h"
-#include "RGBController.h"
 #include "RGBController_GigabyteRGBFusion2SMBus.h"
 #include "SettingsManager.h"
 #include "i2c_smbus.h"

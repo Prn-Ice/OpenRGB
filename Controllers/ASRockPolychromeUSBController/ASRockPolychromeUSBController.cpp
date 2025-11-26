@@ -7,14 +7,14 @@
 |   Shady Nawara (ShadyNawara)                  16 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
-#include <stdio.h>
 #include "RGBController.h"
 #include "ResourceManager.h"
 #include "SettingsManager.h"
+#include "StringUtils.h"
 #include "ASRockPolychromeUSBController.h"
 #include "dmiinfo.h"
 
@@ -80,10 +80,7 @@ std::string PolychromeUSBController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void PolychromeUSBController::SetDeviceInfo()

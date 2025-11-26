@@ -6,7 +6,7 @@
 |   Mola19                                      20 Aug 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -16,13 +16,15 @@
 #include <vector>
 #include "AsusSagarisKeyboardController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
 #define ASUS_SAGARIS_KB_PACKET_SIZE 65
 
-AsusSagarisKeyboardController::AsusSagarisKeyboardController(hid_device* dev_handle, const char* path, unsigned short rev_version)
+AsusSagarisKeyboardController::AsusSagarisKeyboardController(hid_device* dev_handle, const char* path, unsigned short rev_version, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
     version     = rev_version;
 }
 
@@ -41,6 +43,11 @@ std::string AsusSagarisKeyboardController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string AsusSagarisKeyboardController::GetDeviceName()
+{
+    return(name);
+}
+
 std::string AsusSagarisKeyboardController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -51,10 +58,7 @@ std::string AsusSagarisKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 sagaris_mode AsusSagarisKeyboardController::GetMode()

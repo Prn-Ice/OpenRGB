@@ -7,15 +7,14 @@
 |   Mohammed Julfikar Ali Mahbub (o-julfikar)   01 Apr 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 /*-----------------------------------------------------*\
 | OpenRGB includes                                      |
 \*-----------------------------------------------------*/
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
-#include "RGBController.h"
 
 /*-----------------------------------------------------*\
 | A4 Tech specific includes                             |
@@ -34,9 +33,8 @@ void DetectA4TechMouseControllers(hid_device_info* info, const std::string& name
 
     if(dev)
     {
-        BloodyMouseController* controller           = new BloodyMouseController(dev, info->path, info->product_id);
+        BloodyMouseController* controller           = new BloodyMouseController(dev, info->path, info->product_id, name);
         RGBController_BloodyMouse* rgb_controller   = new RGBController_BloodyMouse(controller);
-        rgb_controller->name                        = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
@@ -48,15 +46,16 @@ void DetectBloodyB820R(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        BloodyB820RController*     controller     = new BloodyB820RController(dev, info->path);
+        BloodyB820RController*     controller     = new BloodyB820RController(dev, info->path, name);
         RGBController_BloodyB820R* rgb_controller = new RGBController_BloodyB820R(controller);
-        rgb_controller->name                      = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
 
-REGISTER_HID_DETECTOR_IPU("Bloody W60 Pro",         DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_W60_PRO_PID,     2,      0xFF33,     0x0529);
-REGISTER_HID_DETECTOR_IPU("Bloody W90 Max",         DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_W90_MAX_PID,     2,      0xFF33,     0x053D);
-REGISTER_HID_DETECTOR_IPU("Bloody MP 50RS",         DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_MP_50RS_PID,     2,      0xFFF2,     0x6009);
-REGISTER_HID_DETECTOR_IPU("A4Tech Bloody B820R",    DetectBloodyB820R,                  A4_TECH_VID,    BLOODY_B820R_PID,       2,      0xFF52,     0x0210);
+REGISTER_HID_DETECTOR_IPU("Bloody W60 Pro",  DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_W60_PRO_PID,     2,      0xFF33,     0x0529);
+REGISTER_HID_DETECTOR_IPU("Bloody W70 Max",  DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_W70_MAX_PID,     2,      0xFF33,     0x0518);
+REGISTER_HID_DETECTOR_IPU("Bloody W90 Max",  DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_W90_MAX_PID,     2,      0xFF33,     0x053D);
+REGISTER_HID_DETECTOR_IPU("Bloody W90 Pro",  DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_W90_PRO_PID,     2,      0xFF33,     0x054D);
+REGISTER_HID_DETECTOR_IPU("Bloody MP 50RS",  DetectA4TechMouseControllers,       A4_TECH_VID,    BLOODY_MP_50RS_PID,     2,      0xFFF2,     0x6009);
+REGISTER_HID_DETECTOR_IPU("Bloody B820R",    DetectBloodyB820R,                  A4_TECH_VID,    BLOODY_B820R_PID,       2,      0xFF52,     0x0210);

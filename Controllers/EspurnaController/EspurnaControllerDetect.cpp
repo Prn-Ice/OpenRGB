@@ -6,15 +6,11 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      11 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "EspurnaController.h"
-#include "RGBController.h"
 #include "RGBController_Espurna.h"
 #include "SettingsManager.h"
 

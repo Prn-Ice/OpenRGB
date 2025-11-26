@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       02 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "N5312AController.h"
-#include "RGBController.h"
 #include "RGBController_N5312A.h"
 
 /*---------------------------------------------------------*\
@@ -30,9 +29,8 @@ void DetectN5312AControllers(hid_device_info* info, const std::string& name)
 
     if(dev)
     {
-        N5312AController*     controller         = new N5312AController(dev, *info);
+        N5312AController*     controller         = new N5312AController(dev, *info, name);
         RGBController_N5312A* rgb_controller     = new RGBController_N5312A(controller);
-        rgb_controller->name                     = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

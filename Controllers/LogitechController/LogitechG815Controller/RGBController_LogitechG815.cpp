@@ -6,7 +6,7 @@
 |   Cheerpipe                                   20 Mar 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -185,13 +185,13 @@ static const logitech_g815_led led_names[] =
 
 RGBController_LogitechG815::RGBController_LogitechG815(LogitechG815Controller* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller                      = controller_ptr;
 
-    name        = "Logitech G815 Keyboard Device";
-    vendor      = "Logitech";
-    type        = DEVICE_TYPE_KEYBOARD;
-    description = "Logitech G815 Keyboard Device";
-    serial      = controller->GetSerialString();
+    name                            = controller->GetNameString();
+    vendor                          = "Logitech";
+    type                            = DEVICE_TYPE_KEYBOARD;
+    description                     = "Logitech G815 Keyboard Device";
+    serial                          = controller->GetSerialString();
 
     mode Direct;
     Direct.name                     = "Direct";
@@ -333,7 +333,7 @@ void RGBController_LogitechG815::DeviceUpdateLEDs()
         zone = ( leds[led_idx].value >> 8 );
         idx  = ( leds[led_idx].value );
 
-        if (current_colors[led_idx]==new_colors[led_idx])
+        if(current_colors[led_idx]==new_colors[led_idx])
         {
             /*-------------------------------------------------*\
             | Don't send if key color is not changed            |
@@ -366,7 +366,7 @@ void RGBController_LogitechG815::DeviceUpdateLEDs()
 
         colorkey = new_colors[led_idx];
 
-        if (ledsByColors.count(colorkey) == 0)
+        if(ledsByColors.count(colorkey) == 0)
         {
             ledsByColors.insert(std::pair<RGBColor, std::vector<char>>(colorkey, {}));
         }
@@ -400,16 +400,16 @@ void RGBController_LogitechG815::DeviceUpdateLEDs()
                 frame_buffer_big_mode[2] = RGBGetBValue(x.first);
                 frame_pos                = 3;
 
-                for(uint8_t i = 0; i < max_key_per_color; i++)
+                for(uint8_t i = 0; i < (uint8_t)max_key_per_color; i++)
                 {
-                    if(bi + i < x.second.size())
+                    if((bi + i) < (uint8_t)x.second.size())
                     {
                         frame_buffer_big_mode[frame_pos] = x.second[bi+i];
                         frame_pos++;
                     }
                 }
 
-                if (frame_pos < data_size)
+                if(frame_pos < data_size)
                 {
                     /*-----------------------------------------*\
                     | Zeroing just what is needed and if needed |
@@ -446,7 +446,7 @@ void RGBController_LogitechG815::DeviceUpdateLEDs()
                 li++;
                 led_in_little_frame++;
 
-                if (led_in_little_frame == 4)
+                if(led_in_little_frame == 4)
                 {
                     /*-----------------------------------------*\
                     | No End of Data byte if the packet is full |
@@ -467,7 +467,7 @@ void RGBController_LogitechG815::DeviceUpdateLEDs()
         /*-----------------------------------------------------*\
         | Zeroing just what is needed                           |
         \*-----------------------------------------------------*/
-        memset(frame_buffer_little_mode + (led_in_little_frame * 4 + 1), 0x00, sizeof(frame_buffer_little_mode) - led_in_little_frame * 4);
+        memset(frame_buffer_little_mode + (led_in_little_frame * 4 - 1), 0x00, sizeof(frame_buffer_little_mode) - led_in_little_frame * 4);
 
         /*-----------------------------------------------------*\
         | Data byte                                             |

@@ -1,20 +1,22 @@
-/*-----------------------------------------*\
-|  ZETBladeOpticalController.h              |
-|                                           |
-|  Definitions and types for ZET Blade      |
-|  Optical Keyboard lighting controller     |
-|                                           |
-|  Based on HyperX Alloy Elite2 impl by     |
-|                            KundaPanda     |
-|                                           |
-|  Moon_darker (Vaker) 23/01/2022           |
-\*-----------------------------------------*/
-#include "RGBController.h"
-
-#include <string>
-#include <hidapi/hidapi.h>
+/*---------------------------------------------------------*\
+| ZETBladeOpticalController.h                               |
+|                                                           |
+|   Driver for ZET Blade                                    |
+|                                                           |
+|   Based on HyperX Alloy Elite2 implementation by          |
+|   KundaPanda                                              |
+|                                                           |
+|   Moon_darker (Vaker)                         23 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
+
+#include <string>
+#include <hidapi.h>
+#include "RGBController.h"
 
 #define ZET_BLADE_OPTICAL_DELAY       12ms
 #define ZET_BLADE_OPTICAL_HEADER_LEN     9
@@ -49,10 +51,11 @@
 class ZETBladeOpticalController
 {
 public:
-    ZETBladeOpticalController(hid_device* dev_handle, const char* path);
+    ZETBladeOpticalController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~ZETBladeOpticalController();
 
     std::string                         GetDeviceLocation();
+    std::string                         GetNameString();
     std::string                         GetSerialString();
 
     void                                SetLEDDirect(const std::vector<RGBColor>& colors, unsigned char brightness);
@@ -61,8 +64,10 @@ public:
 private:
     hid_device*                         dev;
     std::string                         location;
+    std::string                         name;
     unsigned int                        effect_mode;
     bool                                custom_mode;
+
     void                                PrepareHeader(unsigned char *packet, unsigned char brightness);
     void                                PrepareHeader(unsigned char *packet, unsigned char mode, unsigned char speed, unsigned char brightness, unsigned char color);
     unsigned char                       RGBToPalette(unsigned char red, unsigned char grn, unsigned char blu);

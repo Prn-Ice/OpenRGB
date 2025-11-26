@@ -6,17 +6,18 @@
 |   Chris M (Dr_No)                             16 Jul 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
-#define EK_COLOUR_MODE_DATA_SIZE (sizeof(ek_colour_mode_data[0]) / sizeof(ek_colour_mode_data[0][0]))
-#define EK_DEVICE_NAME_SIZE (sizeof(device_name) / sizeof(device_name[ 0 ]))
-#define EK_PACKET_LENGTH    0x3F
+#define EK_COLOUR_MODE_DATA_SIZE    (sizeof(ek_colour_mode_data[0]) / sizeof(ek_colour_mode_data[0][0]))
+#define EK_DEVICE_NAME_SIZE         (sizeof(device_name) / sizeof(device_name[ 0 ]))
+#define EK_PACKET_LENGTH            0x3F
+#define HID_MAX_STR                 255
 
 enum
 {
@@ -68,7 +69,6 @@ public:
 
 private:
     std::string             device_name;
-    std::string             serial;
     std::string             location;
     hid_device*             dev;
 

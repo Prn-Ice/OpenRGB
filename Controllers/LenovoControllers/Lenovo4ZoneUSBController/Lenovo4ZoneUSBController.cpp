@@ -4,29 +4,20 @@
 |   Driver for Lenovo 4-Zone devices                        |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <iostream>
 #include "Lenovo4ZoneUSBController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
-Lenovo4ZoneUSBController::Lenovo4ZoneUSBController(hid_device* dev_handle, const char* path, uint16_t in_pid)
+Lenovo4ZoneUSBController::Lenovo4ZoneUSBController(hid_device* dev_handle, const char* path, uint16_t in_pid, std::string dev_name)
 {
-    const uint8_t   sz      = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
     dev                     = dev_handle;
     location                = path;
     pid                     = in_pid;
-
-    hid_get_manufacturer_string(dev, tmp, sz);
-    std::wstring w_tmp      = std::wstring(tmp);
-    name                    = std::string(w_tmp.begin(), w_tmp.end());
-
-    hid_get_product_string(dev, tmp, sz);
-    w_tmp                   = std::wstring(tmp);
-    name.append(" ").append(std::string(w_tmp.begin(), w_tmp.end()));
+    name                    = dev_name;
 }
 
 Lenovo4ZoneUSBController::~Lenovo4ZoneUSBController()

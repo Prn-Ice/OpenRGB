@@ -6,13 +6,13 @@
 |   Morgan Guimard (morg)                       01 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define MSI_VIGOR_GK30_REPORT_SIZE  8
@@ -46,12 +46,12 @@ enum
 class MSIVigorGK30Controller
 {
 public:
-    MSIVigorGK30Controller(hid_device* dev_handle, const hid_device_info& info);
+    MSIVigorGK30Controller(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~MSIVigorGK30Controller();
 
-    std::string     GetSerialString();
     std::string     GetDeviceLocation();
-    std::string     GetFirmwareVersion();
+    std::string     GetNameString();
+    std::string     GetSerialString();
 
     void            SetMode(std::vector<RGBColor> colors,
                             unsigned char brightness,
@@ -71,8 +71,6 @@ private:
     unsigned char   GetColourIndex(unsigned char red, unsigned char green, unsigned char blue);
 
     std::string     location;
+    std::string     name;
     std::string     serial_number;
-    std::string     version;
-
-    unsigned char color_test = 0x00;
 };

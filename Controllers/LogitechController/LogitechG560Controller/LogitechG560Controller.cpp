@@ -7,7 +7,7 @@
 |   based on TheRogueZeta                       31 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -17,10 +17,11 @@
 
 using namespace std::chrono_literals;
 
-LogitechG560Controller::LogitechG560Controller(hid_device* dev_handle, const char* path)
+LogitechG560Controller::LogitechG560Controller(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 LogitechG560Controller::~LogitechG560Controller()
@@ -31,6 +32,11 @@ LogitechG560Controller::~LogitechG560Controller()
 std::string LogitechG560Controller::GetDeviceLocation()
 {
     return("HID: " + location);
+}
+
+std::string LogitechG560Controller::GetDeviceName()
+{
+    return(name);
 }
 
 void LogitechG560Controller::SetDirectMode(uint8_t zone)

@@ -1,17 +1,19 @@
-/*-----------------------------------------*\
-|  ZotacTuringGPUController.cpp             |
-|                                           |
-|  Definitions and types for ZOTAC GeForce  |
-|  RTX 20 series GPU lighting controller    |
-|                                           |
-|  David Henry                  1/07/2023   |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| ZotacTuringGPUController.h                                |
+|                                                           |
+|   Driver for Zotac Turing GPU                             |
+|                                                           |
+|   David Henry                                 07 Jan 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#pragma once
 
 #include <string>
 #include "i2c_smbus.h"
 #include "RGBController.h"
-
-#pragma once
 
 enum
 {
@@ -37,16 +39,18 @@ enum
 class ZotacTuringGPUController
 {
 public:
-    ZotacTuringGPUController(i2c_smbus_interface* bus, u8 dev);
+    ZotacTuringGPUController(i2c_smbus_interface* bus, u8 dev, std::string dev_name);
     ~ZotacTuringGPUController();
 
-    std::string GetDeviceLocation();
+    std::string             GetDeviceLocation();
+    std::string             GetDeviceName();
 
-    void GetMode(RGBColor& color, int& mode, unsigned int& speed);
-    void SetMode(RGBColor color, int mode, unsigned int speed);
+    void                    GetMode(RGBColor& color, int& mode, unsigned int& speed);
+    void                    SetMode(RGBColor color, int mode, unsigned int speed);
 
 private:
-    i2c_smbus_interface* bus;
-    u8                   dev;
+    i2c_smbus_interface*    bus;
+    u8                      dev;
+    std::string             name;
 
 };

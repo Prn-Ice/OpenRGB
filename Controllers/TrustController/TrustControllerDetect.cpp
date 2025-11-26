@@ -1,7 +1,17 @@
+/*---------------------------------------------------------*\
+| TrustControllerDetect.cpp                                 |
+|                                                           |
+|   Detector for Trust devices                              |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
 #include "Detector.h"
 #include "TrustGXT114Controller.h"
 #include "TrustGXT180Controller.h"
-#include "RGBController.h"
 #include "RGBController_TrustGXT114.h"
 #include "RGBController_TrustGXT180.h"
 
@@ -22,12 +32,12 @@ void DetectTrustGXT114Controllers(hid_device_info* info, const std::string& name
 
     if(dev)
     {
-        TrustGXT114Controller* controller               = new TrustGXT114Controller(dev, *info);
+        TrustGXT114Controller* controller               = new TrustGXT114Controller(dev, *info, name);
 
         if(controller->Test())
         {
             RGBController_TrustGXT114* rgb_controller   = new RGBController_TrustGXT114(controller);
-            rgb_controller->name = name;
+
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }
         else
@@ -43,9 +53,9 @@ void DetectTrustGXT180Controllers(hid_device_info* info, const std::string& name
 
     if(dev)
     {
-        TrustGXT180Controller* controller           = new TrustGXT180Controller(dev, *info);
+        TrustGXT180Controller*     controller       = new TrustGXT180Controller(dev, *info, name);
         RGBController_TrustGXT180* rgb_controller   = new RGBController_TrustGXT180(controller);
-        rgb_controller->name                        = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

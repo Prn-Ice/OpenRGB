@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                26 Dec 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_HyperXPulsefireFPSPro.h"
@@ -26,20 +26,20 @@ using namespace std::chrono_literals;
 
 RGBController_HyperXPulsefireFPSPro::RGBController_HyperXPulsefireFPSPro(HyperXPulsefireFPSProController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "HyperX Pulsefire FPS Pro Device";
-    vendor      = "HyperX";
-    type        = DEVICE_TYPE_MOUSE;
-    description = "HyperX Pulsefire FPS Pro Device";
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    name                = controller->GetNameString();
+    vendor              = "HyperX";
+    type                = DEVICE_TYPE_MOUSE;
+    description         = "HyperX Pulsefire FPS Pro Device";
+    location            = controller->GetDeviceLocation();
+    serial              = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0xFFFF;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0xFFFF;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();

@@ -1,18 +1,20 @@
-/*-------------------------------------------------------------------*\
-|  WootingKeyboardController.h                                        |
-|                                                                     |
-|  OpenRGB driver for Wooting RGB keyboardlighting controller         |
-|      https://github.com/WootingKb/wooting-rgb-sdk                   |
-|                                                                     |
-|  Chris M (Dr_No)         9th July 2021                              |
-\*-------------------------------------------------------------------*/
-
-#include "RGBController.h"
-#include "LogManager.h"
-#include <string>
-#include <hidapi/hidapi.h>
+/*---------------------------------------------------------*\
+| WootingKeyboardController.h                               |
+|                                                           |
+|   Driver for Wooting keyboard                             |
+|                                                           |
+|   Chris M (Dr_No)                             09 Jul 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
+
+#include <string>
+#include <hidapi.h>
+#include "RGBController.h"
+#include "LogManager.h"
 
 #define WOOTING_COMMAND_SIZE            8
 #define WOOTING_REPORT_SIZE             129
@@ -38,7 +40,8 @@
 enum WOOTING_DEVICE_TYPE
 {
     WOOTING_KB_TKL      = 0,
-    WOOTING_KB_FULL     = 1
+    WOOTING_KB_FULL     = 1,
+    WOOTING_80HE        = 2
 };
 
 enum RGB_PARTS
@@ -61,7 +64,6 @@ public:
     std::string         vendor;
     std::string         description;
     std::string         location;
-    std::string         serial;
     uint8_t             wooting_type;
     uint8_t             key_code_limit;
 

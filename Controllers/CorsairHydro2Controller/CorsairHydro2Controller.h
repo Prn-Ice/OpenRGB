@@ -6,17 +6,13 @@
 |   Tim Demand (tim.dmd)                        10 Jan 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <vector>
-#ifdef __FreeBSD__
 #include <libusb.h>
-#else
-#include <libusb-1.0/libusb.h>
-#endif
 #include "RGBController.h"
 
 class CorsairHydro2Controller

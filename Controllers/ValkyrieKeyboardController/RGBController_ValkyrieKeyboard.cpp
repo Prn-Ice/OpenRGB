@@ -1,12 +1,14 @@
-﻿/*-----------------------------------------*\
-|  RGBController_ValkyrieKeyboard.cpp       |
-|                                           |
-|  Generic RGB Interface for Valkyrie RGB   |
-|  keyboard devices                         |
-|                                           |
-|  Nollie(Nuonuo)               2023/12/6   |
-|  Bartholomew Ho (imnotmental) 02/01/2024  |
-\*-----------------------------------------*/
+﻿/*---------------------------------------------------------*\
+| RGBController_ValkyrieKeyboard.cpp                        |
+|                                                           |
+|   RGBController for Valkyrie keyboard                     |
+|                                                           |
+|   Nollie (Nuonuo)                             06 Dec 2023 |
+|   Bartholomew Ho (imnotmental)                01 Feb 2024 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
 #include "RGBController_ValkyrieKeyboard.h"
@@ -270,20 +272,20 @@ static const char *normal_led_names[] =
 
 RGBController_ValkyrieKeyboard::RGBController_ValkyrieKeyboard(ValkyrieKeyboardController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "Valkyrie Keyboard Device";
-    vendor      = "Valkyrie";
-    type        = DEVICE_TYPE_KEYBOARD;
-    description = "Valkyrie Keyboard Device";
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
+    name                = controller->GetNameString();
+    vendor              = "Valkyrie";
+    type                = DEVICE_TYPE_KEYBOARD;
+    description         = "Valkyrie Keyboard Device";
+    location            = controller->GetDeviceLocation();
+    serial              = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0xFFFF;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0xFFFF;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();
@@ -313,8 +315,10 @@ void RGBController_ValkyrieKeyboard::SetupZones()
     {
         case 3:
             layout = PRO_LAYOUT;
+            break;
         default:
             layout = NORMAL_LAYOUT;
+            break;
     }
 
     /*---------------------------------------------------------*\
@@ -339,6 +343,7 @@ void RGBController_ValkyrieKeyboard::SetupZones()
                 zone_size               = normal_zone_sizes[zone_idx];
                 matrix_width            = 22;
                 matrix_map_ptr          = (unsigned int *)&normal_matrix_map;
+                break;
         }
 
         zone new_zone;
@@ -367,6 +372,7 @@ void RGBController_ValkyrieKeyboard::SetupZones()
                 break;
             default:
                 new_led.name = normal_led_names[led_idx];
+                break;
         }
 
         leds.push_back(new_led);

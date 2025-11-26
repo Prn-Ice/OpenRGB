@@ -9,13 +9,13 @@
 |   Credit to Luca Lovisa for original work.                |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 /*----------------------------------------------------------------------------*\
@@ -201,13 +201,6 @@ private:
 
 private:
     hid_device*             dev;
-    unsigned short          dev_pid;
-
-    /*---------------------------------------------------------*\
-    | Device-specific protocol settings                         |
-    \*---------------------------------------------------------*/
-    unsigned char           dev_transaction_id;
-    unsigned char           dev_led_id;
 
     /*---------------------------------------------------------*\
     | Device information strings                                |
@@ -215,12 +208,4 @@ private:
     std::string             firmware_version;
     std::string             location;
     std::string             name;
-    device_type             type;
-
-    /*---------------------------------------------------------*\
-    | HID report index for request and response                 |
-    \*---------------------------------------------------------*/
-    unsigned char           report_index;
-    unsigned char           response_index;
-
 };

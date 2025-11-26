@@ -6,14 +6,14 @@
 |   Chris M (Dr_No)                             31 Jan 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <array>
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"  //Needed to set the direct mode
 
 /*---------------------------------------------------------*\
@@ -22,6 +22,7 @@
 
 #define CM_SMALL_ARGB_PACKET_SIZE       65
 #define CM_SMALL_ARGB_INTERRUPT_TIMEOUT 250
+#define HID_MAX_STR                     255
 
 enum
 {
@@ -93,7 +94,6 @@ public:
     void                SetLedsDirect(RGBColor * led_colours, unsigned int led_count);
 private:
     std::string         device_name;
-    std::string         serial;
     std::string         location;
     hid_device*         dev;
 

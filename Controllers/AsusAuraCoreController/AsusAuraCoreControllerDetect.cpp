@@ -7,7 +7,7 @@
 |   Chris M (Dr_No)                             28 Jul 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
@@ -15,11 +15,9 @@
 #include "RGBController.h"
 #include "RGBController_AsusAuraCore.h"
 #include "RGBController_AsusAuraCoreLaptop.h"
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 
 #define AURA_CORE_VID                   0x0B05
-
-#define AURA_STRIX_SCAR_15_PID          0x19B6
 
 /******************************************************************************************\
 *                                                                                          *
@@ -37,7 +35,7 @@ void DetectAsusAuraCoreControllers(hid_device_info* info, const std::string& /*n
     {
         AuraCoreController*     controller                  = new AuraCoreController(dev, info->path);
         RGBController_AuraCore* rgb_controller              = new RGBController_AuraCore(controller);
-        // Constructor sets the name
+
         if(rgb_controller->type != DEVICE_TYPE_UNKNOWN)
         {
             ResourceManager::get()->RegisterRGBController(rgb_controller);
@@ -57,7 +55,7 @@ void DetectAsusAuraCoreLaptopControllers(hid_device_info* info, const std::strin
     {
         AsusAuraCoreLaptopController*     controller        = new AsusAuraCoreLaptopController(dev, info->path);
         RGBController_AsusAuraCoreLaptop* rgb_controller    = new RGBController_AsusAuraCoreLaptop(controller);
-        // Constructor sets the name
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }

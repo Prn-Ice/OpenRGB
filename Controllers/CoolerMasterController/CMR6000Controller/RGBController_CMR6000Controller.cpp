@@ -7,7 +7,7 @@
 |   Eric S (edbgon)                             02 Feb 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_CMR6000Controller.h"
@@ -220,11 +220,6 @@ void RGBController_CMR6000Controller::UpdateZoneLEDs(int /*zone*/)
 void RGBController_CMR6000Controller::UpdateSingleLED(int /*led*/)
 {
     DeviceUpdateLEDs();
-}
-
-void RGBController_CMR6000Controller::SetCustomMode()
-{
-    active_mode = 1;
 }
 
 void RGBController_CMR6000Controller::DeviceUpdateMode()

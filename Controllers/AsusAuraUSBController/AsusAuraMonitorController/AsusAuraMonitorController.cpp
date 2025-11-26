@@ -6,18 +6,20 @@
 |   Mola19                                      08 Mar 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "AsusAuraMonitorController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
-AuraMonitorController::AuraMonitorController(hid_device* dev_handle, const char* path, uint16_t pid)
+AuraMonitorController::AuraMonitorController(hid_device* dev_handle, const char* path, uint16_t pid, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
     device_pid  = pid;
+    name        = dev_name;
 }
 
 AuraMonitorController::~AuraMonitorController()
@@ -30,6 +32,11 @@ std::string AuraMonitorController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string AuraMonitorController::GetNameString()
+{
+    return(name);
+}
+
 std::string AuraMonitorController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -40,10 +47,7 @@ std::string AuraMonitorController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void AuraMonitorController::BeginUpdate()

@@ -6,17 +6,13 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      17 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <vector>
-#ifdef __FreeBSD__
 #include <libusb.h>
-#else
-#include <libusb-1.0/libusb.h>
-#endif
 #include "RGBController.h"
 
 enum
@@ -39,7 +35,7 @@ enum
 class CorsairHydroController
 {
 public:
-    CorsairHydroController(libusb_device_handle* dev_handle);
+    CorsairHydroController(libusb_device_handle* dev_handle, std::string dev_name);
     ~CorsairHydroController();
 
     unsigned char   GetFanPercent(unsigned char fan_channel);
@@ -47,8 +43,8 @@ public:
     unsigned short  GetFanRPM(unsigned char fan_channel);
 
     std::string     GetFirmwareString();
-
     std::string     GetLocation();
+    std::string     GetNameString();
 
     void            SetBlink
                         (
@@ -77,6 +73,7 @@ private:
     libusb_device_handle*   dev;
     std::string             firmware_version;
     std::string             location;
+    std::string             name;
 
     void            SendApplyBlink();
     void            SendApplyPulse();

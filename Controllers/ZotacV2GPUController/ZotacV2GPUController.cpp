@@ -1,19 +1,22 @@
-/*------------------------------------------*\
-|  ZotacV2GPUController.cpp                  |
-|                                            |
-|  Driver for ZOTAC GeForce RTX 30/40 series |
-|  GPU lighting controller                   |
-|                                            |
-|  Krzysztof Haładyn (krzys_h)   3/16/2023   |
-\*------------------------------------------*/
+/*---------------------------------------------------------*\
+| ZotacV2GPUController.cpp                                  |
+|                                                           |
+|   Driver for Zotac V2 GPU                                 |
+|                                                           |
+|   Krzysztof Haładyn (krzys_h)                 16 Mar 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "ZotacV2GPUController.h"
 #include "LogManager.h"
 
-ZotacV2GPUController::ZotacV2GPUController(i2c_smbus_interface* bus, u8 dev)
+ZotacV2GPUController::ZotacV2GPUController(i2c_smbus_interface* bus, u8 dev, std::string dev_name)
 {
-    this->bus = bus;
-    this->dev = dev;
+    this->bus   = bus;
+    this->dev   = dev;
+    this->name  = dev_name;
 
     if(dev)
     {
@@ -35,9 +38,14 @@ std::string ZotacV2GPUController::GetDeviceLocation()
     return ("I2C: " + return_string);
 }
 
+std::string ZotacV2GPUController::GetName()
+{
+    return(name);
+}
+
 std::string ZotacV2GPUController::GetVersion()
 {
-    return version;
+    return(version);
 }
 
 bool ZotacV2GPUController::ReadVersion()

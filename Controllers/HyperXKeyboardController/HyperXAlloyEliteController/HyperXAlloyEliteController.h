@@ -6,13 +6,13 @@
 |   Adam Honse (CalcProgrammer1)                30 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -66,10 +66,11 @@ enum
 class HyperXAlloyEliteController
 {
 public:
-    HyperXAlloyEliteController(hid_device* dev_handle, const char* path);
+    HyperXAlloyEliteController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~HyperXAlloyEliteController();
 
     std::string     GetDeviceLocation();
+    std::string     GetNameString();
     std::string     GetSerialString();
 
     void SetMode
@@ -89,6 +90,7 @@ private:
     unsigned char           active_direction;
     unsigned char           active_speed;
     std::string             location;
+    std::string             name;
 
     void    SelectProfile
                 (

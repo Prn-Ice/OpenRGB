@@ -4,7 +4,7 @@
 |   OpenRGB plugin manager                                  |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "LogManager.h"
@@ -12,6 +12,11 @@
 #include "PluginManager.h"
 #include "OpenRGBThemeManager.h"
 #include "SettingsManager.h"
+#include "ResourceManager.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 PluginManager::PluginManager()
 {
@@ -46,26 +51,54 @@ void PluginManager::RegisterRemovePluginCallback(RemovePluginCallback new_callba
 void PluginManager::ScanAndLoadPlugins()
 {
     /*---------------------------------------------------------*\
-    | Get the plugins directory                                 |
+    | Get the user plugins directory                            |
     |                                                           |
-    | The plugins directory is a directory named "plugins" in   |
-    | the configuration directory                               |
+    | The user plugins directory is a directory named "plugins" |
+    | in the configuration directory                            |
     \*---------------------------------------------------------*/
     filesystem::path plugins_dir = ResourceManager::get()->GetConfigurationDirectory() / plugins_path;
-    ScanAndLoadPluginsFrom(plugins_dir);
+    ScanAndLoadPluginsFrom(plugins_dir, false);
 
-#ifdef OPENRGB_EXTRA_PLUGIN_DIRECTORY
-    /*-----------------------------------------------------------------*\
-    | An additional plugin directory can be set during build time, e.g. |
-    | by the Linux distro to load plugins installed via package manager |
-    \*-----------------------------------------------------------------*/
-    ScanAndLoadPluginsFrom(OPENRGB_EXTRA_PLUGIN_DIRECTORY);
+#ifdef OPENRGB_SYSTEM_PLUGIN_DIRECTORY
+    /*---------------------------------------------------------*\
+    | Get the system plugins directory                          |
+    |                                                           |
+    | The system plugin directory can be set during build time, |
+    | e.g. by the package maintainer to load plugins installed  |
+    | via package manager                                       |
+    \*---------------------------------------------------------*/
+    ScanAndLoadPluginsFrom(OPENRGB_SYSTEM_PLUGIN_DIRECTORY, true);
+#endif
+
+#ifdef _WIN32
+    /*---------------------------------------------------------*\
+    | Get the exe folder plugins directory (Windows)            |
+    |                                                           |
+    | On Windows, system plugins are located in a folder called |
+    | "plugins" inside the folder where the OpenRGB.exe file is |
+    | installed.  Typically, C:\Program Files\OpenRGB but other |
+    | install paths are allowed.                                |
+    \*---------------------------------------------------------*/
+    char path[MAX_PATH];
+    GetModuleFileName(NULL, path, MAX_PATH);
+
+    filesystem::path exe_dir(path);
+    exe_dir = exe_dir.remove_filename() / plugins_path;
+
+    ScanAndLoadPluginsFrom(exe_dir, true);
 #endif
 }
 
-void PluginManager::ScanAndLoadPluginsFrom(const filesystem::path & plugins_dir)
+void PluginManager::ScanAndLoadPluginsFrom(const filesystem::path & plugins_dir, bool is_system)
 {
-    LOG_TRACE("[PluginManager] Scanning plugin directory: %s", plugins_dir.generic_u8string().c_str());
+    if(is_system)
+    {
+        LOG_TRACE("[PluginManager] Scanning system plugin directory: %s", plugins_dir.generic_u8string().c_str());
+    }
+    else
+    {
+        LOG_TRACE("[PluginManager] Scanning user plugin directory: %s", plugins_dir.generic_u8string().c_str());
+    }
 
     if(!filesystem::is_directory(plugins_dir))
     {
@@ -85,15 +118,47 @@ void PluginManager::ScanAndLoadPluginsFrom(const filesystem::path & plugins_dir)
 
         filesystem::path plugin_path = entry.path();
         LOG_TRACE("[PluginManager] Found plugin file %s", plugin_path.filename().generic_u8string().c_str());
-        AddPlugin(plugin_path);
+        AddPlugin(plugin_path, is_system);
     }
 }
 
-void PluginManager::AddPlugin(const filesystem::path& path)
+void PluginManager::AddPlugin(const filesystem::path& path, bool is_system)
 {
     OpenRGBPluginInterface* plugin = nullptr;
 
     unsigned int plugin_idx;
+
+    /*---------------------------------------------------------------------*\
+    | Open plugin settings                                                  |
+    \*---------------------------------------------------------------------*/
+    json plugin_settings = ResourceManager::get()->GetSettingsManager()->GetSettings("Plugins");
+
+    /*---------------------------------------------------------------------*\
+    | Check if this plugin is on the remove list                            |
+    \*---------------------------------------------------------------------*/
+    if(plugin_settings.contains("plugins_remove"))
+    {
+        for(unsigned int plugin_remove_idx = 0; plugin_remove_idx < plugin_settings["plugins_remove"].size(); plugin_remove_idx++)
+        {
+            LOG_WARNING("[PluginManager] Checking remove %d, %s", plugin_remove_idx, to_string(plugin_settings["plugins_remove"][plugin_remove_idx]).c_str());
+
+            if(plugin_settings["plugins_remove"][plugin_remove_idx] == path.generic_u8string())
+            {
+                /*---------------------------------------------------------*\
+                | Delete the plugin file                                    |
+                \*---------------------------------------------------------*/
+                filesystem::remove(path);
+            }
+
+            /*-----------------------------------------------------------------*\
+            | Erase the plugin from the remove list                             |
+            \*-----------------------------------------------------------------*/
+            plugin_settings["plugins_remove"].erase(plugin_remove_idx);
+
+            ResourceManager::get()->GetSettingsManager()->SetSettings("Plugins", plugin_settings);
+            ResourceManager::get()->GetSettingsManager()->SaveSettings();
+        }
+    }
 
     /*---------------------------------------------------------------------*\
     | Search active plugins to see if this path already exists              |
@@ -150,14 +215,9 @@ void PluginManager::AddPlugin(const filesystem::path& path)
                     bool            found       = false;
                     unsigned int    plugin_ct   = 0;
 
-                    /*-----------------------------------------------------*\
-                    | Open plugin list and check if plugin is in the list   |
-                    \*-----------------------------------------------------*/
-                    json plugin_settings = ResourceManager::get()->GetSettingsManager()->GetSettings("Plugins");
-
                     if(plugin_settings.contains("plugins"))
                     {
-                        plugin_ct = plugin_settings["plugins"].size();
+                        plugin_ct = (unsigned int)plugin_settings["plugins"].size();
 
                         for(unsigned int plugin_settings_idx = 0; plugin_settings_idx < plugin_settings["plugins"].size(); plugin_settings_idx++)
                         {
@@ -199,7 +259,7 @@ void PluginManager::AddPlugin(const filesystem::path& path)
                         ResourceManager::get()->GetSettingsManager()->SaveSettings();
                     }
 
-                    LOG_VERBOSE("Loaded plugin %s", info.Name.c_str());
+                    LOG_VERBOSE("[PluginManager] Loaded plugin %s", info.Name.c_str());
 
                     /*-----------------------------------------------------*\
                     | Add the plugin to the PluginManager active plugins    |
@@ -214,6 +274,7 @@ void PluginManager::AddPlugin(const filesystem::path& path)
                     entry.widget        = nullptr;
                     entry.incompatible  = false;
                     entry.api_version   = plugin->GetPluginAPIVersion();
+                    entry.is_system     = is_system;
 
                     loader->unload();
 
@@ -221,7 +282,7 @@ void PluginManager::AddPlugin(const filesystem::path& path)
 
                     if(entry.enabled)
                     {
-                        LoadPlugin(path);
+                        LoadPlugin(&ActivePlugins.back());
                     }
                 }
                 else
@@ -249,6 +310,7 @@ void PluginManager::AddPlugin(const filesystem::path& path)
                     entry.widget        = nullptr;
                     entry.incompatible  = true;
                     entry.api_version   = plugin->GetPluginAPIVersion();
+                    entry.is_system     = is_system;
 
                     loader->unload();
 
@@ -308,7 +370,7 @@ void PluginManager::RemovePlugin(const filesystem::path& path)
     if(ActivePlugins[plugin_idx].loader->isLoaded())
     {
         LOG_TRACE("[PluginManager] Plugin %s is active, unloading", path.c_str());
-        UnloadPlugin(path);
+        UnloadPlugin(&ActivePlugins[plugin_idx]);
     }
 
     /*---------------------------------------------------------------------*\
@@ -317,7 +379,7 @@ void PluginManager::RemovePlugin(const filesystem::path& path)
     ActivePlugins.erase(ActivePlugins.begin() + plugin_idx);
 }
 
-void PluginManager::LoadPlugin(const filesystem::path& path)
+void PluginManager::EnablePlugin(const filesystem::path& path)
 {
     unsigned int plugin_idx;
 
@@ -340,10 +402,16 @@ void PluginManager::LoadPlugin(const filesystem::path& path)
         return;
     }
 
+    ActivePlugins[plugin_idx].enabled = true;
+    LoadPlugin(&ActivePlugins[plugin_idx]);
+}
+
+void PluginManager::LoadPlugin(OpenRGBPluginEntry* plugin_entry)
+{
     /*---------------------------------------------------------------------*\
     | If the plugin is in the list but is incompatible, return              |
     \*---------------------------------------------------------------------*/
-    if(ActivePlugins[plugin_idx].incompatible)
+    if(plugin_entry->incompatible)
     {
         return;
     }
@@ -351,13 +419,11 @@ void PluginManager::LoadPlugin(const filesystem::path& path)
     /*---------------------------------------------------------------------*\
     | If the selected plugin is in the list but not loaded, load it         |
     \*---------------------------------------------------------------------*/
-    if(!ActivePlugins[plugin_idx].loader->isLoaded())
+    if(!plugin_entry->loader->isLoaded())
     {
-        ActivePlugins[plugin_idx].loader->load();
+        plugin_entry->loader->load();
 
-        QObject* instance                = ActivePlugins[plugin_idx].loader->instance();
-
-        bool dark_theme = OpenRGBThemeManager::IsDarkTheme();
+        QObject* instance                = plugin_entry->loader->instance();
 
         if(instance)
         {
@@ -367,16 +433,16 @@ void PluginManager::LoadPlugin(const filesystem::path& path)
             {
                 if(plugin->GetPluginAPIVersion() == OPENRGB_PLUGIN_API_VERSION)
                 {
-                    ActivePlugins[plugin_idx].plugin = plugin;
+                    plugin_entry->plugin = plugin;
 
-                    plugin->Load(dark_theme, ResourceManager::get());
+                    plugin->Load(ResourceManager::get());
 
                     /*-------------------------------------------------*\
                     | Call the Add Plugin callback                      |
                     \*-------------------------------------------------*/
                     if(AddPluginCallbackArg != nullptr)
                     {
-                        AddPluginCallbackVal(AddPluginCallbackArg, &ActivePlugins[plugin_idx]);
+                        AddPluginCallbackVal(AddPluginCallbackArg, plugin_entry);
                     }
                 }
             }
@@ -384,7 +450,7 @@ void PluginManager::LoadPlugin(const filesystem::path& path)
     }
 }
 
-void PluginManager::UnloadPlugin(const filesystem::path& path)
+void PluginManager::DisablePlugin(const filesystem::path& path)
 {
     unsigned int plugin_idx;
 
@@ -407,48 +473,62 @@ void PluginManager::UnloadPlugin(const filesystem::path& path)
         return;
     }
 
+    ActivePlugins[plugin_idx].enabled = false;
+    UnloadPlugin(&ActivePlugins[plugin_idx]);
+}
+
+void PluginManager::UnloadPlugin(OpenRGBPluginEntry* plugin_entry)
+{
     /*---------------------------------------------------------------------*\
     | If the selected plugin is in the list and loaded, unload it           |
     \*---------------------------------------------------------------------*/
-    if(ActivePlugins[plugin_idx].loader->isLoaded())
+    if(plugin_entry->loader->isLoaded())
     {
         /*-------------------------------------------------*\
         | Call plugin's Unload function before GUI removal  |
         \*-------------------------------------------------*/
-        ActivePlugins[plugin_idx].plugin->Unload();
+        plugin_entry->plugin->Unload();
 
         /*-------------------------------------------------*\
         | Call the Remove Plugin callback                   |
         \*-------------------------------------------------*/
         if(RemovePluginCallbackVal != nullptr)
         {
-            RemovePluginCallbackVal(RemovePluginCallbackArg, &ActivePlugins[plugin_idx]);
+            RemovePluginCallbackVal(RemovePluginCallbackArg, plugin_entry);
         }
 
-        bool unloaded = ActivePlugins[plugin_idx].loader->unload();
+        bool unloaded = plugin_entry->loader->unload();
 
         if(!unloaded)
         {
-            LOG_WARNING("[PluginManager] Plugin %s cannot be unloaded", path.c_str());
+            LOG_WARNING("[PluginManager] Plugin %s cannot be unloaded", plugin_entry->path.c_str());
         }
         else
         {
-            LOG_TRACE("[PluginManager] Plugin %s successfully unloaded", path.c_str());
+            LOG_TRACE("[PluginManager] Plugin %s successfully unloaded", plugin_entry->path.c_str());
         }
     }
     else
     {
-        LOG_TRACE("[PluginManager] Plugin %s was already unloaded", path.c_str());
+        LOG_TRACE("[PluginManager] Plugin %s was already unloaded", plugin_entry->path.c_str());
+    }
+}
+
+void PluginManager::LoadPlugins()
+{
+    for(OpenRGBPluginEntry& plugin_entry: ActivePlugins)
+    {
+        if(plugin_entry.enabled)
+        {
+            LoadPlugin(&plugin_entry);
+        }
     }
 }
 
 void PluginManager::UnloadPlugins()
 {
-    for(const OpenRGBPluginEntry& plugin_entry: ActivePlugins)
+    for(OpenRGBPluginEntry& plugin_entry: ActivePlugins)
     {
-        if(plugin_entry.loader->isLoaded())
-        {
-            plugin_entry.plugin->Unload();
-        }
+        UnloadPlugin(&plugin_entry);
     }
 }

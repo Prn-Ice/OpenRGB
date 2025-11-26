@@ -6,13 +6,13 @@
 |   sanchezzzs                                  20 Oct 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -52,13 +52,14 @@ enum
 class LogitechGProKeyboardController
 {
 public:
-    LogitechGProKeyboardController(hid_device* dev_handle_0x11, hid_device* dev_handle_0x12);
+    LogitechGProKeyboardController(hid_device* dev_handle_0x11, hid_device* dev_handle_0x12, std::string dev_name);
     ~LogitechGProKeyboardController();
 
+    std::string GetNameString();
     std::string GetSerialString();
 
     void        Commit();
-    
+
     void        SetDirect
                     (
                     unsigned char       zone,
@@ -78,6 +79,7 @@ public:
 private:
     hid_device* dev_pkt_0x11;
     hid_device* dev_pkt_0x12;
+    std::string name;
 
     void        SendDirectFrame
                     (

@@ -6,7 +6,7 @@
 |   Tam D (too.manyhobbies)                     30 Nov 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -17,7 +17,7 @@
 #include <sstream>
 #include <map>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "CMKeyboardDevices.h"
 #include "KeyboardLayoutManager.h"
 #include "RGBController.h"
@@ -56,15 +56,14 @@ enum cm_keyboard_control_mode
 class CMKeyboardAbstractController
 {
 public:
-    CMKeyboardAbstractController(hid_device* dev_handle, hid_device_info* dev_info);
-    ~CMKeyboardAbstractController();
+    CMKeyboardAbstractController(hid_device* dev_handle, hid_device_info* dev_info, std::string dev_name);
+    virtual ~CMKeyboardAbstractController();
 
     /*---------------------------------------------------------*\
     | Common USB controller fuctions                            |
     \*---------------------------------------------------------*/
     int                 GetProductID();
     std::string         GetDeviceName();
-    void                SetDeviceName(std::string name);
     std::string         GetDeviceVendor();
     std::string         GetDeviceSerial();
     std::string         GetLocation();

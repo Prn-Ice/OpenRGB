@@ -1,15 +1,18 @@
-/*-------------------------------------------------------------------*\
-|  RoccatBurstProAirController.h                                      |
-|                                                                     |
-|  Driver for Roccat Burst Pro Air Mouse                              |
-|                                                                     |
-|  Morgan Guimard (morg)   6/16/2022                                  |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatBurstProAirController.h                             |
+|                                                           |
+|   Driver for Roccat Burst Pro Air                         |
+|                                                           |
+|   Morgan Guimard (morg)                       16 Jun 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
+#include <hidapi.h>
 #include "RGBController.h"
-#include <hidapi/hidapi.h>
 
 #define ROCCAT_BURST_PRO_AIR_REPORT_ID               0x06
 #define ROCCAT_BURST_PRO_AIR_REPORT_SIZE             30
@@ -34,12 +37,12 @@ enum
 class RoccatBurstProAirController
 {
 public:
-    RoccatBurstProAirController(hid_device* dev_handle, const hid_device_info& info);
+    RoccatBurstProAirController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~RoccatBurstProAirController();
 
-    std::string     GetSerialString();
     std::string     GetDeviceLocation();
-    std::string     GetFirmwareVersion();
+    std::string     GetNameString();
+    std::string     GetSerialString();
 
     void            SetColors(std::vector<RGBColor> colors);
     void            SetModeValues(unsigned char mode_value, unsigned char speed, unsigned char brightness);
@@ -47,6 +50,5 @@ public:
 private:
     hid_device*     dev;
     std::string     location;
-    std::string     serial_number;
-    std::string     version;
+    std::string     name;
 };

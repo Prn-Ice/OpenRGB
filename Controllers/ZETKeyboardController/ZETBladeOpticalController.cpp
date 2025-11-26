@@ -1,17 +1,20 @@
-/*-----------------------------------------*\
-|  ZETBladeOpticalController.cpp            |
-|                                           |
-|  Driver for ZET Blade Optical Keyboard    |
-|                                           |
-|  Based on HyperX Alloy Elite2 impl by     |
-|                            KundaPanda     |
-|                                           |
-|  Moon_darker (Vaker) 23/01/2022           |
-\*-----------------------------------------*/
-
-#include "ZETBladeOpticalController.h"
+/*---------------------------------------------------------*\
+| ZETBladeOpticalController.cpp                             |
+|                                                           |
+|   Driver for ZET Blade                                    |
+|                                                           |
+|   Based on HyperX Alloy Elite2 implementation by          |
+|   KundaPanda                                              |
+|                                                           |
+|   Moon_darker (Vaker)                         23 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "StringUtils.h"
+#include "ZETBladeOpticalController.h"
 
 using namespace std::chrono_literals;
 
@@ -24,10 +27,11 @@ using namespace std::chrono_literals;
 static const unsigned int SKIP_INDICES[] = { 1, 17, 18, 19, 20, 75, 77, 78, 79, 83, 85, 96, 98, 100, 108, 109, 111, 112, 113, 116, 123, 125 };
 
 
-ZETBladeOpticalController::ZETBladeOpticalController(hid_device* dev_handle, const char* path)
+ZETBladeOpticalController::ZETBladeOpticalController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     effect_mode = ZET_BLADE_OPTICAL_MODE_STATIC;
 }
@@ -42,20 +46,22 @@ std::string ZETBladeOpticalController::GetDeviceLocation()
     return("HID " + location);
 }
 
+std::string ZETBladeOpticalController::GetNameString()
+{
+    return(name);
+}
+
 std::string ZETBladeOpticalController::GetSerialString()
 {
     wchar_t serial_string[128];
     int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-    if (ret != 0)
+    if(ret != 0)
     {
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void ZETBladeOpticalController::PrepareHeader(unsigned char* packet, unsigned char brightness)
@@ -125,7 +131,7 @@ void ZETBladeOpticalController::SetLEDDirect(const std::vector<RGBColor>& colors
         | Packets have colors in groups of 4 bytes, with    |
         | the first byte being key id and then R, G, B.     |
         \*-------------------------------------------------*/
-        buf[buf_idx] = color_idx + skipped + ZET_BLADE_OPTICAL_KEY_OFFSET;
+        buf[buf_idx]        = (unsigned char)(color_idx + skipped + ZET_BLADE_OPTICAL_KEY_OFFSET);
         buf[buf_idx + 1]    = RGBGetRValue(colors[color_idx]);
         buf[buf_idx + 2]    = RGBGetGValue(colors[color_idx]);
         buf[buf_idx + 3]    = RGBGetBValue(colors[color_idx]);

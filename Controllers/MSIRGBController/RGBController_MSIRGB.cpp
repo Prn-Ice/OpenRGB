@@ -6,7 +6,7 @@
 |   Adam Honse (CalcProgrammer1)                14 Feb 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_MSIRGB.h"
@@ -24,18 +24,19 @@
 
 RGBController_MSIRGB::RGBController_MSIRGB(MSIRGBController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "MSI Motherboard";
-    vendor      = "MSI";
-    type        = DEVICE_TYPE_MOTHERBOARD;
-    description = "MSI-RGB Device";
+    name                = controller->GetDeviceName();
+    vendor              = "MSI";
+    type                = DEVICE_TYPE_MOTHERBOARD;
+    description         = "MSI-RGB Device";
+    location            = controller->GetDeviceLocation();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();

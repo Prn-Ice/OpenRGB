@@ -1,15 +1,18 @@
-/*-------------------------------------------------------------------*\
-|  RoccatKoneProController.h                                          |
-|                                                                     |
-|  Driver for Roccat Kone Pro Mouse                                   |
-|                                                                     |
-|  Garrett Denham (GardenOfWyers)          01/12/2024                 |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatKoneProController.h                                 |
+|                                                           |
+|   Driver for Roccat Kone Pro                              |
+|                                                           |
+|   Garrett Denham (GardenOfWyers)              12 Jan 2024 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
+#include <hidapi.h>
 #include "RGBController.h"
-#include <hidapi/hidapi.h>
 
 #define ROCCAT_KONE_PRO_CONTROL_MODE_PACKET_LENGTH    6
 #define ROCCAT_KONE_PRO_DIRECT_MODE_PACKET_LENGTH     11
@@ -41,12 +44,12 @@ enum
 class RoccatKoneProController
 {
 public:
-    RoccatKoneProController(hid_device* dev_handle, const hid_device_info& info);
+    RoccatKoneProController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name);
     ~RoccatKoneProController();
 
-    std::string     GetSerialString();
     std::string     GetDeviceLocation();
-    std::string     GetFirmwareVersion();
+    std::string     GetNameString();
+    std::string     GetSerialString();
 
     void            SetupDirectMode();
     void            SendDirect(std::vector<RGBColor> colors);
@@ -60,8 +63,7 @@ public:
 private:
     hid_device*     dev;
     std::string     location;
-    std::string     serial_number;
-    std::string     version;
+    std::string     name;
 
     unsigned int    CalculateCRC(unsigned char* bytes);
     void            SwitchControl(bool direct);

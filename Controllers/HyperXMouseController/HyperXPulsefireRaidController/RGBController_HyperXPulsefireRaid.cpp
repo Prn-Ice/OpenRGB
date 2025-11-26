@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       06 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_HyperXPulsefireRaid.h"
@@ -26,24 +26,23 @@ using namespace std::chrono_literals;
 
 RGBController_HyperXPulsefireRaid::RGBController_HyperXPulsefireRaid(HyperXPulsefireRaidController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller              = controller_ptr;
 
-    name        = "HyperX Pulsefire Raid Device";
-    vendor      = "HyperX";
-    type        = DEVICE_TYPE_MOUSE;
-    description = "HyperX Pulsefire Raid Device";
-    location    = controller->GetDeviceLocation();
-    serial      = controller->GetSerialString();
-    version     = controller->GetFirmwareVersion();
+    name                    = controller->GetNameString();
+    vendor                  = "HyperX";
+    type                    = DEVICE_TYPE_MOUSE;
+    description             = "HyperX Pulsefire Raid Device";
+    location                = controller->GetDeviceLocation();
+    serial                  = controller->GetSerialString();
 
     mode Direct;
-    Direct.name           = "Direct";
-    Direct.value          = 0x00;
-    Direct.flags          = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
-    Direct.color_mode     = MODE_COLORS_PER_LED;
-    Direct.brightness     = HYPERX_PULSFIRE_RAID_BRIGHTNESS_MAX;
-    Direct.brightness_min = HYPERX_PULSFIRE_RAID_BRIGHTNESS_MIN;
-    Direct.brightness_max = HYPERX_PULSFIRE_RAID_BRIGHTNESS_MAX;
+    Direct.name             = "Direct";
+    Direct.value            = 0x00;
+    Direct.flags            = MODE_FLAG_HAS_PER_LED_COLOR | MODE_FLAG_HAS_BRIGHTNESS;
+    Direct.color_mode       = MODE_COLORS_PER_LED;
+    Direct.brightness       = HYPERX_PULSFIRE_RAID_BRIGHTNESS_MAX;
+    Direct.brightness_min   = HYPERX_PULSFIRE_RAID_BRIGHTNESS_MIN;
+    Direct.brightness_max   = HYPERX_PULSFIRE_RAID_BRIGHTNESS_MAX;
 
     modes.push_back(Direct);
 

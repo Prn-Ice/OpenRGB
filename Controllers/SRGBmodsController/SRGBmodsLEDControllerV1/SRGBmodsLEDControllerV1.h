@@ -1,18 +1,20 @@
-/*-----------------------------------------*\
-|  SRGBmodsLEDControllerV1.h                |
-|                                           |
-|  Definitions and types for SRGBmods       |
-|  LED Controller V1                        |
-|                                           |
-|  Adam Honse (CalcProgrammer1) 6/30/2023   |
-\*-----------------------------------------*/
-
-#include "RGBController.h"
-#include <chrono>
-#include <vector>
-#include <hidapi/hidapi.h>
+/*---------------------------------------------------------*\
+| SRGBmodsLEDControllerV1.h                                 |
+|                                                           |
+|   Driver for SRGBmods LED Controller V1                   |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                30 Jun 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
+
+#include <chrono>
+#include <vector>
+#include <hidapi.h>
+#include "RGBController.h"
 
 enum
 {
@@ -26,10 +28,11 @@ enum
 class SRGBmodsLEDControllerV1
 {
 public:
-    SRGBmodsLEDControllerV1(hid_device* dev_handle, const char* path);
+    SRGBmodsLEDControllerV1(hid_device* dev_handle, const char* path, std::string dev_name);
     ~SRGBmodsLEDControllerV1();
 
     std::string     GetLocationString();
+    std::string     GetNameString();
     std::string     GetSerialString();
 
     void            SetChannelLEDs(unsigned char channel, RGBColor * colors, unsigned int num_colors);
@@ -39,6 +42,7 @@ public:
 private:
     hid_device*     dev;
     std::string     location;
+    std::string     name;
 
     void            SendPacket
                         (

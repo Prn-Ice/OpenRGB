@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      16 Dec 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_NZXTMouse.h"
@@ -26,7 +26,7 @@ RGBController_NZXTMouse::RGBController_NZXTMouse(NZXTMouseController* controller
 {
     controller          = controller_ptr;
 
-    name                = "NZXT Mouse";
+    name                = controller->GetName();
     vendor              = "NZXT";
     type                = DEVICE_TYPE_MOUSE;
     description         = "NZXT Mouse Device";
@@ -65,7 +65,7 @@ void RGBController_NZXTMouse::SetupZones()
     for(unsigned int led_idx = 0; led_idx < left.leds_count; led_idx++)
     {
         led left_led;
-        left_led.name   = "Left LED " + led_idx;
+        left_led.name   = "Left LED " + std::to_string(led_idx);
 
         leds.push_back(left_led);
     }
@@ -84,7 +84,7 @@ void RGBController_NZXTMouse::SetupZones()
     for(unsigned int led_idx = 0; led_idx < right.leds_count; led_idx++)
     {
         led right_led;
-        right_led.name   = "Right LED " + led_idx;
+        right_led.name   = "Right LED " + std::to_string(led_idx);
 
         leds.push_back(right_led);
     }
@@ -102,12 +102,12 @@ void RGBController_NZXTMouse::DeviceUpdateLEDs()
 controller->SetLEDs(&colors[0]);
 }
 
-void RGBController_NZXTMouse::UpdateZoneLEDs(int zone)
+void RGBController_NZXTMouse::UpdateZoneLEDs(int /*zone*/)
 {
 DeviceUpdateLEDs();
 }
 
-void RGBController_NZXTMouse::UpdateSingleLED(int led)
+void RGBController_NZXTMouse::UpdateSingleLED(int /*led*/)
 {
 DeviceUpdateLEDs();
 }

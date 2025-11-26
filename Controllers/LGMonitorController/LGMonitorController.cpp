@@ -6,30 +6,18 @@
 |   Morgan Guimard (morg)                       11 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string.h>
 #include "LGMonitorController.h"
+#include "StringUtils.h"
 
-LGMonitorController::LGMonitorController(hid_device* dev_handle, const hid_device_info& info)
+LGMonitorController::LGMonitorController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 }
 
 LGMonitorController::~LGMonitorController()
@@ -42,14 +30,22 @@ std::string LGMonitorController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string LGMonitorController::GetSerialString()
+std::string LGMonitorController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string LGMonitorController::GetFirmwareVersion()
+std::string LGMonitorController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void LGMonitorController::SetDirect(const std::vector<RGBColor> colors)
@@ -92,7 +88,9 @@ void LGMonitorController::SetDirect(const std::vector<RGBColor> colors)
         data[offset++] = RGBGetBValue(color);
     }
 
-    data[offset]    = crc(data, 0, offset++);
+    data[offset]    = crc(data, 0, offset);
+    offset++;
+
     data[offset++]  = LG_MONITOR_END_CMD_1;
     data[offset]    = LG_MONITOR_END_CMD_2;
 

@@ -6,16 +6,18 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      16 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "NZXTHue1Controller.h"
+#include "StringUtils.h"
 
-NZXTHue1Controller::NZXTHue1Controller(hid_device* dev_handle, unsigned int /*fan_channels*/, const char* path)
+NZXTHue1Controller::NZXTHue1Controller(hid_device* dev_handle, unsigned int /*fan_channels*/, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     Initialize();
 }
@@ -35,6 +37,11 @@ std::string NZXTHue1Controller::GetLocation()
     return("HID: " + location);
 }
 
+std::string NZXTHue1Controller::GetName()
+{
+    return(name);
+}
+
 std::string NZXTHue1Controller::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -45,10 +52,7 @@ std::string NZXTHue1Controller::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 unsigned int NZXTHue1Controller::GetAccessoryType()
@@ -90,7 +94,7 @@ void NZXTHue1Controller::SetEffect
             \*-----------------------------------------------------*/
             for (std::size_t idx = 0; idx < 40; idx++)
             {
-                int pixel_idx = idx * 3;
+                int pixel_idx = (int)idx * 3;
                 RGBColor color = colors[color_idx];
                 color_data[pixel_idx + 0x00] = RGBGetGValue(color);
                 color_data[pixel_idx + 0x01] = RGBGetRValue(color);
@@ -100,7 +104,7 @@ void NZXTHue1Controller::SetEffect
             /*-----------------------------------------------------*\
             | Send mode and color data                              |
             \*-----------------------------------------------------*/
-            SendPacket(mode, direction, color_idx, speed, 40, &color_data[0]);
+            SendPacket(mode, direction, (unsigned char)color_idx, speed, 40, &color_data[0]);
         }
     }
     /*-----------------------------------------------------*\
@@ -113,7 +117,7 @@ void NZXTHue1Controller::SetEffect
         \*-----------------------------------------------------*/
         for (std::size_t idx = 0; idx < num_colors; idx++)
         {
-            int pixel_idx = idx * 3;
+            int pixel_idx = (int)idx * 3;
             RGBColor color = colors[idx];
             color_data[pixel_idx + 0x00] = RGBGetGValue(color);
             color_data[pixel_idx + 0x01] = RGBGetRValue(color);
@@ -140,7 +144,7 @@ void NZXTHue1Controller::SetLEDs
     \*-----------------------------------------------------*/
     for (std::size_t idx = 0; idx < num_colors; idx++)
     {
-        int pixel_idx = idx * 3;
+        int pixel_idx = (int)idx * 3;
         RGBColor color = colors[idx];
         color_data[pixel_idx + 0x00] = RGBGetGValue(color);
         color_data[pixel_idx + 0x01] = RGBGetRValue(color);

@@ -6,7 +6,7 @@
 |   Morgan Guimard (morg)                       01 Jun 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
@@ -27,13 +27,13 @@
 RGBController_MSIVigorGK30::RGBController_MSIVigorGK30(MSIVigorGK30Controller* controller_ptr)
 {
     controller                          = controller_ptr;
-    name                                = "MSI VigorGK30 USB Device";
+
+    name                                = controller->GetNameString();
     vendor                              = "MSI";
     type                                = DEVICE_TYPE_KEYBOARD;
-    description                         = name;
+    description                         = "MSI VigorGK30 USB Device";
     location                            = controller->GetDeviceLocation();
     serial                              = controller->GetSerialString();
-    version                             = controller->GetFirmwareVersion();
 
     mode Custom;
     Custom.name                         = "Custom";

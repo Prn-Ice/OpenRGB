@@ -5,244 +5,16 @@
 |   motherboard                                             |
 |                                                           |
 |   jackun                                      08 Jan 2020 |
+|   megadjc                                     31 Jul 2025 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <array>
-#include <sstream>
+#include "GigabyteFusion2USB_Devices.h"
+#include "LogManager.h"
 #include "RGBController_GigabyteRGBFusion2USB.h"
 #include "ResourceManager.h"
-#include "SettingsManager.h"
-
-/*-------------------------------------------------*\
-| LedHeaders is a map of the led header addresses   |
-\*-------------------------------------------------*/
-static FwdLedHeaders LedLookup
-{
-    {"LED1",   0x20}, {"LED2",   0x21}, {"LED3", 0x22}, {"LED4", 0x23},
-    {"LED5",   0x24}, {"LED6",   0x25}, {"LED7", 0x26}, {"LED8", 0x27},
-    {"D_LED1", 0x58}, {"D_LED2", 0x59},
-};
-
-/*-------------------------------------------------*\
-| This is the default knownLayouts structure and    |
-| will be written into config if it doesn't exist   |
-\*-------------------------------------------------*/
-static MBName MBName2LayoutLookup
-{
-    {"B550 AORUS ELITE",            "STD_ATX"   },
-    {"B550 AORUS PRO",              "STD_ATX"   },
-    {"B550I AORUS PRO AX",          "ITX"       },
-    {"X570 AORUS ELITE",            "STD_ATX"   },
-    {"X570 AORUS MASTER",           "MSTR_ATX_3"},
-    {"X570 AORUS PRO",              "STD_ATX"   },
-    {"X570 AORUS ELITE WIFI",       "STD_ATX"   },
-    {"X570 AORUS PRO WIFI",         "STD_ATX"   },
-    {"X570 AORUS ULTRA",            "STD_ATX"   },
-    {"X570 I AORUS PRO WIFI",       "ITX"       },
-    {"X670E AORUS MASTER",          "MSTR_ATX_2"},
-    {"Z390 AORUS MASTER-CF",        "MSTR_ATX"  },
-};
-
-/*-------------------------------------------------*\
-| This is the default Custom layout that will be    |
-| written into config if it doesn't exist           |
-\*-------------------------------------------------*/
-static const KnownLayout HardcodedCustom
-{
-    {
-        "Custom",
-        {
-            {
-                "Motherboard",
-                {
-                    { "Name for Led 1", LED1, 1 },
-                    { "Name for Led 2", LED2, 1 },
-                    { "Name for Led 3", LED3, 1 },
-                    { "Name for Led 4", LED4, 1 },
-                    { "Name for Led 5", LED5, 1 },
-                    { "Name for Led 8", LED8, 1 },
-                }
-            },
-            {
-                "D_LED1 Bottom",
-                {
-                    { "Name for LED Strip 1", HDR_D_LED1, 0 },
-                }
-            },
-            {
-                "D_LED2 Top",
-                {
-                    { "Name for LED Strip 2", HDR_D_LED2, 0 },
-                }
-            }
-        }
-    }
-};
-
-/*-------------------------------------------------*\
-| KnownLayoutsLookup now needs to be variable to    |
-| allow for a custom addition from config           |
-\*-------------------------------------------------*/
-static KnownLayout knownLayoutsLookup
-{
-    {
-        "IT8297BX-GBX570",    //Left as a catch all
-        {
-            {
-                "Motherboard",
-                {
-                    { "Name for Led 1", LED1, 1 },
-                    { "Name for Led 2", LED2, 1 },
-                    { "Name for Led 3", LED3, 1 },
-                    { "Name for Led 4", LED4, 1 },
-                    { "Name for Led 5", LED5, 1 },
-                    { "Name for Led 6", LED6, 1 },
-                    { "Name for Led 7", LED7, 1 },
-                    { "Name for Led 8", LED8, 1 },
-                }
-            },
-            {
-                "D_LED1 Bottom",
-                {
-                    { "Name for LED Strip 1", HDR_D_LED1, 0 },
-                }
-            },
-            {
-                "D_LED2 Top",
-                {
-                    { "Name for LED Strip 2", HDR_D_LED2, 0 },
-                }
-            }
-        }
-    },
-    {
-        "STD_ATX",
-        {
-            {
-                "Motherboard",
-                {
-                    { "Back I/O",   HDR_BACK_IO, 1 },
-                    { "CPU Header", HDR_CPU, 1 },
-                    { "PCIe",       HDR_PCIE, 1},
-                    { "LED C1/C2",  HDR_LED_C1C2, 1 }, // 12VGRB headers seem to be connected
-                }
-            },
-            {
-                "D_LED1 Bottom",
-                {
-                    { "D_LED1 Bottom", HDR_D_LED1, 0 },
-                }
-            },
-            {
-                "D_LED2 Top",
-                {
-                    { "D_LED2 Top", HDR_D_LED2, 0 },
-                }
-            }
-        }
-    },
-    {
-        "ITX",
-        {
-            {
-                "Motherboard",
-                {
-                    { "LED Group0", HDR_BACK_IO, 1 },
-                    { "LED Group1", HDR_CPU, 1 },
-                    { "LED Group2", HDR_LED_2, 1 },
-                    { "LED Group3", HDR_PCIE, 1 },
-                    { "LED C1/C2",  HDR_LED_C1C2, 1 }, // 12VGRB headers seem to be connected
-                }
-            },
-            {
-                "D_LED1",
-                {
-                    { "D_LED1", HDR_D_LED1, 0 },
-                }
-            }
-        }
-    },
-    {
-        "MSTR_ATX",
-        {
-            {
-                "Digital Headers",
-                {
-                    { "D_LED1 / D_LED2", LED6, 0},
-                }
-            },
-            {
-                "ARGB Strip",
-                {
-                    { "Back IO / VRM",  LED7, 0},
-                }
-            },
-            {
-                "Motherboard",
-                {
-                    { "XMP Logo",       LED2, 1},
-                    { "Chipset Logo",   LED3, 1},
-                    { "PCIe",           LED4, 1},
-                    { "LED C1/C2",      LED5, 1},
-                }
-            }
-        }
-    },
-    {
-        "MSTR_ATX_2",
-        {
-            {
-                "D_LED1 Bottom",
-                {
-                    { "D_LED1 Bottom", HDR_D_LED2, 0},
-                }
-            },
-            {
-                "D_LED2 Top",
-                {
-                    { "D_LED2 Top",  HDR_D_LED1, 0},
-                }
-            },
-            {
-                "Motherboard",
-                {
-                    { "LED C1",         LED2, 1},
-                    { "LED C2",         LED5, 1},
-                    { "CPU Header",     LED3, 1},
-                    { "Cover Left",     LED4, 1},
-                    { "Cover Right",    LED1, 1},
-                }
-            }
-        }
-    },
-    {
-        "MSTR_ATX_3",
-        {
-            {
-                "Digital Headers",
-                {
-                    { "D_LED1 / D_LED2", HDR_D_LED1, 0},
-                }
-            },
-            {
-                "ARGB Strip",
-                {
-                    { "LED C1/C2",  LED5, 1},
-                }
-            },
-            {
-                "Motherboard",
-                {
-                    { "Aorus Logo", LED7, 1},
-                    { "ESS Logo",   LED4, 1},
-                }
-            }
-        }
-    },
-};
 
 /**------------------------------------------------------------------*\
     @name Gigabyte RGB Fusion 2 USB
@@ -258,25 +30,25 @@ static KnownLayout knownLayoutsLookup
 
 RGBController_RGBFusion2USB::RGBController_RGBFusion2USB(RGBFusion2USBController* controller_ptr, std::string detector)
 {
-    controller              = controller_ptr;
-
-    name                    = controller->GetDeviceName();
-    detector_name           = detector;
-    vendor                  = "Gigabyte";
-    type                    = DEVICE_TYPE_MOTHERBOARD;
-    description             = controller->GetDeviceDescription();
-    version                 = controller->GetFWVersion();
-    location                = controller->GetDeviceLocation();
-    serial                  = controller->GetSerial();
+    controller                  = controller_ptr;
+    name                        = controller->GetDeviceName();
+    detector_name               = detector;
+    vendor                      = "Gigabyte";
+    type                        = DEVICE_TYPE_MOTHERBOARD;
+    description                 = controller->GetDeviceDescription();
+    version                     = controller->GetFWVersion();
+    location                    = controller->GetDeviceLocation();
+    serial                      = controller->GetSerial();
+    device_num                  = controller->GetDeviceNum();
 
     mode Direct;
-    Direct.name             = "Direct";
-    Direct.value            = 0xFFFF;
-    Direct.flags            = MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.brightness_min   = RGBFUSION2_BRIGHTNESS_MIN;
-    Direct.brightness_max   = RGBFUSION2_BRIGHTNESS_MAX;
-    Direct.brightness       = RGBFUSION2_BRIGHTNESS_MAX;
-    Direct.color_mode       = MODE_COLORS_PER_LED;
+    Direct.name                 = "Direct";
+    Direct.value                = 0xFFFF;
+    Direct.flags                = MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.brightness_min       = RGBFUSION2_BRIGHTNESS_MIN;
+    Direct.brightness_max       = RGBFUSION2_BRIGHTNESS_MAX;
+    Direct.brightness           = RGBFUSION2_BRIGHTNESS_MAX;
+    Direct.color_mode           = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     mode Static;
@@ -297,31 +69,31 @@ RGBController_RGBFusion2USB::RGBController_RGBFusion2USB(RGBFusion2USBController
     Breathing.value             = EFFECT_PULSE;
     Breathing.flags             = MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_MODE_SPECIFIC_COLOR | MODE_FLAG_HAS_RANDOM_COLOR;
     Breathing.brightness_min    = RGBFUSION2_BRIGHTNESS_MIN;
-    Breathing.brightness_max    = RGBFUSION2_BRIGHTNESS_MAX;
-    Breathing.brightness        = RGBFUSION2_BRIGHTNESS_MAX;
-    Breathing.speed_min         = 0;
-    Breathing.speed_max         = 4;
+    Breathing.brightness_max    = 100;                      // Set 100 max due to controller quirks
+    Breathing.brightness        = Breathing.brightness_max;
+    Breathing.speed_min         = RGBFUSION2_SPEED_MIN;
+    Breathing.speed_max         = RGBFUSION2_SPEED_MAX;
+    Breathing.speed             = RGBFUSION2_SPEED_MID;
     Breathing.colors_min        = 1;
     Breathing.colors_max        = 1;
     Breathing.color_mode        = MODE_COLORS_MODE_SPECIFIC;
     Breathing.colors.resize(1);
-    Breathing.speed             = 2;
     modes.push_back(Breathing);
 
     mode Blinking;
-    Blinking.name               = "Blinking";
+    Blinking.name               = "Flashing";
     Blinking.value              = EFFECT_BLINKING;
     Blinking.flags              = MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_MODE_SPECIFIC_COLOR | MODE_FLAG_HAS_RANDOM_COLOR;
     Blinking.brightness_min     = RGBFUSION2_BRIGHTNESS_MIN;
     Blinking.brightness_max     = RGBFUSION2_BRIGHTNESS_MAX;
     Blinking.brightness         = RGBFUSION2_BRIGHTNESS_MAX;
-    Blinking.speed_min          = 0;
-    Blinking.speed_max          = 4;
+    Blinking.speed_min          = RGBFUSION2_SPEED_MIN;
+    Blinking.speed_max          = RGBFUSION2_SPEED_MAX;
+    Blinking.speed              = RGBFUSION2_SPEED_MID;
     Blinking.colors_min         = 1;
     Blinking.colors_max         = 1;
     Blinking.color_mode         = MODE_COLORS_MODE_SPECIFIC;
     Blinking.colors.resize(1);
-    Blinking.speed              = 2;
     modes.push_back(Blinking);
 
     mode ColorCycle;
@@ -331,29 +103,103 @@ RGBController_RGBFusion2USB::RGBController_RGBFusion2USB(RGBFusion2USBController
     ColorCycle.brightness_min   = RGBFUSION2_BRIGHTNESS_MIN;
     ColorCycle.brightness_max   = RGBFUSION2_BRIGHTNESS_MAX;
     ColorCycle.brightness       = RGBFUSION2_BRIGHTNESS_MAX;
-    ColorCycle.speed_min        = 0;
-    ColorCycle.speed_max        = 4;
+    ColorCycle.speed_min        = RGBFUSION2_SPEED_MIN;
+    ColorCycle.speed_max        = RGBFUSION2_SPEED_MAX;
+    ColorCycle.speed            = RGBFUSION2_SPEED_MID;
     ColorCycle.color_mode       = MODE_COLORS_NONE;
-    ColorCycle.speed            = 2;
     modes.push_back(ColorCycle);
 
     mode Flashing;
-    Flashing.name               = "Flashing";
-    Flashing.value              = 10;
+    Flashing.name               = "Double Flash";
+    Flashing.value              = EFFECT_DFLASH;
     Flashing.flags              = MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_SPEED | MODE_FLAG_HAS_MODE_SPECIFIC_COLOR | MODE_FLAG_HAS_RANDOM_COLOR;
     Flashing.brightness_min     = RGBFUSION2_BRIGHTNESS_MIN;
     Flashing.brightness_max     = RGBFUSION2_BRIGHTNESS_MAX;
     Flashing.brightness         = RGBFUSION2_BRIGHTNESS_MAX;
-    Flashing.speed_min          = 0;
-    Flashing.speed_max          = 4;
+    Flashing.speed_min          = RGBFUSION2_SPEED_MIN;
+    Flashing.speed_max          = RGBFUSION2_SPEED_MAX;
+    Flashing.speed              = RGBFUSION2_SPEED_MID;
     Flashing.colors_min         = 1;
     Flashing.colors_max         = 1;
     Flashing.color_mode         = MODE_COLORS_MODE_SPECIFIC;
     Flashing.colors.resize(1);
-    Flashing.speed              = 2;
     modes.push_back(Flashing);
 
-    Load_Device_Config();
+    mode Wave;
+    Wave.name                   = "Wave";
+    Wave.value                  = EFFECT_WAVE;
+    Wave.flags                  = MODE_FLAG_HAS_BRIGHTNESS | MODE_FLAG_HAS_SPEED;
+    Wave.brightness_min         = RGBFUSION2_BRIGHTNESS_MIN;
+    Wave.brightness_max         = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave.brightness             = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave.speed_min              = RGBFUSION2_SPEED_MIN;
+    Wave.speed_max              = RGBFUSION2_SPEED_MAX;
+    Wave.speed                  = RGBFUSION2_SPEED_MID;
+    Wave.colors_min             = 0;
+    Wave.colors_max             = 0;
+    Wave.color_mode             = MODE_COLORS_NONE;
+    modes.push_back(Wave);
+
+    mode Random;
+    Random.name                 = "Random";
+    Random.value                = EFFECT_RANDOM;
+    Random.flags                = MODE_FLAG_HAS_BRIGHTNESS;
+    Random.brightness_min       = RGBFUSION2_BRIGHTNESS_MIN;
+    Random.brightness_max       = RGBFUSION2_BRIGHTNESS_MAX;
+    Random.brightness           = RGBFUSION2_BRIGHTNESS_MAX;
+    Random.colors_min           = 0;
+    Random.colors_max           = 0;
+    Random.color_mode           = MODE_COLORS_NONE;
+    modes.push_back(Random);
+
+    mode Wave1;
+    Wave1.name                  = "Wave 1";
+    Wave1.value                 = EFFECT_WAVE1;
+    Wave1.flags                 = MODE_FLAG_HAS_BRIGHTNESS;
+    Wave1.brightness_min        = RGBFUSION2_BRIGHTNESS_MIN;
+    Wave1.brightness_max        = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave1.brightness            = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave1.colors_min            = 0;
+    Wave1.colors_max            = 0;
+    Wave1.color_mode            = MODE_COLORS_NONE;
+    modes.push_back(Wave1);
+
+    mode Wave2;
+    Wave2.name                  = "Wave 2";
+    Wave2.value                 = EFFECT_WAVE2;
+    Wave2.flags                 = MODE_FLAG_HAS_BRIGHTNESS;
+    Wave2.brightness_min        = RGBFUSION2_BRIGHTNESS_MIN;
+    Wave2.brightness_max        = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave2.brightness            = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave2.colors_min            = 0;
+    Wave2.colors_max            = 0;
+    Wave2.color_mode            = MODE_COLORS_NONE;
+    modes.push_back(Wave2);
+
+    mode Wave3;
+    Wave3.name                  = "Wave 3";
+    Wave3.value                 = EFFECT_WAVE3;
+    Wave3.flags                 = MODE_FLAG_HAS_BRIGHTNESS;
+    Wave3.brightness_min        = RGBFUSION2_BRIGHTNESS_MIN;
+    Wave3.brightness_max        = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave3.brightness            = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave3.colors_min            = 0;
+    Wave3.colors_max            = 0;
+    Wave3.color_mode            = MODE_COLORS_NONE;
+    modes.push_back(Wave3);
+
+    mode Wave4;
+    Wave4.name                  = "Wave 4";
+    Wave4.value                 = EFFECT_WAVE4;
+    Wave4.flags                 = MODE_FLAG_HAS_BRIGHTNESS;
+    Wave4.brightness_min        = RGBFUSION2_BRIGHTNESS_MIN;
+    Wave4.brightness_max        = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave4.brightness            = RGBFUSION2_BRIGHTNESS_MAX;
+    Wave4.colors_min            = 0;
+    Wave4.colors_max            = 0;
+    Wave4.color_mode            = MODE_COLORS_NONE;
+    modes.push_back(Wave4);
+
     Init_Controller();
     SetupZones();
 }
@@ -363,208 +209,207 @@ RGBController_RGBFusion2USB::~RGBController_RGBFusion2USB()
     delete controller;
 }
 
-void RGBController_RGBFusion2USB::Load_Device_Config()
-{
-    const std::string SectionLayout     = "MotherboardLayouts";
-    const std::string SectionCustom     = "CustomLayout";
-    SettingsManager* settings_manager   = ResourceManager::get()->GetSettingsManager();
-    json device_settings                = settings_manager->GetSettings(detector_name);
-    RvrseLedHeaders ReverseLedLookup    = reverse_map(LedLookup);
-
-    /*-------------------------------------------------*\
-    | Get Layouts from the settings manager             |
-    | If MotherboardLayouts is not found then write it  |
-    | to settings                                       |
-    \*-------------------------------------------------*/
-    if(!device_settings.contains(SectionLayout))
-    {
-        device_settings[SectionLayout] = MBName2LayoutLookup;
-        settings_manager->SetSettings(detector_name, device_settings);
-        settings_manager->SaveSettings();
-        MBName2Layout = MBName2LayoutLookup;
-    }
-    else
-    {
-        for(const nlohmann::detail::iteration_proxy_value<nlohmann::detail::iter_impl<nlohmann::json>>& it : device_settings[SectionLayout].items())
-        {
-            MBName2Layout.insert( std::pair<std::string, std::string>(it.key(), it.value() ));
-        }
-    }
-
-    /*-------------------------------------------------*\
-    | Get Custom Layout from the settings manager       |
-    \*-------------------------------------------------*/
-    layout = HardcodedCustom.find("Custom")->second;
-    if (!device_settings.contains(SectionCustom))
-    {
-        /*---------------------------------------------*\
-        | If the Custom layout is not found then write  |
-        | it to settings                                |
-        \*---------------------------------------------*/
-        json json_HCL;
-
-        for(ZoneLeds::iterator zl = layout.begin(); zl != layout.end(); zl++)
-        {
-            std::vector<LedPort> v_lp = zl->second;
-            json json_zl;
-
-            for(std::vector<LedPort>::iterator lp_it = v_lp.begin(); lp_it != v_lp.end(); lp_it++)
-            {
-                json json_lp;
-                json_lp["name"]     = lp_it[0].name;
-                json_lp["header"]   = ReverseLedLookup.find(lp_it[0].header)->second;
-                json_zl.push_back(json_lp);
-            }
-            json_HCL.emplace(zl->first, json_zl);
-        }
-
-        device_settings[SectionCustom]["Enabled"] = false;
-        device_settings[SectionCustom]["Data"] = json_HCL;
-        settings_manager->SetSettings(detector_name, device_settings);
-        settings_manager->SaveSettings();
-    }
-    else
-    {
-        custom_layout = device_settings[SectionCustom]["Enabled"];
-
-        /*---------------------------------------------*\
-        | If the Custom layout is found and enabled     |
-        | then read it in from config                   |
-        \*---------------------------------------------*/
-        if(custom_layout)
-        {
-            json json_HCL = device_settings[SectionCustom]["Data"];
-            layout.clear();
-
-            for(const nlohmann::detail::iteration_proxy_value<nlohmann::detail::iter_impl<nlohmann::json>>& json_layout_it : json_HCL.items())
-            {
-                json json_zl = json_layout_it.value();
-                std::vector<LedPort> v_lp;
-
-                for(json& zl : json_zl)
-                {
-                    json json_vlp = zl;
-
-                    LedPort lp;
-
-                    /*---------------------------------*\
-                    | Initialize the name, header, and  |
-                    | count values.  Set the D_LED      |
-                    | headers LED count to 0            |
-                    \*---------------------------------*/
-                    lp.name         = json_vlp["name"].get<std::string>();
-                    lp.header       = LedLookup.find(json_vlp["header"].get<std::string>())->second;
-                    lp.count        = ((lp.header == LED6) || (lp.header == LED7)) ? 0 : 1;
-                    v_lp.push_back(lp);
-                }
-
-                layout.insert(std::pair<std::string,std::vector<LedPort>>(json_layout_it.key(),v_lp));
-            }
-        }
-    }
-}
-
+/*---------------------------------------------------------*\
+| Loads JSON config data                                    |
+\*---------------------------------------------------------*/
 void RGBController_RGBFusion2USB::Init_Controller()
 {
+    const std::string SectionCustom      = "CustomLayout";
+    const std::string SectionCalibration = "Calibration";
+    RvrseLedHeaders ReverseLedLookup     = reverse_map(LedLookup);
+    SettingsManager* settings_manager    = ResourceManager::get()->GetSettingsManager();
+    nlohmann::json device_settings       = settings_manager->GetSettings(detector_name);
+
     /*---------------------------------------------------------*\
-    | Look up channel map based on device name                  |
+    | Create the custom layout from the generic_device          |
     \*---------------------------------------------------------*/
-    if (!custom_layout)
+    gb_fusion2_device* layout = const_cast<gb_fusion2_device*>(gb_fusion2_device_list[device_index]);
+
+    if(!device_settings.contains(SectionCustom))
     {
-        /*-----------------------------------------------------*\
-        | If the layout is custom then it's loaded and ready,   |
-        | otherwise get known layouts                           |
-        | This check is a quick way to get a boolean on find()  |
-        \*-----------------------------------------------------*/
-        if(MBName2Layout.count(controller->GetDeviceName()))
+        device_settings[SectionCustom]["Enabled"]   = false;
+        device_settings[SectionCustom]["Data"]      = BuildCustomLayoutJson(layout, ReverseLedLookup);
+        settings_manager->SetSettings(detector_name, device_settings);
+        settings_manager->SaveSettings();
+    }
+
+    bool custom_layout = device_settings[SectionCustom]["Enabled"];
+
+    if(custom_layout)
+    {
+        LoadCustomLayoutFromJson(device_settings[SectionCustom]["Data"], LedLookup, layout);
+    }
+
+    EncodedCalibration hw_cal = controller->GetCalibration(false);
+
+    if(!device_settings.contains(SectionCalibration))
+    {
+        device_settings[SectionCalibration]["Enabled"] = false;
+        device_settings[SectionCalibration]["Data"]    = WriteCalJsonFrom(hw_cal);
+        settings_manager->SetSettings(detector_name, device_settings);
+        settings_manager->SaveSettings();
+    }
+    else
+    {
+        nlohmann::json& cal_sec = device_settings[SectionCalibration];
+        bool cal_enable         = cal_sec.value("Enabled", false);
+
+        if(!cal_sec.contains("Data") || !cal_sec["Data"].is_object())
         {
-            layout = knownLayoutsLookup.find(MBName2Layout.find(controller->GetDeviceName())->second )->second;
+            cal_sec["Data"] = WriteCalJsonFrom(hw_cal);
+            settings_manager->SetSettings(detector_name, device_settings);
+            settings_manager->SaveSettings();
         }
         else
         {
-            layout = knownLayoutsLookup.find("IT8297BX-GBX570")->second;
+            nlohmann::json& cdata = cal_sec["Data"];
+            FillMissingWith(cdata, hw_cal);
+
+            if(!cal_enable)
+            {
+                cal_sec["Data"] = WriteCalJsonFrom(hw_cal);
+                settings_manager->SetSettings(detector_name, device_settings);
+                settings_manager->SaveSettings();
+            }
+        }
+
+        if(cal_enable)
+        {
+            const nlohmann::json& cdata = cal_sec["Data"];
+
+            EncodedCalibration desired;
+            desired.dled[0]   = GET_JSON_VAL_ELSE_OFF(cdata, "HDR_D_LED1");
+            desired.dled[1]   = GET_JSON_VAL_ELSE_OFF(cdata, "HDR_D_LED2");
+            desired.mainboard = GET_JSON_VAL_ELSE_OFF(cdata, "Mainboard");
+            desired.spare[0]  = GET_JSON_VAL_ELSE_OFF(cdata, "Spare0");
+            desired.spare[1]  = GET_JSON_VAL_ELSE_OFF(cdata, "Spare1");
+
+            if(controller->GetProductID() == 0x5711)
+            {
+                desired.dled[2]  = GET_JSON_VAL_ELSE_OFF(cdata, "HDR_D_LED3");
+                desired.dled[3]  = GET_JSON_VAL_ELSE_OFF(cdata, "HDR_D_LED4");
+                desired.spare[2] = GET_JSON_VAL_ELSE_OFF(cdata, "Spare2");
+                desired.spare[3] = GET_JSON_VAL_ELSE_OFF(cdata, "Spare3");
+            }
+            else
+            {
+                desired.dled[2]  = "OFF";
+                desired.dled[3]  = "OFF";
+                desired.spare[2] = "OFF";
+                desired.spare[3] = "OFF";
+            }
+                controller->SetCalibration(desired, false);
         }
     }
 
-    /*---------------------------------------------------------*\
-    | Initialize the number of zones from the layout            |
-    \*---------------------------------------------------------*/
-    zones.resize(layout.size());
+    /*---------------------------------------------------------------------*\
+    |  When no match found the first entry (generic_device) will be used    |
+    |    otherwise look up channel map based on device name                 |
+    \*---------------------------------------------------------------------*/
+    if(!custom_layout)
+    {
+        /*-----------------------------------------------------------------*\
+        | Loop through all known devices to look for a name match           |
+        |   NB: Can be switched to device IDs lookup when acpi table        |
+        |   is able to be probed accurately                                 |
+        \*-----------------------------------------------------------------*/
+        for(unsigned int i = 0; i < GB_FUSION2_DEVICE_COUNT; i++)
+        {
+            if(gb_fusion2_device_list[i]->name == name)
+            {
+                /*---------------------------------------------------------*\
+                | Set device ID                                             |
+                \*---------------------------------------------------------*/
+                device_index = i;
+                layout = const_cast<gb_fusion2_device*>(gb_fusion2_device_list[i]);
+                break;
+            }
+        }
+    }
 
     /*---------------------------------------------------------*\
     | Iterate through layout and process each zone              |
     \*---------------------------------------------------------*/
-    int zone_idx = 0;
-    for(ZoneLeds::iterator zl = layout.begin(); zl != layout.end(); zl++)
+    for(uint8_t zone_idx = 0; zone_idx < GB_FUSION2_ZONES_MAX; zone_idx++)
     {
-        std::vector<LedPort> lp     = zl->second;
-        int LED_count               = 0;
-        bool single_zone            = true;
-
-        for(std::size_t lp_idx = 0; lp_idx < lp.size(); lp_idx++)
+        if(!layout->zones[0][zone_idx])
         {
-            /*-------------------------------------------------*\
-            | Get LED count and check if it is a single LED zone|
-            \*-------------------------------------------------*/
-            int lp_count            = lp[lp_idx].count;
-            single_zone             = single_zone && (lp_count == 1);
-            LED_count              += lp_count;
+            continue;
         }
+        const gb_fusion2_zone* zone_at_idx = layout->zones[0][zone_idx];
 
-        zones[zone_idx].name        = zl->first;
-        zones[zone_idx].leds_min    = (single_zone) ? LED_count : RGBFusion2_Digital_LEDS_Min;
-        zones[zone_idx].leds_max    = (single_zone) ? LED_count : RGBFusion2_Digital_LEDS_Max;
-        zones[zone_idx].leds_count  = (single_zone) ? LED_count : 0;
-        zones[zone_idx].type        = (single_zone) ? ZONE_TYPE_SINGLE : ZONE_TYPE_LINEAR;
-        zones[zone_idx].matrix_map  = NULL;
-        zone_idx++;
+        zone new_zone;
+        new_zone.name               = zone_at_idx->name;
+        new_zone.leds_min           = zone_at_idx->leds_min;
+        new_zone.leds_max           = zone_at_idx->leds_max;
+        new_zone.leds_count         = new_zone.leds_min;
+        new_zone.type               = (new_zone.leds_min == new_zone.leds_max) ? ZONE_TYPE_SINGLE : ZONE_TYPE_LINEAR;
+        new_zone.matrix_map         = NULL;
+        zones.emplace_back(new_zone);
     }
 }
 
 void RGBController_RGBFusion2USB::SetupZones()
 {
-    /*-------------------------------------------------*\
-    | Clear any existing color/LED configuration        |
-    \*-------------------------------------------------*/
+    /*---------------------------------------------------------*\
+    | Clear any existing color/LED configuration                |
+    \*---------------------------------------------------------*/
     leds.clear();
     colors.clear();
 
+    unsigned int d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+
     /*---------------------------------------------------------*\
-    | Set up zones                                              |
+    | Set up zones (Fixed so as to not spam the controller)     |
     \*---------------------------------------------------------*/
-    int zone_idx = 0;
-    for(ZoneLeds::iterator zl = layout.begin(); zl != layout.end(); zl++)
+
+    for(uint8_t zone_idx = 0; zone_idx < GB_FUSION2_ZONES_MAX; zone_idx++)
     {
-        bool single_zone = (zones[zone_idx].type == ZONE_TYPE_SINGLE);
+        const gb_fusion2_zone* zone_at_idx = gb_fusion2_device_list[device_index]->zones[0][zone_idx];
+        if(!zone_at_idx)
+        {
+            continue;
+        }
+        bool single_zone = (zone_at_idx->leds_min == zone_at_idx->leds_max);
 
         if(!single_zone)
         {
-            controller->SetLedCount(zl->second.at(0).header, zones[zone_idx].leds_count);
-            controller->DisableBuiltinEffect(0, 0x3);
+            switch(zone_at_idx->idx)
+            {
+                case LED4:
+                case HDR_D_LED2:
+                    d2 = zones[zone_idx].leds_count;
+                    break;
+                case HDR_D_LED3:
+                    d3 = zones[zone_idx].leds_count;
+                    break;
+                case HDR_D_LED4:
+                    d4 = zones[zone_idx].leds_count;
+                    break;
+                default:
+                    d1 = zones[zone_idx].leds_count;
+                    break;
+            }
         }
 
-        for(unsigned int lp_idx = 0; lp_idx < zones[zone_idx].leds_count; lp_idx++)
+        for(unsigned int led_idx = 0; led_idx < zones[zone_idx].leds_count; led_idx++)
         {
             led new_led;
 
-            if(single_zone)
+            new_led.name  = zone_at_idx->name;
+            new_led.value = zone_at_idx->idx;
+
+            if(!single_zone)
             {
-                new_led.name  = zl->second.at(lp_idx).name;
-                new_led.value = zl->second.at(lp_idx).header;
-            }
-            else
-            {
-                new_led.name  = zl->second.at(0).name;
-                new_led.name.append(" LED " + std::to_string(lp_idx));
-                new_led.value = zl->second.at(0).header;
+                new_led.name.append(" LED " + std::to_string(led_idx));
             }
 
             leds.push_back(new_led);
         }
-
-        zone_idx++;
     }
 
+    controller->SetLedCount(d1, d2, d3, d4);
+    controller->SetStripBuiltinEffectState(-1, false);
     SetupColors();
 }
 
@@ -585,10 +430,93 @@ void RGBController_RGBFusion2USB::ResizeZone(int zone, int new_size)
 
 void RGBController_RGBFusion2USB::DeviceUpdateLEDs()
 {
+    int         mode_value  = (modes[active_mode].value);
+    bool        random      = (modes[active_mode].color_mode == MODE_COLORS_RANDOM);
+    uint32_t*   color       = &null_color;
+
+    /*---------------------------------------------------------*\
+    | If Wave 1-4 then use special sequence.                    |
+    \*---------------------------------------------------------*/
+    if(mode_value == 6 || (mode_value >= 9 && mode_value <= 12))
+    {
+        controller->SetStripBuiltinEffectState(-1, true);
+        controller->SetLEDEffect(-1, 1, 0, 0xFF, 0, color);
+        controller->ApplyEffect();
+        controller->SetLEDEffect( 2, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
+        controller->ApplyEffect();
+        return;
+    }
+
     for(int zone_idx = 0; zone_idx < (int)zones.size(); zone_idx++)
     {
-        UpdateZoneLEDs(zone_idx);
+        if(zones[zone_idx].type == ZONE_TYPE_SINGLE)
+        {
+            for(std::size_t led_idx = 0; led_idx < zones[zone_idx].leds_count; led_idx++)
+            {
+                /*---------------------------------------------------------*\
+                | Motherboard LEDs always use effect mode, so use static for|
+                | direct mode but get colors from zone                      |
+                \*---------------------------------------------------------*/
+                if(modes[active_mode].value == 0xFFFF)
+                {
+                    color       = &zones[zone_idx].colors[led_idx];
+                    mode_value  = EFFECT_STATIC;
+                }
+                /*---------------------------------------------------------*\
+                | If the mode uses mode-specific color, get color from mode |
+                \*---------------------------------------------------------*/
+                else if(modes[active_mode].color_mode == MODE_COLORS_MODE_SPECIFIC)
+                {
+                    color       = &modes[active_mode].colors[0];
+                }
+
+                /*---------------------------------------------------------*\
+                | Apply the mode and color to the zone                      |
+                \*---------------------------------------------------------*/
+                controller->SetLEDEffect(zones[zone_idx].leds[led_idx].value, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
+            }
+        }
+        /*---------------------------------------------------------*\
+        | Set strip LEDs                                            |
+        \*---------------------------------------------------------*/
+        else
+        {
+            if(zones[zone_idx].leds && zones[zone_idx].leds_count)
+            {
+                unsigned char hdr = zones[zone_idx].leds->value;
+
+                /*---------------------------------------------------------*\
+                | Direct mode addresses a different register                |
+                \*---------------------------------------------------------*/
+                if(modes[active_mode].value == 0xFFFF)
+                {
+                    controller->SetStripBuiltinEffectState(hdr, false);
+                    controller->SetStripColors(hdr, zones[zone_idx].colors, zones[zone_idx].leds_count);
+                }
+
+                /*---------------------------------------------------------*\
+                | Effect mode                                               |
+                \*---------------------------------------------------------*/
+                else
+                {
+                    /*---------------------------------------------------------*\
+                    | If mode has mode specific color, load color from mode     |
+                    \*---------------------------------------------------------*/
+                    if(modes[active_mode].color_mode == MODE_COLORS_MODE_SPECIFIC)
+                    {
+                        color       = &modes[active_mode].colors[0];
+                    }
+
+                    /*---------------------------------------------------------*\
+                    | Apply hardware effects to LED strips                      |
+                    \*---------------------------------------------------------*/
+                    controller->SetStripBuiltinEffectState(hdr, true);
+                    controller->SetLEDEffect(hdr, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
+                }
+            }
+        }
     }
+    controller->ApplyEffect();
 }
 
 void RGBController_RGBFusion2USB::UpdateZoneLEDs(int zone)
@@ -596,61 +524,62 @@ void RGBController_RGBFusion2USB::UpdateZoneLEDs(int zone)
     /*---------------------------------------------------------*\
     | Get mode parameters                                       |
     \*---------------------------------------------------------*/
-    int     mode_value  = (modes[active_mode].value);
-    bool    random      = (modes[active_mode].color_mode == MODE_COLORS_RANDOM || mode_value == EFFECT_COLORCYCLE);
+    int         mode_value  = (modes[active_mode].value);
+    bool        random      = (modes[active_mode].color_mode == MODE_COLORS_RANDOM);
+    uint32_t*   color       = &null_color;
+
+    /*---------------------------------------------------------*\
+    | If Wave 1-4 then use special sequence.                    |
+    \*---------------------------------------------------------*/
+    if(mode_value == 6 || (mode_value >= 9 && mode_value <= 12))
+    {
+        controller->SetStripBuiltinEffectState(-1, true);
+        controller->SetLEDEffect(-1, 1, 0, 0xFF, 0, color);
+        controller->ApplyEffect();
+        controller->SetLEDEffect( 2, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
+        controller->ApplyEffect();
+        return;
+    }
 
     /*---------------------------------------------------------*\
     | Set motherboard LEDs                                      |
     \*---------------------------------------------------------*/
     if(zones[zone].type == ZONE_TYPE_SINGLE)
     {
-        unsigned char red = 0;
-        unsigned char grn = 0;
-        unsigned char blu = 0;
-
         for(std::size_t led_idx = 0; led_idx < zones[zone].leds_count; led_idx++)
         {
-            /*---------------------------------------------------------*\
-            | Initialize mode value                                     |
-            \*---------------------------------------------------------*/
-            mode_value = modes[active_mode].value;
-
-            /*---------------------------------------------------------*\
-            | Motherboard LEDs always use effect mode, so use static for|
-            | direct mode but get colors from zone                      |
-            \*---------------------------------------------------------*/
+            /*------------------------------------------------------------*\
+            | Motherboard LEDs always use effect mode, so use static for   |
+            | direct mode but get colors from zone                         |
+            \*------------------------------------------------------------*/
             if(mode_value == 0xFFFF)
             {
-                red = RGBGetRValue(zones[zone].colors[led_idx]);
-                grn = RGBGetGValue(zones[zone].colors[led_idx]);
-                blu = RGBGetBValue(zones[zone].colors[led_idx]);
-
-                mode_value = EFFECT_STATIC;
+                color       = &zones[zone].colors[led_idx];
+                mode_value  = EFFECT_STATIC;
             }
+
             /*---------------------------------------------------------*\
             | If the mode uses mode-specific color, get color from mode |
             \*---------------------------------------------------------*/
             else if(modes[active_mode].color_mode == MODE_COLORS_MODE_SPECIFIC)
             {
-                red = RGBGetRValue(modes[active_mode].colors[0]);
-                grn = RGBGetGValue(modes[active_mode].colors[0]);
-                blu = RGBGetBValue(modes[active_mode].colors[0]);
+                color       = &modes[active_mode].colors[0];
             }
 
             /*---------------------------------------------------------*\
             | Apply the mode and color to the zone                      |
             \*---------------------------------------------------------*/
-            controller->SetLEDEffect(zones[zone].leds[led_idx].value, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, red, grn, blu);
+            controller->SetLEDEffect(zones[zone].leds[led_idx].value, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
+            controller->ApplyEffect();
         }
-
-        controller->ApplyEffect();
     }
+
     /*---------------------------------------------------------*\
     | Set strip LEDs                                            |
     \*---------------------------------------------------------*/
     else
     {
-        if(zones[zone].leds_count)
+        if(zones[zone].leds && zones[zone].leds_count)
         {
             unsigned char hdr = zones[zone].leds->value;
 
@@ -659,34 +588,28 @@ void RGBController_RGBFusion2USB::UpdateZoneLEDs(int zone)
             \*---------------------------------------------------------*/
             if(mode_value == 0xFFFF)
             {
-                hdr += RGBFusion2_Digital_Direct_Offset;
-                controller->DisableBuiltinEffect(1, ((hdr == HDR_D_LED1_RGB) ? 0x01 : 0x02));
+                controller->SetStripBuiltinEffectState(hdr, false);
                 controller->SetStripColors(hdr, zones[zone].colors, zones[zone].leds_count);
             }
+
             /*---------------------------------------------------------*\
             | Effect mode                                               |
             \*---------------------------------------------------------*/
             else
             {
-                unsigned char red = 0;
-                unsigned char grn = 0;
-                unsigned char blu = 0;
-
                 /*---------------------------------------------------------*\
                 | If mode has mode specific color, load color from mode     |
                 \*---------------------------------------------------------*/
                 if(modes[active_mode].color_mode == MODE_COLORS_MODE_SPECIFIC)
                 {
-                    red = RGBGetRValue(modes[active_mode].colors[0]);
-                    grn = RGBGetGValue(modes[active_mode].colors[0]);
-                    blu = RGBGetBValue(modes[active_mode].colors[0]);
+                    color       = &modes[active_mode].colors[0];
                 }
 
                 /*---------------------------------------------------------*\
                 | Apply built-in effects to LED strips                      |
                 \*---------------------------------------------------------*/
-                controller->DisableBuiltinEffect(0, hdr == HDR_D_LED1 ? 0x01 : 0x02);
-                controller->SetLEDEffect(hdr, modes[active_mode].value, modes[active_mode].speed, modes[active_mode].brightness, random, red, grn, blu);
+                controller->SetStripBuiltinEffectState(hdr, true);
+                controller->SetLEDEffect(hdr, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
                 controller->ApplyEffect();
             }
         }
@@ -698,8 +621,22 @@ void RGBController_RGBFusion2USB::UpdateSingleLED(int led)
     /*---------------------------------------------------------*\
     | Get mode parameters                                       |
     \*---------------------------------------------------------*/
-    bool            random      = (modes[active_mode].color_mode == MODE_COLORS_RANDOM);
-    int             mode_value  = (modes[active_mode].value);
+    int         mode_value  = (modes[active_mode].value);
+    bool        random      = (modes[active_mode].color_mode == MODE_COLORS_RANDOM);
+    uint32_t*   color       = &null_color;
+
+    /*---------------------------------------------------------*\
+    | If Wave 1-4 then use special sequence.                    |
+    \*---------------------------------------------------------*/
+    if(mode_value == 6 || (mode_value >= 9 && mode_value <= 12))
+    {
+        controller->SetStripBuiltinEffectState(-1, true);
+        controller->SetLEDEffect(-1, 1, 0, 0xFF, 0, color);
+        controller->ApplyEffect();
+        controller->SetLEDEffect( 2, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
+        controller->ApplyEffect();
+        return;
+    }
     unsigned int    zone_idx    = GetLED_Zone(led);
 
     /*---------------------------------------------------------*\
@@ -707,35 +644,28 @@ void RGBController_RGBFusion2USB::UpdateSingleLED(int led)
     \*---------------------------------------------------------*/
     if(zones[zone_idx].type == ZONE_TYPE_SINGLE)
     {
-        unsigned char red = 0;
-        unsigned char grn = 0;
-        unsigned char blu = 0;
-
         /*---------------------------------------------------------*\
         | Motherboard LEDs always use effect mode, so use static for|
         | direct mode but get colors from zone                      |
         \*---------------------------------------------------------*/
         if(mode_value == 0xFFFF)
         {
-            red = RGBGetRValue(colors[led]);
-            grn = RGBGetGValue(colors[led]);
-            blu = RGBGetBValue(colors[led]);
-
-            mode_value = EFFECT_STATIC;
+            color       = &colors[led];
+            mode_value  = EFFECT_STATIC;
         }
+
         /*---------------------------------------------------------*\
         | If the mode uses mode-specific color, get color from mode |
         \*---------------------------------------------------------*/
         else if(modes[active_mode].color_mode == MODE_COLORS_MODE_SPECIFIC)
         {
-            red = RGBGetRValue(modes[active_mode].colors[0]);
-            grn = RGBGetGValue(modes[active_mode].colors[0]);
-            blu = RGBGetBValue(modes[active_mode].colors[0]);
+            color       = &modes[active_mode].colors[0];
         }
 
-        controller->SetLEDEffect(leds[led].value, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, red, grn, blu);
+        controller->SetLEDEffect(leds[led].value, mode_value, modes[active_mode].speed, modes[active_mode].brightness, random, color);
         controller->ApplyEffect();
     }
+
     /*---------------------------------------------------------*\
     | Set strip LEDs                                            |
     \*---------------------------------------------------------*/
@@ -763,8 +693,150 @@ int RGBController_RGBFusion2USB::GetLED_Zone(int led_idx)
         }
     }
 
-    /*---------------------------------*\
-    | If zone is not found, return -1   |
-    \*---------------------------------*/
+    /*---------------------------------------------------------*\
+    | If zone is not found, return -1                           |
+    \*---------------------------------------------------------*/
     return(-1);
 }
+
+/*---------------------------------------------------------*\
+| Convert calibration data to JSON                          |
+\*---------------------------------------------------------*/
+nlohmann::json RGBController_RGBFusion2USB::WriteCalJsonFrom(const EncodedCalibration& src)
+{
+    nlohmann::json calib_json;
+    calib_json["HDR_D_LED1"]    = src.dled[0];
+    calib_json["HDR_D_LED2"]    = src.dled[1];
+    calib_json["HDR_D_LED3"]    = src.dled[2];
+    calib_json["HDR_D_LED4"]    = src.dled[3];
+    calib_json["Mainboard"]     = src.mainboard;
+    calib_json["Spare0"]        = src.spare[0];
+    calib_json["Spare1"]        = src.spare[1];
+    calib_json["Spare2"]        = src.spare[2];
+    calib_json["Spare3"]        = src.spare[3];
+
+    return calib_json;
+}
+
+/*---------------------------------------------------------*\
+| Fill missing JSON calibration keys                        |
+\*---------------------------------------------------------*/
+void RGBController_RGBFusion2USB::FillMissingWith(nlohmann::json& dst, const EncodedCalibration& fb)
+{
+    struct SetIfMissing
+    {
+        nlohmann::json& dst;
+
+        void operator()(const char* key, const std::string& val) const
+        {
+            if(!dst.contains(key))
+            {
+                dst[key] = val;
+            }
+        }
+    };
+
+    SetIfMissing set_if_missing{dst};
+
+    set_if_missing("HDR_D_LED1", fb.dled[0]);
+    set_if_missing("HDR_D_LED2", fb.dled[1]);
+    set_if_missing("Mainboard", fb.mainboard);
+    set_if_missing("Spare0",    fb.spare[0]);
+    set_if_missing("Spare1",    fb.spare[1]);
+
+    if(controller->GetProductID() == 0x5711)
+    {
+        set_if_missing("HDR_D_LED3", fb.dled[2]);
+        set_if_missing("HDR_D_LED4", fb.dled[3]);
+        set_if_missing("Spare2", fb.spare[2]);
+        set_if_missing("Spare3", fb.spare[3]);
+    }
+}
+
+/*---------------------------------------------------------*\
+| Build custom layout in JSON                               |
+\*---------------------------------------------------------*/
+nlohmann::json RGBController_RGBFusion2USB::BuildCustomLayoutJson(
+        const gb_fusion2_device* layout,
+        const RvrseLedHeaders& reverseLookup)
+{
+    nlohmann::json json_custom;
+    for(uint8_t zone_idx = 0; zone_idx < GB_FUSION2_ZONES_MAX; zone_idx++)
+    {
+        if(!layout->zones[0][zone_idx])
+        {
+            continue;
+        }
+
+        nlohmann::json json_zone;
+        json_zone["name"]           = layout->zones[0][zone_idx]->name;
+        json_zone["header"]         = reverseLookup.at(layout->zones[0][zone_idx]->idx);
+        json_zone["leds_min"]       = layout->zones[0][zone_idx]->leds_min;
+        json_zone["leds_max"]       = layout->zones[0][zone_idx]->leds_max;
+
+        json_custom[layout->name].push_back(json_zone);
+    }
+    return json_custom;
+}
+
+/*---------------------------------------------------------*\
+| Build custom layout from JSON                             |
+\*---------------------------------------------------------*/
+void RGBController_RGBFusion2USB::LoadCustomLayoutFromJson(
+        const nlohmann::json& json_custom,
+        const FwdLedHeaders& forwardLookup,
+        gb_fusion2_device* layout)
+{
+    for(uint8_t zone_idx = 0; zone_idx < GB_FUSION2_ZONES_MAX; zone_idx++)
+    {
+        /*---------------------------------------------------------*\
+        | Check if there are more JSON objects to parse             |
+        \*---------------------------------------------------------*/
+        if(json_custom[layout->name].size() <= zone_idx)
+        {
+            layout->zones[0][zone_idx] = nullptr;
+            continue;
+        }
+        nlohmann::json json_zone    = json_custom[layout->name].at(zone_idx);
+        gb_fusion2_zone* new_zone   = new gb_fusion2_zone();
+
+        new_zone->name              = json_zone["name"].get<std::string>();
+        std::string header          = json_zone["header"].get<std::string>();
+        new_zone->idx               = forwardLookup.at(header);
+        if(    header == "HDR_D_LED1"
+            || header == "HDR_D_LED2"
+            || header == "HDR_D_LED3"
+            || header == "HDR_D_LED4")
+        {
+            new_zone->leds_min      = std::max(json_zone["leds_min"].get<int>(), 1);
+            new_zone->leds_max      = std::min(json_zone["leds_max"].get<int>(), 1024);
+        }
+        else
+        {
+            new_zone->leds_min      = 1;
+            new_zone->leds_max      = 1;
+        }
+
+        /*---------------------------------------------------------*\
+        | Check for valid values from JSON                          |
+        \*---------------------------------------------------------*/
+        if(new_zone->name != ""
+           && new_zone->leds_min <= new_zone->leds_max
+           && new_zone->idx >= GB_FUSION2_LED_IDX::LED1
+           && new_zone->idx <= GB_FUSION2_LED_IDX::LED11)
+        {
+            layout->zones[0][zone_idx]  = new_zone;
+        }
+        else
+        {
+            LOG_ERROR("[%s] Error creating zone %d: Validation failed for %s @ index %d (LEDs min %d to %d max)",
+                      controller->GetDeviceName().c_str(),
+                      zone_idx,
+                      new_zone->name.c_str(),
+                      new_zone->idx,
+                      new_zone->leds_min,
+                      new_zone->leds_max);
+        }
+    }
+}
+

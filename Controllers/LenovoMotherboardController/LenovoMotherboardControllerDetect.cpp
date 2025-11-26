@@ -6,12 +6,11 @@
 |   Morgan Guimard (morg)                       26 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "Detector.h"
 #include "LenovoMotherboardController.h"
-#include "RGBController.h"
 #include "RGBController_LenovoMotherboard.h"
 #include "dmiinfo.h"
 
@@ -33,9 +32,8 @@ void DetectLenovoMotherboardControllers(hid_device_info* info, const std::string
     {
         DMIInfo dmi;
 
-        LenovoMotherboardController*     controller         = new LenovoMotherboardController(dev, *info);
+        LenovoMotherboardController*     controller         = new LenovoMotherboardController(dev, *info, name + " " + dmi.getMainboard());
         RGBController_LenovoMotherboard* rgb_controller     = new RGBController_LenovoMotherboard(controller);
-        rgb_controller->name                                = name + " " + dmi.getMainboard();
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

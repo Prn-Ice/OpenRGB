@@ -5,21 +5,23 @@
 |                                                           |
 |   Volodymyr Nazarchuk (Vavooon)               28 Apr 2021 |
 |   Mike White (kamaaina)                       09 Jun 2021 |
+|   carlos jordao                               15 Mar 2025 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "HyperXAlloyOriginsCoreController.h"
+#include "StringUtils.h"
+#include "LogManager.h"
 
-// Skip these indices in the color output
-static unsigned int skip_idx[] = {6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 44, 46, 47, 54, 55, 58, 60, 61, 62, 63, 70, 71, 78, 79, 86, 87, 94, 95, 101, 102, 103, 109, 110, 111, 118, 119};
 
-HyperXAlloyOriginsCoreController::HyperXAlloyOriginsCoreController(hid_device* dev_handle, hid_device_info* dev_info)
+HyperXAlloyOriginsCoreController::HyperXAlloyOriginsCoreController(hid_device* dev_handle, hid_device_info* dev_info, std::string dev_name)
 {
-    dev              = dev_handle;
-    location         = dev_info->path;
+    dev             = dev_handle;
+    location        = dev_info->path;
+    name            = dev_name;
 
     /*-----------------------------------------------------*\
     | Get the firmware version from the device info         |
@@ -43,6 +45,11 @@ std::string HyperXAlloyOriginsCoreController::GetDeviceLocation()
     return("HID " + location);
 }
 
+std::string HyperXAlloyOriginsCoreController::GetNameString()
+{
+    return(name);
+}
+
 std::string HyperXAlloyOriginsCoreController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -53,16 +60,45 @@ std::string HyperXAlloyOriginsCoreController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string HyperXAlloyOriginsCoreController::GetFirmwareVersion()
 {
     return(firmware_version);
 }
+
+unsigned int HyperXAlloyOriginsCoreController::GetVariant()
+{
+    unsigned char packet[65];
+    unsigned int variant = 0;
+    int actual = 0;
+
+    memset(packet, 0x00, sizeof(packet));
+
+    /*---------------------------------------*\
+    | Command 10 asks some data from keyboard |
+    | The answer looks like:                  |
+    | * command answer header (bytes 0-4)     |
+    |   * data length: byte 4                 |
+    | * version               (bytes 5-6)     |
+    | * Product string        (bytes 9-33)    |
+    | * Layout variant        (byte  56)      |
+    \*---------------------------------------*/
+    packet[1] = 0x10;
+    hid_write(dev, packet, 65);
+    memset(packet, 0x00, sizeof(packet));
+    actual = hid_read(dev, packet, 65);
+
+    if(actual > 0)
+        variant = packet[56];
+    else
+        variant = 0;
+
+    LOG_DEBUG("[HyperX Alloy Origins Core] variant: 0x%02X", variant);
+    return variant;
+}
+
 
 void HyperXAlloyOriginsCoreController::SetBrightness(unsigned int brightness)
 {
@@ -76,37 +112,60 @@ void HyperXAlloyOriginsCoreController::SetBrightness(unsigned int brightness)
     hid_write(dev, packet, 65);
 }
 
-
-void HyperXAlloyOriginsCoreController::SetLEDsDirect(std::vector<RGBColor> colors)
+void HyperXAlloyOriginsCoreController::SetLEDsDirect(std::vector<led> leds, std::vector<RGBColor> colors)
 {
-    for(unsigned int skip_cnt = 0; skip_cnt < (sizeof(skip_idx) / sizeof(skip_idx[0])); skip_cnt++)
+    /*------------------------------------------------------------------------------*\
+    | * Always send 380 bytes to the keyboard and a total of 94 led indexes.         |
+    | The colors are grouped into segments of 48 bytes.                              |
+    | Each one is divided into:                                                      |
+    |    6 Green + 2 zeroes +  6 Green + 2 zeroes +                                  |
+    |    6 Red   + 2 zeroes +  6 Red   + 2 zeroes +                                  |
+    |    6 Blue  + 2 zeroes +  6 Blue  + 2 zeroes                                    |
+    |    \=---> sector 0       \=--> sector 1                                        |
+    | Every 6 colors form a sector. The names are arbitrary, just to make clear how  |
+    | to set the colors into the buffer.                                             |
+    | So each segment has 2 sectors and 12 colors.                                   |
+    | The last 10 colors don't fill completely the last segment.                     |
+    | * All 94 colors can be sent even if some of them aren't used by the physical   |
+    | keyboard. This allows to lit every key, even if not mapped directly.           |
+    \*------------------------------------------------------------------------------*/
+    unsigned int segment = 0, sector = 0, sequence = 0;
+    unsigned int total_colors = 0;
+    memset(color_buf, 0x00, sizeof(color_buf));
+
+    /*---------------------------------------------------------------------------*\
+    | transfer the colors to the buffer. Max 94 colors to avoid buffer overflow.  |
+    \*---------------------------------------------------------------------------*/
+    if(colors.size() > 94)
     {
-        colors.insert(colors.begin() + skip_idx[skip_cnt], 0x00000000);
+        total_colors = 94;
+    }
+    else
+    {
+        total_colors = (unsigned int)colors.size();
     }
 
-    unsigned char buf[380];
-    memset(buf, 0x00, sizeof(buf));
-
-    int offset = 0;
-    int rowPos = 0;
-
-    for(unsigned int color_idx = 0; color_idx < colors.size(); color_idx++)
+    unsigned int pos = 0, color_idx = 0;
+    for(unsigned int i = 0; i < total_colors; i++)
     {
-        if (color_idx > 0 && color_idx % 16 == 0)
-        {
-            offset += 48;
-            rowPos = 0;
-        }
+        color_idx     = leds[i].value;
+        segment       = (color_idx / 12) * 48;
+        sector        = ((color_idx / 6) & 1) * 8;
+        sequence      = color_idx % 6;
 
-        buf[rowPos + offset]      = RGBGetGValue(colors[color_idx]);
-        buf[rowPos + offset + 16] = RGBGetRValue(colors[color_idx]);
-        buf[rowPos + offset + 32] = RGBGetBValue(colors[color_idx]);
+        pos           = segment + sector + sequence;
 
-        rowPos++;
+        color_buf[pos     ] = RGBGetGValue(colors[i]);
+        color_buf[pos + 16] = RGBGetRValue(colors[i]);
+        color_buf[pos + 32] = RGBGetBValue(colors[i]);
     }
+}
 
+
+void HyperXAlloyOriginsCoreController::SendRGBToDevice()
+{
     unsigned int sentBytes   = 0;
-    unsigned int bytesToSend = sizeof(buf);
+    unsigned int bytesToSend = sizeof(color_buf);
     unsigned int payloadSize = 60;
     unsigned int seq         = 0;
 
@@ -124,8 +183,8 @@ void HyperXAlloyOriginsCoreController::SetLEDsDirect(std::vector<RGBColor> color
         packet[2] = seq++;
         packet[4] = payloadSize;
 
-        memcpy(&packet[5], &buf[sentBytes], payloadSize);
-        hid_write(dev, packet, 65);
+        memcpy(&packet[5], &color_buf[sentBytes], payloadSize);
+        hid_write(dev, packet, payloadSize + 5);
 
         sentBytes += payloadSize;
     }

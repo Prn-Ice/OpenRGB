@@ -6,17 +6,11 @@
 |   Devin Wendt (umbreon222@gmail.com)          16 Feb 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <algorithm>
-#include <cctype>
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "KasaSmartController.h"
-#include "RGBController.h"
 #include "RGBController_KasaSmart.h"
 #include "SettingsManager.h"
 

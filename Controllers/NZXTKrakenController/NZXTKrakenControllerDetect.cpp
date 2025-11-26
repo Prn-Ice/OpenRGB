@@ -6,14 +6,12 @@
 |   Martin Hartl (inlart)                       04 Apr 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "NZXTKrakenController.h"
-#include "RGBController.h"
 #include "RGBController_NZXTKraken.h"
 
 #define NZXT_KRAKEN_VID     0x1E71
@@ -31,11 +29,12 @@
 void DetectNZXTKrakenControllers(hid_device_info* info, const std::string& name)
 {
     hid_device* dev = hid_open_path(info->path);
-    if( dev )
+
+    if(dev)
     {
-        NZXTKrakenController* controller = new NZXTKrakenController(dev, info->path);
+        NZXTKrakenController*     controller     = new NZXTKrakenController(dev, info->path, name);
         RGBController_NZXTKraken* rgb_controller = new RGBController_NZXTKraken(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }   /* DetectNZXTKrakenControllers() */

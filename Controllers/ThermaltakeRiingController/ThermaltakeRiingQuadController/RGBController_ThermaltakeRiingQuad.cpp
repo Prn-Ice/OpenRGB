@@ -1,11 +1,13 @@
-/*-------------------------------------------------------------------*\
-|  RGBController_ThermaltakeRiingQuad.cpp                             |
-|                                                                     |
-|  Driver for Thermaltake Riing Quad Controller                       |
-|                                                                     |
-|  Chris M (Dr_No)          15th Feb 2021                             |
-|                                                                     |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_ThermaltakeRiingQuad.cpp                    |
+|                                                           |
+|   RGBController for Thermaltake Riing Quad                |
+|                                                           |
+|   Chris M (Dr_No)                             15 Feb 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_ThermaltakeRiingQuad.h"
 
@@ -85,7 +87,7 @@ void RGBController_ThermaltakeRiingQuad::SetupZones()
         | Riing Quad protocol is 54                         |
         \*-------------------------------------------------*/
         zones[channel_idx].leds_min   = 0;
-        zones[channel_idx].leds_max   = 54;
+        zones[channel_idx].leds_max   = 60;
 
         if(first_run)
         {
@@ -132,7 +134,7 @@ void RGBController_ThermaltakeRiingQuad::DeviceUpdateLEDs()
 {
     for(std::size_t zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
-        controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+        controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
     }
 }
 
@@ -153,6 +155,6 @@ void RGBController_ThermaltakeRiingQuad::DeviceUpdateMode()
     for(std::size_t zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
         controller->SetMode(modes[active_mode].value, modes[active_mode].speed);
-        controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+        controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
     }
 }

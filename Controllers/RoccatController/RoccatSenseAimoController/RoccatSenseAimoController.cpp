@@ -1,26 +1,52 @@
-/*-------------------------------------------------------------------*\
-|  RoccatSenseAimoController.cpp                                      |
-|                                                                     |
-|  Driver for Roccat Sense Aimo                                       |
-|                                                                     |
-|  Mola19 08/09/2023                                                  |
-\*-------------------------------------------------------------------*/
-
-#include "RoccatSenseAimoController.h"
+/*---------------------------------------------------------*\
+| RoccatSenseAimoController.cpp                             |
+|                                                           |
+|   Driver for Roccat Sense Aimo                            |
+|                                                           |
+|   Mola19                                      09 Aug 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
-
 #include "LogManager.h"
+#include "RoccatSenseAimoController.h"
+#include "StringUtils.h"
 
-RoccatSenseAimoController::RoccatSenseAimoController(hid_device* dev_handle, char *path)
+RoccatSenseAimoController::RoccatSenseAimoController(hid_device* dev_handle, char *path, std::string dev_name)
 {
-    dev      = dev_handle;
-    location = path;
+    dev         = dev_handle;
+    location    = path;
+    name        = dev_name;
 }
 
 RoccatSenseAimoController::~RoccatSenseAimoController()
 {
     hid_close(dev);
+}
+
+std::string RoccatSenseAimoController::GetLocation()
+{
+    return("HID: " + location);
+}
+
+std::string RoccatSenseAimoController::GetName()
+{
+    return(name);
+}
+
+std::string RoccatSenseAimoController::GetSerial()
+{
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string RoccatSenseAimoController::GetVersion()
@@ -40,28 +66,6 @@ std::string RoccatSenseAimoController::GetVersion()
     return std::string(version);
 }
 
-std::string RoccatSenseAimoController::GetSerial()
-{
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        return("");
-    }
-
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
-
-}
-
-std::string RoccatSenseAimoController::GetLocation()
-{
-    return("HID: " + location);
-}
-
 mode_struct RoccatSenseAimoController::GetMode()
 {
     uint8_t buf[19] = { 0x02 };
@@ -78,7 +82,7 @@ mode_struct RoccatSenseAimoController::GetMode()
         default_mode.brightness = ROCCAT_SENSE_AIMO_BRIGHTNESS_DEFAULT;
         default_mode.left = ToRGBColor(0, 0, 0);
         default_mode.right = ToRGBColor(0, 0, 0);
-        
+
         return default_mode;
     }
 
@@ -114,7 +118,7 @@ void RoccatSenseAimoController::SetMode(uint8_t profile, uint8_t mode, uint8_t s
         buf[0x09 + i * 8] = 0xFF; // this device uses RGBA, but OpenRGB doesn't allow it, so it is always max
     }
 
-    buf[0x12] = 0x00; // this stores the swarm theme and first bit is a flag if custom is active in swarm. No usage outside Swarm 
+    buf[0x12] = 0x00; // this stores the swarm theme and first bit is a flag if custom is active in swarm. No usage outside Swarm
 
     int return_length = hid_send_feature_report(dev, buf, 19);
 

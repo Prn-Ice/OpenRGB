@@ -6,7 +6,7 @@
 |   Michael Losert                              27 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <algorithm>
@@ -14,10 +14,12 @@
 #include <iomanip>
 #include <sstream>
 #include "LianLiGAIITrinityController.h"
+#include "StringUtils.h"
 
-LianLiGAIITrinityController::LianLiGAIITrinityController(hid_device* dev_handle)
+LianLiGAIITrinityController::LianLiGAIITrinityController(hid_device* dev_handle, char* path)
 {
-    dev = dev_handle;
+    dev         = dev_handle;
+    location    = path;
 }
 
 LianLiGAIITrinityController::~LianLiGAIITrinityController()
@@ -26,6 +28,11 @@ LianLiGAIITrinityController::~LianLiGAIITrinityController()
     {
         hid_close(dev);
     }
+}
+
+std::string LianLiGAIITrinityController::GetLocation()
+{
+    return("HID: " + location);
 }
 
 LianLiGAIITrinityController::GAII_Info LianLiGAIITrinityController::GetControllerInfo()
@@ -37,8 +44,7 @@ LianLiGAIITrinityController::GAII_Info LianLiGAIITrinityController::GetControlle
     wchar_t       tmp[sz];
 
     hid_get_serial_number_string(dev, tmp, sz);
-    std::wstring serialWStr = std::wstring(tmp);
-    controllerInfo.serial = std::string(serialWStr.begin(), serialWStr.end());
+    controllerInfo.serial = StringUtils::wstring_to_string(tmp);
 
     // get firmware version
     unsigned char data[64] = "";

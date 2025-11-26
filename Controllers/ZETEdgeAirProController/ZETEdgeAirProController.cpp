@@ -1,32 +1,23 @@
-/*-----------------------------------------*\
-|  ZETEdgeAirProController.cpp              |
-|                                           |
-|  Driver for ZET Edge Air Pro mouse        |
-|  lighting  controller                     |
-|                                           |
-|  Guimard Morgan (morg) 1/29/2022          |
-\*-----------------------------------------*/
-#include "ZETEdgeAirProController.h"
-#include <string.h>
+/*---------------------------------------------------------*\
+| ZETEdgeAirProController.cpp                               |
+|                                                           |
+|   Driver for ZET Edge Air Pro                             |
+|                                                           |
+|   Morgan Guimard (morg)                       29 Jan 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-ZETEdgeAirProController::ZETEdgeAirProController(hid_device* dev_handle, const hid_device_info& info)
+#include <string.h>
+#include "StringUtils.h"
+#include "ZETEdgeAirProController.h"
+
+ZETEdgeAirProController::ZETEdgeAirProController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
     location            = info.path;
-    version             = "";
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 }
 
 ZETEdgeAirProController::~ZETEdgeAirProController()
@@ -39,14 +30,22 @@ std::string ZETEdgeAirProController::GetDeviceLocation()
     return("HID: " + location);
 }
 
-std::string ZETEdgeAirProController::GetSerialString()
+std::string ZETEdgeAirProController::GetNameString()
 {
-    return(serial_number);
+    return(name);
 }
 
-std::string ZETEdgeAirProController::GetFirmwareVersion()
+std::string ZETEdgeAirProController::GetSerialString()
 {
-    return(version);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void ZETEdgeAirProController::SetMode(RGBColor color, unsigned char brightness, unsigned char speed, unsigned char mode_value)

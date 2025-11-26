@@ -6,14 +6,11 @@
 |   Matt Silva (thesilvanator)                              |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
-#include "LogManager.h"
 #include "Detector.h"
 #include "HyperXMicrophoneController.h"
-#include "RGBController.h"
 #include "RGBController_HyperXMicrophone.h"
 #include "hidapi_wrapper.h"
 
@@ -40,9 +37,8 @@ void DetectHyperXMicrophoneControllers(hidapi_wrapper wrapper, hid_device_info* 
 
     if(dev)
     {
-        HyperXMicrophoneController* controller         = new HyperXMicrophoneController(wrapper, dev, info->path);
+        HyperXMicrophoneController* controller         = new HyperXMicrophoneController(wrapper, dev, info->path, name);
         RGBController_HyperXMicrophone *rgb_controller = new RGBController_HyperXMicrophone(controller);
-        rgb_controller->name                          = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

@@ -1,6 +1,17 @@
-﻿#include <hidapi/hidapi.h>
+﻿/*---------------------------------------------------------*\
+| ValkyrieKeyboardControllerDetect.cpp                      |
+|                                                           |
+|   Detector for Valkyrie keyboard                          |
+|                                                           |
+|   Nollie (Nuonuo)                             06 Dec 2023 |
+|   Bartholomew Ho (imnotmental)                01 Feb 2024 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <hidapi.h>
 #include "Detector.h"
-#include "RGBController.h"
 #include "RGBController_ValkyrieKeyboard.h"
 
 void DetectValkyrieKeyboardControllers(hid_device_info* info, const std::string& name)
@@ -9,10 +20,9 @@ void DetectValkyrieKeyboardControllers(hid_device_info* info, const std::string&
 
     if(dev)
     {
-            ValkyrieKeyboardController*       controller        = new ValkyrieKeyboardController(dev, info->path, info->product_id, info->interface_number);
-            RGBController_ValkyrieKeyboard*   rgb_controller    = new RGBController_ValkyrieKeyboard(controller);
-            rgb_controller->name                                = name;
-            ResourceManager::get()->RegisterRGBController(rgb_controller);
+        ValkyrieKeyboardController*       controller        = new ValkyrieKeyboardController(dev, info->path, info->product_id, info->interface_number, name);
+        RGBController_ValkyrieKeyboard*   rgb_controller    = new RGBController_ValkyrieKeyboard(controller);
+        ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
 

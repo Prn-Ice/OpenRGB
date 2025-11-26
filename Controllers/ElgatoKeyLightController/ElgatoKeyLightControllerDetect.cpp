@@ -4,15 +4,11 @@
 |   Detector for Elgato Key Light                           |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
 #include "Detector.h"
 #include "ElgatoKeyLightController.h"
-#include "RGBController.h"
 #include "RGBController_ElgatoKeyLight.h"
 #include "SettingsManager.h"
 

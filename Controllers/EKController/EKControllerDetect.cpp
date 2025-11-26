@@ -6,13 +6,12 @@
 |   Chris M (Dr_No)                             16 Jul 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "EKController.h"
-#include "RGBController.h"
 #include "RGBController_EKController.h"
 
 #define EK_VID                0x0483

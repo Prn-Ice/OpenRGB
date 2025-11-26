@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      17 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -14,9 +14,10 @@
 #include <sstream>
 #include "CorsairHydroController.h"
 
-CorsairHydroController::CorsairHydroController(libusb_device_handle* dev_handle)
+CorsairHydroController::CorsairHydroController(libusb_device_handle* dev_handle, std::string dev_name)
 {
     dev         = dev_handle;
+    name        = dev_name;
 
     /*-----------------------------------------------------*\
     | Fill in location string with USB ID                   |
@@ -49,6 +50,11 @@ std::string CorsairHydroController::GetFirmwareString()
 std::string CorsairHydroController::GetLocation()
 {
     return("USB: " + location);
+}
+
+std::string CorsairHydroController::GetNameString()
+{
+    return(name);
 }
 
 void CorsairHydroController::SetBlink

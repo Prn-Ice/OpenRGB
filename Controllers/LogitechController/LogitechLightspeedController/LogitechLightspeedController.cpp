@@ -6,11 +6,12 @@
 |   TheRogueZeta                                05 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogitechLightspeedController.h"
+#include "StringUtils.h"
 
 LogitechLightspeedController::LogitechLightspeedController(hid_device* dev_handle, const char* path)
 {
@@ -46,8 +47,7 @@ std::string LogitechLightspeedController::GetSerialString()
             return("");
         }
 
-        std::wstring return_wstring = serial_string;
-        std::string return_string(return_wstring.begin(), return_wstring.end());
+        std::string return_string(StringUtils::wstring_to_string(serial_string));
 
         return(return_string);
     }

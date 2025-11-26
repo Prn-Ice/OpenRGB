@@ -6,12 +6,12 @@
 |   Adam Honse (CalcProgrammer1)                10 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -31,30 +31,32 @@ enum
 class AuraMousematController
 {
 public:
-    AuraMousematController(hid_device* dev_handle, const char* path);
+    AuraMousematController(hid_device* dev_handle, const char* path, std::string dev_name);
     virtual ~AuraMousematController();
 
     std::string GetDeviceLocation();
+    std::string GetName();
     std::string GetSerialString();
     std::string GetVersion();
 
-    void UpdateLeds
-        (
-        std::vector<RGBColor>    colors
-        );
+    void        UpdateLeds
+                    (
+                    std::vector<RGBColor>    colors
+                    );
 
-    void UpdateDevice
-        (
-        unsigned char           mode,
-        std::vector<RGBColor>   colors,
-        unsigned char           speed,
-        unsigned char           brightness,
-        unsigned char           pattern
-        );
+    void        UpdateDevice
+                    (
+                    unsigned char           mode,
+                    std::vector<RGBColor>   colors,
+                    unsigned char           speed,
+                    unsigned char           brightness,
+                    unsigned char           pattern
+                    );
 
-    void SaveMode();
+    void        SaveMode();
 
 private:
-    hid_device*                 dev;
-    std::string                 location;
+    hid_device* dev;
+    std::string location;
+    std::string name;
 };

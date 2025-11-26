@@ -1,12 +1,15 @@
-/*-------------------------------------------------------------------*\
-|  TecknetController.cpp                                              |
-|                                                                     |
-|  Driver for Technet Devices                                         |
-|                                                                     |
-|  Chris M (Dr_No)          29th Jul 2020                             |
-|                                                                     |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| TecknetController.cpp                                     |
+|                                                           |
+|   Driver for Tecknet devices                              |
+|                                                           |
+|   Chris M (Dr_No)                             29 Jul 2020 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
+#include "StringUtils.h"
 #include "TecknetController.h"
 
 static unsigned char tecknet_colour_mode_data[][16] =
@@ -23,24 +26,19 @@ static unsigned char tecknet_speed_mode_data[][9] =
 
 TecknetController::TecknetController(hid_device* dev_handle, char *_path)
 {
-    const int szTemp = 256;
-    wchar_t tmpName[szTemp];
-
-    dev = dev_handle;
-
-    hid_get_manufacturer_string(dev, tmpName, szTemp);
-    std::wstring wName = std::wstring(tmpName);
-    device_name = std::string(wName.begin(), wName.end());
-
-    hid_get_product_string(dev, tmpName, szTemp);
-    wName = std::wstring(tmpName);
-    device_name.append(" ").append(std::string(wName.begin(), wName.end()));
-
-    hid_get_serial_number_string(dev, tmpName, szTemp);
-    wName = std::wstring(tmpName);
-    serial = std::string(wName.begin(), wName.end());
-
+    dev      = dev_handle;
     location = _path;
+
+    /*---------------------------------------------------------*\
+    | Get device name from HID manufacturer and product strings |
+    \*---------------------------------------------------------*/
+    wchar_t name_string[HID_MAX_STR];
+
+    hid_get_manufacturer_string(dev, name_string, HID_MAX_STR);
+    device_name = StringUtils::wstring_to_string(name_string);
+
+    hid_get_product_string(dev, name_string, HID_MAX_STR);
+    device_name.append(" ").append(StringUtils::wstring_to_string(name_string));
 
     current_mode        = TECKNET_MODE_DIRECT;
     current_speed       = TECKNET_SPEED_NORMAL;
@@ -59,7 +57,15 @@ std::string TecknetController::GetDeviceName()
 
 std::string TecknetController::GetSerial()
 {
-    return serial;
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string TecknetController::GetLocation()

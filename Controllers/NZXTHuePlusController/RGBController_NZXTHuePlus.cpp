@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      20 Jun 2019 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_NZXTHuePlus.h"
@@ -256,7 +256,7 @@ void RGBController_HuePlus::DeviceUpdateLEDs()
 {
     for(std::size_t zone_idx = 0; zone_idx < zones.size(); zone_idx++)
     {
-        controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+        controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
     }
 }
 
@@ -297,12 +297,12 @@ void RGBController_HuePlus::DeviceUpdateMode()
 
             controller->SetChannelEffect
                     (
-                    zone_idx,
+                    (unsigned char)zone_idx,
                     modes[active_mode].value,
                     modes[active_mode].speed,
                     direction,
                     colors,
-                    modes[active_mode].colors.size()
+                    (unsigned int)modes[active_mode].colors.size()
                     );
         }
     }

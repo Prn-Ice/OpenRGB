@@ -1,34 +1,33 @@
-/*-------------------------------------------------------------------*\
-|  ThermaltakeRiingQuadController.cpp                                 |
-|                                                                     |
-|  Driver for Thermaltake Riing Quad Controller                       |
-|                                                                     |
-|  Chris M (Dr_No)          15th Feb 2021                             |
-|                                                                     |
-\*-------------------------------------------------------------------*/
-
-#include "ThermaltakeRiingQuadController.h"
+/*---------------------------------------------------------*\
+| ThermaltakeRiingQuadController.cpp                        |
+|                                                           |
+|   Driver for Thermaltake Riing Quad                       |
+|                                                           |
+|   Chris M (Dr_No)                             15 Feb 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "StringUtils.h"
+#include "ThermaltakeRiingQuadController.h"
 
 ThermaltakeRiingQuadController::ThermaltakeRiingQuadController(hid_device* dev_handle, const char* path)
 {
-    wchar_t tmpName[HID_MAX_STR];
-
     dev         = dev_handle;
     location    = path;
 
-    hid_get_manufacturer_string(dev, tmpName, HID_MAX_STR);
-    std::wstring wName = std::wstring(tmpName);
-    device_name = std::string(wName.begin(), wName.end());
+    /*---------------------------------------------------------*\
+    | Get device name from HID manufacturer and product strings |
+    \*---------------------------------------------------------*/
+    wchar_t name_string[HID_MAX_STR];
 
-    hid_get_product_string(dev, tmpName, HID_MAX_STR);
-    wName = std::wstring(tmpName);
-    device_name.append(" ").append(std::string(wName.begin(), wName.end()));
+    hid_get_manufacturer_string(dev, name_string, HID_MAX_STR);
+    device_name = StringUtils::wstring_to_string(name_string);
 
-    hid_get_serial_number_string(dev, tmpName, HID_MAX_STR);
-    wName = std::wstring(tmpName);
-    serial = std::string(wName.begin(), wName.end());
+    hid_get_product_string(dev, name_string, HID_MAX_STR);
+    device_name.append(" ").append(StringUtils::wstring_to_string(name_string));
 
     SendInit();
 
@@ -86,16 +85,24 @@ std::string ThermaltakeRiingQuadController::GetDeviceLocation()
 
 std::string ThermaltakeRiingQuadController::GetSerial()
 {
-    return(serial);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
+
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void ThermaltakeRiingQuadController::SetChannelLEDs(unsigned char channel, RGBColor * colors, unsigned int num_colors)
 {
     unsigned char* color_data = new unsigned char[3 * num_colors];
 
-    for(std::size_t color = 0; color < num_colors; color++)
+    for(unsigned int color = 0; color < num_colors; color++)
     {
-        int color_idx = color * 3;
+        unsigned int color_idx = color * 3;
         color_data[color_idx + 0]   = RGBGetGValue(colors[color]);
         color_data[color_idx + 1]   = RGBGetRValue(colors[color]);
         color_data[color_idx + 2]   = RGBGetBValue(colors[color]);
@@ -104,7 +111,7 @@ void ThermaltakeRiingQuadController::SetChannelLEDs(unsigned char channel, RGBCo
     tt_quad_buffer[channel][THERMALTAKE_QUAD_ZONE_BYTE]     = channel + 1;
     tt_quad_buffer[channel][THERMALTAKE_QUAD_MODE_BYTE]     = current_mode + ( current_speed & 0x03 );
     memcpy(&tt_quad_buffer[channel][THERMALTAKE_QUAD_DATA_BYTE], color_data, (num_colors * 3));
-   
+
     hid_write(dev, tt_quad_buffer[channel], THERMALTAKE_QUAD_PACKET_SIZE);
 
     delete[] color_data;

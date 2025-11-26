@@ -1,34 +1,23 @@
-/*-------------------------------------------------------------------*\
-|  RoccatHordeAimoController.cpp                                      |
-|                                                                     |
-|  Driver for Roccat Horde Aimo Keyboard                              |
-|                                                                     |
-|  Morgan Guimard (morg)          2/24/2022                           |
-|                                                                     |
-\*-------------------------------------------------------------------*/
-
-#include "RoccatHordeAimoController.h"
+/*---------------------------------------------------------*\
+| RoccatHordeAimoController.cpp                             |
+|                                                           |
+|   Driver for Roccat Horde Aimo                            |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Feb 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "RoccatHordeAimoController.h"
+#include "StringUtils.h"
 
-RoccatHordeAimoController::RoccatHordeAimoController(hid_device* dev_handle, const hid_device_info& info)
+RoccatHordeAimoController::RoccatHordeAimoController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
-    version             = "";
     location            = info.path;
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 
     InitialPacket();
 }
@@ -51,19 +40,27 @@ void RoccatHordeAimoController::InitialPacket()
     hid_send_feature_report(dev, usb_buf, 8);
 }
 
-std::string RoccatHordeAimoController::GetFirmwareVersion()
+std::string RoccatHordeAimoController::GetDeviceLocation()
 {
-    return version;
+    return("HID: " + location);
+}
+
+std::string RoccatHordeAimoController::GetNameString()
+{
+    return(name);
 }
 
 std::string RoccatHordeAimoController::GetSerialString()
 {
-    return serial_number;
-}
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-std::string RoccatHordeAimoController::GetDeviceLocation()
-{
-    return("HID: " + location);
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void RoccatHordeAimoController::SetColors(std::vector<RGBColor> colors)

@@ -6,20 +6,22 @@
 |   Adam Honse (CalcProgrammer1)                10 May 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <chrono>
 #include <cstring>
 #include <thread>
 #include "AOCKeyboardController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
-AOCKeyboardController::AOCKeyboardController(hid_device* dev_handle, const char* path)
+AOCKeyboardController::AOCKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 AOCKeyboardController::~AOCKeyboardController()
@@ -32,6 +34,11 @@ std::string AOCKeyboardController::GetDeviceLocation()
     return("HID " + location);
 }
 
+std::string AOCKeyboardController::GetDeviceName()
+{
+    return(name);
+}
+
 std::string AOCKeyboardController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -42,10 +49,7 @@ std::string AOCKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void AOCKeyboardController::SetLightingConfig

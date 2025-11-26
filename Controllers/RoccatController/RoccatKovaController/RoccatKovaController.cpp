@@ -1,19 +1,24 @@
-/*-----------------------------------------*\
-|  RoccatKovaController.cpp                 |
-|                                           |
-|  Controller for Roccat Kova               |
-|                                           |
-|  Gustash 01/12/2022                       |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatKovaController.cpp                                  |
+|                                                           |
+|   Driver for Roccat Kova                                  |
+|                                                           |
+|   Gustash                                     01 Dec 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "RoccatKovaController.h"
+#include <hidapi.h>
 #include "LogManager.h"
-#include <hidapi/hidapi.h>
+#include "RoccatKovaController.h"
+#include "StringUtils.h"
 
-RoccatKovaController::RoccatKovaController(hid_device* dev_handle, char *path)
+RoccatKovaController::RoccatKovaController(hid_device* dev_handle, char *path, std::string dev_name)
 {
-    dev      = dev_handle;
-    location = path;
+    dev         = dev_handle;
+    location    = path;
+    name        = dev_name;
 
     SendInitialPacket();
     FetchFirmwareVersion();
@@ -26,31 +31,30 @@ RoccatKovaController::~RoccatKovaController()
 
 std::string RoccatKovaController::GetLocation()
 {
-    return ("HID: " + location);
+    return("HID: " + location);
+}
+
+std::string RoccatKovaController::GetName()
+{
+    return(name);
 }
 
 std::string RoccatKovaController::GetSerial()
 {
-    const uint8_t sz    = ROCCAT_KOVA_HID_MAX_STR;
-    wchar_t tmp[sz];
-
-    uint8_t ret         = hid_get_serial_number_string(dev, tmp, sz);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
     if(ret != 0)
     {
-        LOG_DEBUG("[Roccat Kova] Get HID Serial string failed");
-        return "";
+        return("");
     }
 
-    std::wstring w_tmp  = std::wstring(tmp);
-    std::string  serial = std::string(w_tmp.begin(), w_tmp.end());
-
-    return serial;
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
-std::string RoccatKovaController::GetFirmwareVersion()
+std::string RoccatKovaController::GetVersion()
 {
-    return firmware_version;
+    return(version);
 }
 
 void RoccatKovaController::SetColor(RGBColor color_wheel,
@@ -120,10 +124,10 @@ void RoccatKovaController::FetchFirmwareVersion()
 
     hid_get_feature_report(dev, buf, ROCCAT_KOVA_VERSION_READ_PACKET_SIZE);
 
-    uint8_t version                                        = buf[ROCCAT_KOVA_FIRMWARE_VERSION_IDX];
+    uint8_t fw_version                                     = buf[ROCCAT_KOVA_FIRMWARE_VERSION_IDX];
     char version_str[5]                                    {00};
-    snprintf(version_str, 5, "%.2f", version / 100.);
-    firmware_version                                       = version_str;
+    snprintf(version_str, 5, "%.2f", fw_version / 100.);
+    version                                                = version_str;
 }
 
 void RoccatKovaController::FetchProfileData(uint8_t *buf)

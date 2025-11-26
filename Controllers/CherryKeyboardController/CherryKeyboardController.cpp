@@ -6,16 +6,18 @@
 |   Sebastian Kraus                             25 Dec 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "CherryKeyboardController.h"
+#include "StringUtils.h"
 
-CherryKeyboardController::CherryKeyboardController(hid_device* dev_handle, const char* path)
+CherryKeyboardController::CherryKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 }
 
 CherryKeyboardController::~CherryKeyboardController()
@@ -28,6 +30,11 @@ std::string CherryKeyboardController::GetDeviceLocation()
     return("HID: " + location);
 }
 
+std::string CherryKeyboardController::GetDeviceName()
+{
+    return(name);
+}
+
 std::string CherryKeyboardController::GetSerialString()
 {
     wchar_t serial_string[128];
@@ -38,10 +45,7 @@ std::string CherryKeyboardController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CherryKeyboardController::SetKeyboardColors

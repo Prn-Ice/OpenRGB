@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      18 Jul 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_HYTEMousemat.h"
@@ -26,7 +26,8 @@ RGBController_HYTEMousemat::RGBController_HYTEMousemat(HYTEMousematController* c
 {
     controller          = controller_ptr;
 
-    name                = "HYTE Mousemat";
+    name                = controller->GetName();
+    vendor              = "HYTE";
     description         = "HYTE Mousemat Device";
     type                = DEVICE_TYPE_MOUSEMAT;
     location            = controller->GetLocation();
@@ -52,7 +53,7 @@ RGBController_HYTEMousemat::RGBController_HYTEMousemat(HYTEMousematController* c
 
 RGBController_HYTEMousemat::~RGBController_HYTEMousemat()
 {
-
+    delete controller;
 }
 
 void RGBController_HYTEMousemat::SetupZones()

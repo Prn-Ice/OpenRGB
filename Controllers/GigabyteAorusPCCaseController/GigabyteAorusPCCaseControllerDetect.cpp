@@ -6,12 +6,11 @@
 |   Denis Nazarov (nenderus)                    10 Feb 2024 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
-#include "RGBController.h"
 #include "GigabyteAorusPCCaseController.h"
 #include "RGBController_GigabyteAorusPCCase.h"
 
@@ -38,9 +37,8 @@ void DetectGigabyteAorusPCCaseControllers(hid_device_info* info, const std::stri
 
     if(dev)
     {
-        GigabyteAorusPCCaseController*      controller      = new GigabyteAorusPCCaseController(dev, info->path);
+        GigabyteAorusPCCaseController*      controller      = new GigabyteAorusPCCaseController(dev, info->path, name);
         RGBController_GigabyteAorusPCCase*  rgb_controller  = new RGBController_GigabyteAorusPCCase(controller);
-        rgb_controller->name                                = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

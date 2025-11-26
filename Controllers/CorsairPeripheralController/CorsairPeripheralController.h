@@ -6,13 +6,13 @@
 |   Adam Honse (CalcProgrammer1)                09 Jan 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define CORSAIR_PERIPHERAL_PACKET_LENGTH 65
@@ -94,7 +94,7 @@ enum
 class CorsairPeripheralController
 {
 public:
-    CorsairPeripheralController(hid_device* dev_handle, const char* path);
+    CorsairPeripheralController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~CorsairPeripheralController();
 
     int             GetLogicalLayout();
@@ -110,7 +110,6 @@ public:
     void            SetLEDsKeyboardLimited(std::vector<RGBColor> colors);
     void            SetLEDsMouse(std::vector<RGBColor> colors);
     void            SetLEDsMousemat(std::vector<RGBColor> colors);
-    void            SetName(std::string device_name);
     void            SetHardwareMode
                     (
                         int mode_value,

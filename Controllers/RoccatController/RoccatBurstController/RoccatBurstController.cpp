@@ -6,30 +6,18 @@
 |   Morgan Guimard (morg)                       24 Feb 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "RoccatBurstController.h"
+#include "StringUtils.h"
 
-RoccatBurstController::RoccatBurstController(hid_device* dev_handle, const hid_device_info& info)
+RoccatBurstController::RoccatBurstController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
-    version             = "";
     location            = info.path;
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 
     SetupDirectMode();
 }
@@ -39,19 +27,27 @@ RoccatBurstController::~RoccatBurstController()
     hid_close(dev);
 }
 
-std::string RoccatBurstController::GetFirmwareVersion()
+std::string RoccatBurstController::GetDeviceLocation()
 {
-    return version;
+    return("HID: " + location);
+}
+
+std::string RoccatBurstController::GetNameString()
+{
+    return(name);
 }
 
 std::string RoccatBurstController::GetSerialString()
 {
-    return serial_number;
-}
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-std::string RoccatBurstController::GetDeviceLocation()
-{
-    return("HID: " + location);
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void RoccatBurstController::SetupDirectMode()

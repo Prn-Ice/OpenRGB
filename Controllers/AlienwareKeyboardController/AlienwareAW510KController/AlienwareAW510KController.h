@@ -6,13 +6,13 @@
 |   Mohamad Sallal (msallal)                    22 May 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -77,10 +77,11 @@ struct SelectedKeys
 class AlienwareAW510KController
 {
 public:
-    AlienwareAW510KController(hid_device* dev_handle, const char* path);
+    AlienwareAW510KController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~AlienwareAW510KController();
 
     std::string GetDeviceLocation();
+    std::string GetDeviceName();
     std::string GetSerialString();
 
     void        SendInitialize();
@@ -142,6 +143,7 @@ public:
 private:
     hid_device*             dev;
     std::string             location;
+    std::string             name;
 
     void        SendMode
                     (

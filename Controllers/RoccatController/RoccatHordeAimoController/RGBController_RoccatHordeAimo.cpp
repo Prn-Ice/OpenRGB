@@ -1,11 +1,13 @@
-/*-----------------------------------------*\
-|  RGBController_RoccatHordeAimo.cpp        |
-|                                           |
-|  Generic RGB Interface for OpenRGB        |
-|                                           |
-|                                           |
-|  Morgan Guimard (morg) 2/24/2022          |
-\*-----------------------------------------*/
+/*---------------------------------------------------------*\
+| RGBController_RoccatHordeAimo.cpp                         |
+|                                                           |
+|   RGBController for Roccat Horde Aimo                     |
+|                                                           |
+|   Morgan Guimard (morg)                       24 Feb 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include "RGBController_RoccatHordeAimo.h"
 
@@ -24,10 +26,12 @@ RGBController_RoccatHordeAimo::RGBController_RoccatHordeAimo(RoccatHordeAimoCont
 {
     controller          = controller_ptr;
 
-    name                = "Roccat Horde Aimo";
+    name                = controller->GetNameString();
     vendor              = "Roccat";
     type                = DEVICE_TYPE_KEYBOARD;
-    description         = "Roccat Horde Aimo Keyboard";
+    description         = "Roccat Horde Aimo Keyboard Device";
+    location            = controller->GetDeviceLocation();
+    serial              = controller->GetSerialString();
 
     mode Direct;
     Direct.name         = "Direct";

@@ -7,7 +7,7 @@
 |   Based on TheRogueZeta                       31 Aug 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_LogitechG933.h"
@@ -25,13 +25,13 @@
 
 RGBController_LogitechG933::RGBController_LogitechG933(LogitechG933Controller* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller              = controller_ptr;
 
-    name        = "Logitech G933 Lightsync Headset";
-    vendor      = "Logitech";
-    type        = DEVICE_TYPE_HEADSET;
-    description = "Logitech G933 Lightsync Headset";
-    location    = controller->GetDeviceLocation();
+    name                    = controller->GetDeviceName();
+    vendor                  = "Logitech";
+    type                    = DEVICE_TYPE_HEADSET;
+    description             = "Logitech G933 Lightsync Headset";
+    location                = controller->GetDeviceLocation();
 
     mode Off;
     Off.name                = "Off";

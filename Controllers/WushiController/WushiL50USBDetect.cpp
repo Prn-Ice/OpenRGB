@@ -1,9 +1,16 @@
+/*---------------------------------------------------------*\
+| WushiL50USBControllerDetect.cpp                           |
+|                                                           |
+|   Detector for Wushi L50                                  |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <hidapi.h>
 #include "Detector.h"
-#include "LogManager.h"
-#include "RGBController.h"
 #include "WushiL50USBController.h"
 #include "RGBController_WushiL50USB.h"
-#include <hidapi/hidapi.h>
 
 /*-----------------------------------------------------*\
 | Wushi vendor ID                                       |
@@ -21,9 +28,8 @@ void DetectWushiL50USBControllers(hidapi_wrapper wrapper, hid_device_info* info,
 
     if(dev)
     {
-        WushiL50USBController*     controller      = new WushiL50USBController(wrapper, dev, info->path);
+        WushiL50USBController*     controller      = new WushiL50USBController(wrapper, dev, info->path, name);
         RGBController_WushiL50USB* rgb_controller  = new RGBController_WushiL50USB(controller);
-        rgb_controller->name                       = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

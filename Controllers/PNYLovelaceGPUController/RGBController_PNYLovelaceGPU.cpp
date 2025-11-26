@@ -6,7 +6,7 @@
 |   yufan                                       01 Oct 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBController_PNYLovelaceGPU.h"
@@ -26,7 +26,7 @@ RGBController_PNYLovelaceGPU::RGBController_PNYLovelaceGPU(PNYLovelaceGPUControl
 {
     controller              = controller_ptr;
 
-    name                    = "PNY GPU";
+    name                    = controller->GetDeviceName();
     vendor                  = "PNY";
     description             = "PNY RGB GPU Device";
     location                = controller->GetDeviceLocation();

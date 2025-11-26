@@ -6,11 +6,12 @@
 |   Chris M (DrNo)                              05 Apr 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "CougarKeyboardController.h"
+#include "StringUtils.h"
 
 using namespace std::chrono_literals;
 
@@ -53,21 +54,11 @@ static uint8_t keyvalue_map[113] =
            149, 150, 151
 };
 
-CougarKeyboardController::CougarKeyboardController(hid_device* dev_handle, const char* path)
+CougarKeyboardController::CougarKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
     dev                 = dev_handle;
     location            = path;
-
-    hid_get_manufacturer_string(dev, tmp, sz);
-    std::wstring wName = std::wstring(tmp);
-    device_name = std::string(wName.begin(), wName.end());
-
-    hid_get_product_string(dev, tmp, sz);
-    wName = std::wstring(tmp);
-    device_name.append(" ").append(std::string(wName.begin(), wName.end()));
+    name                = dev_name;
 }
 
 CougarKeyboardController::~CougarKeyboardController()
@@ -77,25 +68,20 @@ CougarKeyboardController::~CougarKeyboardController()
 
 std::string CougarKeyboardController::GetDeviceName()
 {
-    return device_name;
+    return(name);
 }
 
 std::string CougarKeyboardController::GetSerial()
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-    int ret             = hid_get_serial_number_string(dev, tmp, sz);
-
-    if (ret != 0)
+    if(ret != 0)
     {
         return("");
     }
 
-    std::wstring w_tmp  = std::wstring(tmp);
-    std::string serial  = std::string(w_tmp.begin(), w_tmp.end());
-
-    return serial;
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string CougarKeyboardController::GetLocation()

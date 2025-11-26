@@ -6,7 +6,7 @@
 |   Frank Niessen (denk_mal)                    16 Dec 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include "RGBControllerKeyNames.h"
@@ -17,10 +17,10 @@ using namespace std::chrono_literals;
 //0xFFFFFFFF indicates an unused entry in matrix
 #define NA  0xFFFFFFFF
 
-// US Layout TODO: mus be checked/corrected
+// US Layout
 static unsigned int matrix_map_us[7][21] =
     {
-        {NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,  NA, 126,  NA,  NA,  NA},
+        {NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,  NA,  NA,  NA,  NA,  NA},
         { 5, NA, 17, 23, 29, 35, 41, 47, 53, 59, 65, 71, 77, 83, 89, 95, 101, 127, 128, 129, 130},
         { 4, 10, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70, 76, 82, 88, 94, 100, 106, 112, 118, 124},
         { 3,  9, 15, 21, 27, 33, 39, 45, 51, 57, 63, 69, 75,  7, 87, 93,  99, 105, 111, 117, 123},
@@ -214,11 +214,11 @@ RGBController_DasKeyboard::RGBController_DasKeyboard(DasKeyboardController* cont
 
     updateDevice = true;
 
-    name        = "Das Keyboard Device";
+    name        = controller->GetNameString();
     vendor      = "Metadot";
     type        = DEVICE_TYPE_KEYBOARD;
     description = "Das Keyboard Device";
-    location    = controller->GetDeviceLocation();
+    location    = controller->GetLocationString();
     serial      = controller->GetSerialString();
     version     = controller->GetVersionString();
 
@@ -242,6 +242,8 @@ RGBController_DasKeyboard::RGBController_DasKeyboard(DasKeyboardController* cont
     modes[3].value      = DAS_KEYBOARD_MODE_SPECTRUM_CYCLE;
     modes[3].flags      = MODE_FLAG_HAS_PER_LED_COLOR;
     modes[3].color_mode = MODE_COLORS_PER_LED;
+
+    SetupZones();
 }
 
 RGBController_DasKeyboard::~RGBController_DasKeyboard()

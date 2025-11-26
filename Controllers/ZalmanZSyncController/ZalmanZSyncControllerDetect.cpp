@@ -1,9 +1,18 @@
+/*---------------------------------------------------------*\
+| ZalmanZSyncControllerDetect.cpp                           |
+|                                                           |
+|   Detector for Zalman Z Sync                              |
+|                                                           |
+|   Adam Honse (CalcProgrammer1)                30 Jan 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
+
+#include <hidapi.h>
 #include "Detector.h"
 #include "ZalmanZSyncController.h"
-#include "RGBController.h"
 #include "RGBController_ZalmanZSync.h"
-#include <vector>
-#include <hidapi/hidapi.h>
 
 #define ZALMAN_VID          0x1C57
 #define ZALMAN_Z_SYNC_PID   0x7ED0
@@ -22,9 +31,8 @@ void DetectZalmanZSyncControllers(hid_device_info* info, const std::string& name
 
     if(dev)
     {
-        ZalmanZSyncController*     controller     = new ZalmanZSyncController(dev, info->path);
+        ZalmanZSyncController*     controller     = new ZalmanZSyncController(dev, info->path, name);
         RGBController_ZalmanZSync* rgb_controller = new RGBController_ZalmanZSync(controller);
-        rgb_controller->name                      = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

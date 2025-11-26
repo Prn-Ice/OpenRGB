@@ -6,12 +6,13 @@
 |   Le Philousophe                              25 Dec 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
 #include "LogManager.h"
 #include "EVisionV2KeyboardController.h"
+#include "StringUtils.h"
 
 #define BLANK_SPACE 6
 #define query_check_buffer(c) \
@@ -47,34 +48,27 @@ static uint8_t endorfy_map[EVISION_V2_MATRIX_WIDTH * EVISION_V2_MATRIX_HEIGHT] =
     105, 106, 107,                111,                115, 116, 117, 118, 119, 120, 121, 123,      124,
 };
 
-EVisionV2KeyboardController::EVisionV2KeyboardController(hid_device* dev_handle, const char* path, EVisionV2KeyboardLayout layout_)
+EVisionV2KeyboardController::EVisionV2KeyboardController(hid_device* dev_handle, const char* path, EVisionV2KeyboardLayout dev_layout, std::string dev_name)
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
-    layout              = layout_;
     dev                 = dev_handle;
     location            = path;
+    name                = dev_name;
+    layout              = dev_layout;
 
-    hid_get_manufacturer_string(dev, tmp, sz);
-    std::wstring wName = std::wstring(tmp);
-    device_name = std::string(wName.begin(), wName.end());
-
-    hid_get_product_string(dev, tmp, sz);
-    wName = std::wstring(tmp);
-    device_name.append(" ").append(std::string(wName.begin(), wName.end()));
-
+    /*---------------------------------------------------------*\
+    | Get capabilities and layout                               |
+    \*---------------------------------------------------------*/
     uint8_t buffer[7];
     if(Read(EVISION_V2_CMD_READ_CAPABILITIES, 0, sizeof(buffer), buffer) < 0)
     {
         return;
     }
-    if(buffer[0] != 0xaa && buffer[1] != 0x55)
+    if(buffer[0] != 0xAA && buffer[1] != 0x55)
     {
         return;
     }
 
-    map_size = buffer[5];
+    map_size    = buffer[5];
     macros_size = buffer[6] * 0x80;
 
     switch(layout)
@@ -83,6 +77,7 @@ EVisionV2KeyboardController::EVisionV2KeyboardController(hid_device* dev_handle,
             keyvalue_map = evisionv2_map;
             led_count = 106;
             break;
+
         case ENDORFY_KEYBOARD_LAYOUT:
             keyvalue_map = endorfy_map;
             led_count = 104;
@@ -95,27 +90,22 @@ EVisionV2KeyboardController::~EVisionV2KeyboardController()
     hid_close(dev);
 }
 
-std::string EVisionV2KeyboardController::GetDeviceName()
+std::string EVisionV2KeyboardController::GetName()
 {
-    return device_name;
+    return(name);
 }
 
 std::string EVisionV2KeyboardController::GetSerial()
 {
-    const uint8_t   sz  = HID_MAX_STR;
-    wchar_t         tmp[sz];
-
-    int ret             = hid_get_serial_number_string(dev, tmp, sz);
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
     if(ret != 0)
     {
         return("");
     }
 
-    std::wstring w_tmp = std::wstring(tmp);
-    std::string serial = std::string(w_tmp.begin(), w_tmp.end());
-
-    return serial;
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 std::string EVisionV2KeyboardController::GetLocation()
@@ -269,6 +259,9 @@ int EVisionV2KeyboardController::GetMode(EVisionV2KeyboardPart part, EvisionV2Mo
             offset += EVISION_V2_PARAMETER_EDGE;
             size = EVISION_V2_PARAMETER_END - EVISION_V2_PARAMETER_EDGE;
             break;
+        default:
+            size = 0;
+            break;
     }
 
     ret = Read(EVISION_V2_CMD_READ_CONFIG, offset, size, buffer);
@@ -346,8 +339,8 @@ void EVisionV2KeyboardController::SetMode(EVisionV2KeyboardPart part, const Evis
         Write(EVISION_V2_CMD_WRITE_CONFIG, EVISION_V2_OFFSET_CURRENT_PROFILE, &current_profile, 1);
     }
 
-    uint16_t offset;
-    uint8_t size;
+    uint16_t offset = 0;
+    uint8_t size    = 0;
 
     offset = current_profile * 0x40 + EVISION_V2_OFFSET_FIRST_PROFILE;
 

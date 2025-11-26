@@ -6,14 +6,12 @@
 |   Adam Honse (CalcProgrammer1)                15 Mar 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "RedragonMouseController.h"
-#include "RGBController.h"
 #include "RGBController_RedragonMouse.h"
 
 /*-----------------------------------------------------*\
@@ -28,6 +26,8 @@
 #define REDRAGON_M602_PID               0xFC38
 #define REDRAGON_M808_PID               0xFC5F
 #define REDRAGON_M801_PID               0xFC58
+#define REDRAGON_M810_PID               0xFA7E
+#define REDRAGON_M987_PID               0xFC69
 
 /******************************************************************************************\
 *                                                                                          *
@@ -40,11 +40,12 @@
 void DetectRedragonMice(hid_device_info* info, const std::string& name)
 {
     hid_device* dev = hid_open_path(info->path);
-    if( dev )
+
+    if(dev)
     {
-        RedragonMouseController* controller = new RedragonMouseController(dev, info->path);
+        RedragonMouseController*     controller     = new RedragonMouseController(dev, info->path, name);
         RGBController_RedragonMouse* rgb_controller = new RGBController_RedragonMouse(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
@@ -59,3 +60,5 @@ REGISTER_HID_DETECTOR_IP("Redragon M908 Impact",     DetectRedragonMice,      RE
 REGISTER_HID_DETECTOR_IP("Redragon M602 Griffin",    DetectRedragonMice,      REDRAGON_MOUSE_VID,    REDRAGON_M602_PID,         2, REDRAGON_MOUSE_USAGE_PAGE);
 REGISTER_HID_DETECTOR_IP("Redragon M808 Storm",      DetectRedragonMice,      REDRAGON_MOUSE_VID,    REDRAGON_M808_PID,         2, REDRAGON_MOUSE_USAGE_PAGE);
 REGISTER_HID_DETECTOR_IP("Redragon M801 Sniper",     DetectRedragonMice,      REDRAGON_MOUSE_VID,    REDRAGON_M801_PID,         2, REDRAGON_MOUSE_USAGE_PAGE);
+REGISTER_HID_DETECTOR_IP("Redragon M810 Taipan",     DetectRedragonMice,      REDRAGON_MOUSE_VID,    REDRAGON_M810_PID,         2, REDRAGON_MOUSE_USAGE_PAGE);
+REGISTER_HID_DETECTOR_IP("Redragon M987 Reaping",    DetectRedragonMice,      REDRAGON_MOUSE_VID,    REDRAGON_M987_PID,         2, REDRAGON_MOUSE_USAGE_PAGE);

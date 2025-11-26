@@ -6,7 +6,7 @@
 |   Name (cnn1236661)                           25 Jun 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <algorithm>
@@ -26,20 +26,20 @@
 
 RGBController_Nollie::RGBController_Nollie(NollieController* controller_ptr)
 {
-    controller  = controller_ptr;
+    controller          = controller_ptr;
 
-    name        = "Nollie Device";
-    vendor      = "Nollie";
-    description = "Nollie Controller Device";
-    type        = DEVICE_TYPE_LEDSTRIP;
-    location    = controller->GetLocationString();
-    serial      = controller->GetSerialString();
+    name                = controller->GetNameString();
+    vendor              = "Nollie";
+    description         = "Nollie Controller Device";
+    type                = DEVICE_TYPE_LEDSTRIP;
+    location            = controller->GetLocationString();
+    serial              = controller->GetSerialString();
 
     mode Direct;
-    Direct.name       = "Direct";
-    Direct.value      = 0xFFFF;
-    Direct.flags      = MODE_FLAG_HAS_PER_LED_COLOR;
-    Direct.color_mode = MODE_COLORS_PER_LED;
+    Direct.name         = "Direct";
+    Direct.value        = 0xFFFF;
+    Direct.flags        = MODE_FLAG_HAS_PER_LED_COLOR;
+    Direct.color_mode   = MODE_COLORS_PER_LED;
     modes.push_back(Direct);
 
     SetupZones();
@@ -72,6 +72,8 @@ void RGBController_Nollie::SetupZones()
             channels_num  = NOLLIE16_CHANNELS_NUM;
             ch_led_num    = NOLLIE_HS_CH_LED_NUM;
             channel_index = ch16;
+            if (controller->GetUSBVID() == NOLLIERGBOS_2_VID)
+                channel_index = n16;
             break;
         case NOLLIE28_12_PID:
             channels_num  = NOLLIE28_12_CHANNELS_NUM;
@@ -152,9 +154,9 @@ void RGBController_Nollie::SetupZones()
 void RGBController_Nollie::ResizeZone(int zone, int new_size)
 {
     /*-----------------------------------------------------*\
-    |  Set whether MOS is enabled or not                   |
+    |  Set whether MOS is enabled or not                    |
     \*-----------------------------------------------------*/
-    if(controller->GetUSBPID() == NOLLIE32_PID)
+    if(controller->GetUSBVID() == NOLLIE32_VID && NOLLIE32_PID == controller->GetUSBPID())
     {
         if(zone == NOLLIE32_MOS_TRIGGER_CH && new_size > NOLLIE32_MOS_TRIGGER_LED)
         {
@@ -164,6 +166,14 @@ void RGBController_Nollie::ResizeZone(int zone, int new_size)
         {
             controller->SetMos(true);
         }
+    }
+
+    /*-----------------------------------------------------*\
+    |  Nollie1 needs to report the number of LEDs           |
+    \*-----------------------------------------------------*/
+    if(controller->GetUSBVID() == NOLLIE1_VID && controller->GetUSBPID() == NOLLIE1_PID)
+    {
+        controller->InitChLEDs(&new_size,NOLLIE1_CHANNELS_NUM);
     }
 
     if((size_t) zone >= zones.size())
@@ -201,7 +211,7 @@ void RGBController_Nollie::DeviceUpdateLEDs()
         for(std::size_t i = 0; i < ChSort.size(); i++)
         {
             int* ptr = std::find(channel_index, channel_index + 32, ChSort[i]);
-            int zone_idx = ptr - channel_index;
+            int zone_idx = (int)(ptr - channel_index);
             controller->SetChannelLEDs(ChSort[i], zones[zone_idx].colors, zones[zone_idx].leds_count);
         }
     }
@@ -211,7 +221,7 @@ void RGBController_Nollie::DeviceUpdateLEDs()
         {
             if(zones[zone_idx].leds_count > 0)
             {
-                controller->SetChannelLEDs(zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
+                controller->SetChannelLEDs((unsigned char)zone_idx, zones[zone_idx].colors, zones[zone_idx].leds_count);
             }
         }
         controller->SendUpdate();

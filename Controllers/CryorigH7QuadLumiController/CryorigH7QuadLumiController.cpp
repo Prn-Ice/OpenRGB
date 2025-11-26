@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      15 Apr 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <cstring>
@@ -15,11 +15,13 @@
 #include <string>
 #include "CryorigH7QuadLumiController.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
-CryorigH7QuadLumiController::CryorigH7QuadLumiController(hid_device* dev_handle, const char* path)
+CryorigH7QuadLumiController::CryorigH7QuadLumiController(hid_device* dev_handle, const char* path, std::string dev_name)
 {
     dev         = dev_handle;
     location    = path;
+    name        = dev_name;
 
     SendFirmwareRequest();
 }
@@ -32,6 +34,11 @@ CryorigH7QuadLumiController::~CryorigH7QuadLumiController()
 std::string CryorigH7QuadLumiController::GetLocation()
 {
     return("HID: " + location);
+}
+
+std::string CryorigH7QuadLumiController::GetName()
+{
+    return(name);
 }
 
 std::string CryorigH7QuadLumiController::GetFirmwareVersion()
@@ -49,10 +56,7 @@ std::string CryorigH7QuadLumiController::GetSerialString()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void CryorigH7QuadLumiController::SetChannelEffect

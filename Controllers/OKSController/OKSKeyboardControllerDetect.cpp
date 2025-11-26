@@ -6,13 +6,12 @@
 |   Merafour (OKS)                              24 Feb 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "OKSKeyboardController.h"
-#include "RGBController.h"
 #include "RGBController_OKSKeyboard.h"
 
 /******************************************************************************************\
@@ -28,9 +27,9 @@ void DetectOKSKeyboardControllers(hid_device_info* info, const std::string& name
 
     if(dev)
     {
-        OKSKeyboardController*     controller     = new OKSKeyboardController(dev, info->path, info->product_id);
+        OKSKeyboardController*     controller     = new OKSKeyboardController(dev, info->path, info->product_id, name);
         RGBController_OKSKeyboard* rgb_controller = new RGBController_OKSKeyboard(controller);
-        rgb_controller->name = name;
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }   /* DetectOKSKeyboardControllers() */

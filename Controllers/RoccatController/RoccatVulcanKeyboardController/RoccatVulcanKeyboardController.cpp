@@ -1,27 +1,29 @@
-/*-------------------------------------------------------------------*\
-|  RoccatVulcanKeyboardController.cpp                                 |
-|                                                                     |
-|  Driver for Roccat Vulcan Keyboard                                  |
-|                                                                     |
-|  Mola19 17/12/2021                                                  |
-|                                                                     |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatVulcanKeyboardController.cpp                        |
+|                                                           |
+|   Driver for Roccat Vulcan keyboard                       |
+|                                                           |
+|   Mola19                                      17 Dec 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
-#include "RoccatVulcanKeyboardController.h"
-
+#include <chrono>
 #include <cstring>
 #include <math.h>
-#include <chrono>
 #include <thread>
 #include <vector>
-
 #include "LogManager.h"
+#include "RoccatVulcanKeyboardController.h"
+#include "StringUtils.h"
 
-RoccatVulcanKeyboardController::RoccatVulcanKeyboardController(hid_device* dev_ctrl_handle, hid_device* dev_led_handle, char *path, uint16_t pid)
+RoccatVulcanKeyboardController::RoccatVulcanKeyboardController(hid_device* dev_ctrl_handle, hid_device* dev_led_handle, char *path, uint16_t pid, std::string dev_name)
 {
     dev_ctrl    = dev_ctrl_handle;
     dev_led     = dev_led_handle;
     location    = path;
+    name        = dev_name;
     device_pid  = pid;
 }
 
@@ -29,6 +31,16 @@ RoccatVulcanKeyboardController::~RoccatVulcanKeyboardController()
 {
     hid_close(dev_ctrl);
     hid_close(dev_led);
+}
+
+std::string RoccatVulcanKeyboardController::GetLocation()
+{
+    return("HID: " + location);
+}
+
+std::string RoccatVulcanKeyboardController::GetName()
+{
+    return(name);
 }
 
 std::string RoccatVulcanKeyboardController::GetSerial()
@@ -41,18 +53,8 @@ std::string RoccatVulcanKeyboardController::GetSerial()
         return("");
     }
 
-    std::wstring return_wstring = serial_string;
-    std::string return_string(return_wstring.begin(), return_wstring.end());
-
-    return(return_string);
-
+    return(StringUtils::wstring_to_string(serial_string));
 }
-
-std::string RoccatVulcanKeyboardController::GetLocation()
-{
-    return("HID: " + location);
-}
-
 
 device_info RoccatVulcanKeyboardController::InitDeviceInfo()
 {
@@ -65,6 +67,8 @@ device_info RoccatVulcanKeyboardController::InitDeviceInfo()
         case ROCCAT_MAGMA_PID:
         case ROCCAT_MAGMA_MINI_PID:
         case ROCCAT_VULCAN_PRO_PID:
+        case ROCCAT_VULCAN_II_PID:
+        case TURTLE_BEACH_VULCAN_II_PID:
             packet_length = 9;
             report_id     = 0x09;
             break;
@@ -118,6 +122,8 @@ void RoccatVulcanKeyboardController::EnableDirect(bool on_off_switch)
         case ROCCAT_MAGMA_PID:
         case ROCCAT_MAGMA_MINI_PID:
         case ROCCAT_VULCAN_PRO_PID:
+        case ROCCAT_VULCAN_II_PID:
+        case TURTLE_BEACH_VULCAN_II_PID:
             buf = new uint8_t[5] { 0x0E, 0x05, on_off_switch, 0x00, 0x00 };
             hid_send_feature_report(dev_ctrl, buf, 5);
             break;
@@ -152,16 +158,22 @@ void RoccatVulcanKeyboardController::SendColors(std::vector<led_color> colors)
             column_length = 12;
             protocol_version = 2;
             break;
+        case ROCCAT_VULCAN_II_PID:
+        case TURTLE_BEACH_VULCAN_II_PID:
+            packet_length = 396;
+            column_length = 1;
+            protocol_version = 2;
+            break;
         default:
             packet_length = 436;
             column_length = 12;
             protocol_version = 1;
     }
-    
-    unsigned char packet_num = ceil((float) packet_length / 64);
+
+    unsigned char packet_num = (unsigned char)(ceil((float)packet_length / 64));
 
     std::vector<std::vector<uint8_t>> bufs(packet_num);
-    
+
     for(int p = 0; p < packet_num; p++)
     {
         bufs[p].resize(65);
@@ -186,7 +198,7 @@ void RoccatVulcanKeyboardController::SendColors(std::vector<led_color> colors)
 
     if(header_length_first == 3)
     {
-        bufs[0][3] = packet_length;
+        bufs[0][3] = (uint8_t)packet_length;
     }
     else
     {
@@ -204,8 +216,8 @@ void RoccatVulcanKeyboardController::SendColors(std::vector<led_color> colors)
 
     for(unsigned int i = 0; i < colors.size(); i++)
     {
-        int coloumn = floor(colors[i].value / column_length);
-        int row = colors[i].value % column_length;
+        int column  = (int)(floor(colors[i].value / column_length));
+        int row     = colors[i].value % column_length;
 
         /*-----------------------------------------------------------------------*\
         |  This has to be split up for readability.                               |
@@ -218,7 +230,7 @@ void RoccatVulcanKeyboardController::SendColors(std::vector<led_color> colors)
         \*-----------------------------------------------------------------------*/
         if(protocol_version == 1)
         {
-            int offset = coloumn * 3 * column_length + row + header_length_first;
+            int offset = column * 3 * column_length + row + header_length_first;
 
             bufs[offset / 64][offset % 64 + 1] = RGBGetRValue(colors[i].color);
 
@@ -232,7 +244,7 @@ void RoccatVulcanKeyboardController::SendColors(std::vector<led_color> colors)
         {
             unsigned int data_length_packet = 64 - header_length_first;
 
-            int offset = coloumn * 3 * column_length + row;
+            int offset = column * 3 * column_length + row;
 
             bufs[offset / data_length_packet][offset % data_length_packet + header_length_first + 1] = RGBGetRValue(colors[i].color);
 
@@ -280,6 +292,12 @@ void RoccatVulcanKeyboardController::SendMode(unsigned int mode, unsigned int sp
             packet_length = 371;
             column_length = 12;
             break;
+        case ROCCAT_VULCAN_II_PID:
+        case TURTLE_BEACH_VULCAN_II_PID:
+            protocol_version = 2;
+            packet_length = 377;
+            column_length = 1;
+            break;
         default:
             protocol_version = 1;
             packet_length = 443;
@@ -296,7 +314,7 @@ void RoccatVulcanKeyboardController::SendMode(unsigned int mode, unsigned int sp
 
     if(header_length == 1)
     {
-        buf[1] = packet_length;
+        buf[1] = (uint8_t)packet_length;
     }
     else
     {
@@ -326,10 +344,10 @@ void RoccatVulcanKeyboardController::SendMode(unsigned int mode, unsigned int sp
 
     for(unsigned int i = 0; i < colors.size(); i++)
     {
-        int coloumn = floor(colors[i].value / column_length);
-        int row = colors[i].value % column_length;
+        int column  = (int)(floor(colors[i].value / column_length));
+        int row     = colors[i].value % column_length;
 
-        int offset = coloumn * 3 * column_length + row + 9;
+        int offset = column * 3 * column_length + row + 9;
 
         buf[offset] = RGBGetRValue(colors[i].color);
 
@@ -348,7 +366,7 @@ void RoccatVulcanKeyboardController::SendMode(unsigned int mode, unsigned int sp
     buf[packet_length - 2] = total & 0xFF;
     buf[packet_length - 1] = total >> 8;
 
-    int ret = hid_send_feature_report(dev_ctrl, buf, packet_length);
+    hid_send_feature_report(dev_ctrl, buf, packet_length);
 
     delete[] buf;
 }

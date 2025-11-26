@@ -4,7 +4,7 @@
 |   Device list for Corsair V2 peripherals                  |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -71,10 +71,14 @@ typedef struct
 #define CORSAIR_K55_RGB_PRO_PID                     0x1BA4
 #define CORSAIR_K60_RGB_PRO_PID                     0x1BA0
 #define CORSAIR_K60_RGB_PRO_LP_PID                  0x1BAD
-#define CORSAIR_K60_RGB_PRO_TKL_PID                 0x1BC7
+#define CORSAIR_K60_RGB_PRO_TKL_B_PID               0x1BC7
+#define CORSAIR_K60_RGB_PRO_TKL_W_PID               0x1BED
+#define CORSAIR_K70_CORE_RGB_PID                    0x1BFD
 #define CORSAIR_K70_RGB_PRO_PID                     0x1BC4
+#define CORSAIR_K70_RGB_PRO_V2_PID                  0x1BB3
 #define CORSAIR_K70_RGB_TKL_PID                     0x1B73
 #define CORSAIR_K70_RGB_TKL_CS_PID                  0x1BB9
+#define CORSAIR_K95_PLATINUM_XT_PID                 0x1B89
 #define CORSAIR_K100_OPTICAL_V1_PID                 0x1B7C
 #define CORSAIR_K100_OPTICAL_V2_PID                 0x1BC5
 #define CORSAIR_K100_MXRED_PID                      0x1B7D
@@ -92,6 +96,7 @@ typedef struct
 #define CORSAIR_M55_RGB_PRO_PID                     0x1B70
 #define CORSAIR_M65_RGB_ULTRA_WIRED_PID             0x1B9E
 #define CORSAIR_M65_RGB_ULTRA_WIRELESS_PID          0x1BB5
+#define CORSAIR_M75_GAMING_MOUSE_PID                0x1BF0
 #define CORSAIR_SLIPSTREAM_WIRELESS_PID1            0x1BA6
 #define CORSAIR_SLIPSTREAM_WIRELESS_PID2            0x1B65
 
@@ -99,6 +104,7 @@ typedef struct
 | Corsair V2 Protocol Mousemats                         |
 \*-----------------------------------------------------*/
 #define CORSAIR_MM700_PID                           0x1B9B
+#define CORSAIR_MM700_3XL_PID                       0x1BC9
 
 /*-----------------------------------------------------*\
 | These constant values are defined in                  |

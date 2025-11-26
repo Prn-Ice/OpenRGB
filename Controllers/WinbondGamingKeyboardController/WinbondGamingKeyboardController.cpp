@@ -1,18 +1,20 @@
-/*---------------------------------------------*\
-|  WinbondGamingKeyboardController.cpp          |
-|                                               |
-|  Driver for "Winbond Gaming Keyboard" boards, |
-|  like Pulsar PCMK TKL Keyboard                |
-|                                               |
-|  Daniel Gibson  3 December 2023               |
-\*---------------------------------------------*/
-
-#include "WinbondGamingKeyboardController.h"
-#include "RGBController_WinbondGamingKeyboard.h"
-#include "LogManager.h"
+/*---------------------------------------------------------*\
+| WinbondGamingKeyboardController.cpp                       |
+|                                                           |
+|   Driver for Winbond Gaming Keyboard                      |
+|                                                           |
+|   Daniel Gibson                               03 Dec 2023 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <algorithm>
 #include <string.h>
+#include "LogManager.h"
+#include "StringUtils.h"
+#include "WinbondGamingKeyboardController.h"
+#include "RGBController_WinbondGamingKeyboard.h"
 
 #define WINBOND_HID_DATA_LEN 64
 
@@ -71,6 +73,15 @@ void WinbondGamingKeyboardController::SetNameVendorDescription(const hid_device_
             kb_size = KEYBOARD_SIZE_SIXTY;
         }
 
+    }
+    else if((name.find("Rockfall") != std::string::npos) || (name.find("Skyfall") != std::string::npos))
+    {
+        vendor      = "Hator";
+        layout      = KEYBOARD_LAYOUT_ANSI_QWERTY;
+        if(name.find("TKL") != std::string::npos)
+        {
+            kb_size = KEYBOARD_SIZE_TKL;
+        }
     }
     else
     {
@@ -201,22 +212,17 @@ void WinbondGamingKeyboardController::SetVersionLayout()
     version = "???";
 }
 
-std::string WinbondGamingKeyboardController::GetSerialString() const
+std::string WinbondGamingKeyboardController::GetSerialString()
 {
-    wchar_t serial_wchar[128] = {};
-    int ret = hid_get_serial_number_string(dev, serial_wchar, 128);
-    if(ret == -1)
-    {
-        return "";
-    }
-    std::wstring serial_wstring(serial_wchar);
-    std::string serial_string;
-    std::transform(serial_wstring.begin(), serial_wstring.end(), std::back_inserter(serial_string), [] (wchar_t i)
-    {
-        return (char)i;
-    });
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-    return serial_string;
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 static void setModeImpl(hid_device* dev, bool is_logo, unsigned char effect_mode, unsigned char colors[2][3],
@@ -282,7 +288,7 @@ void WinbondGamingKeyboardController::SetLEDsData(const std::vector<RGBColor>& c
         {
             continue;
         }
-        
+
         /*--------------------------------------------------------------------------------------------------*\
         | the following two lines are the inverse of the KV() macro in RGBController_WinbondGamingKeyboard.h |
         \*--------------------------------------------------------------------------------------------------*/
@@ -300,7 +306,7 @@ void WinbondGamingKeyboardController::SetLEDsData(const std::vector<RGBColor>& c
         }
 
         msg_num &= 7; // 0..7
-        
+
         /*----------------------------*\
         | transform 0..0xFF to 0..0xC1 |
         \*----------------------------*/

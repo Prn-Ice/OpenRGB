@@ -6,13 +6,13 @@
 |   Sebastian Kraus                             25 Dec 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define CHERRY_KB_PACKET_SIZE                        64
@@ -30,20 +30,23 @@
 #define MX_BOARD_8_0_TKL_RGB_PID        0x00B7
 #define MX_BOARD_10_0_FL_RGB_PID        0x00BB
 #define G80_3000_TKL_NBL_PID            0x00C3
-#define MX_BOARD_2_0S_FL_RGB_PID        0x00C4
+#define MX_BOARD_2_0S_FL_RGB_EU_PID     0x01A6
+#define MX_BOARD_2_0S_FL_RGB_US_PID     0x00C4
+#define MX_BOARD_2_0S_FL_NBL_PID        0x00CE
 #define G80_3000_TKL_RGB_PID            0x00C5
 #define MV_BOARD_3_0FL_RGB_PID          0x00C7
 #define CCF_MX_8_0_TKL_BL_PID           0x00C9
 #define CCF_MX_1_0_TKL_BL_PID           0x00CA
 #define CCF_MX_1_0_TKL_NBL_PID          0x00CB
 #define G80_3000_TKL_NBL_KOR_PID        0x00CD
-#define MX_BOARD_2_0S_FL_NBL_PID        0x00CE
 #define MX_1_0_FL_NBL_PID               0x00D2
 #define MX_1_0_FL_RGB_PID               0x00D3
-#define G80_3000N_TKL_RGB_PID           0x00DD
-#define G80_3000N_FL_RGB_PID            0x00DE
-#define MX_BOARD_10_0N_FL_RGB_PID       0x00DF
-#define MX_BOARD_2_0S_FL_RGB_DE_PID     0x01A6
+#define G80_3000N_TKL_RGB_EU_PID        0x00DD
+#define G80_3000N_TKL_RGB_US_PID        0x00E0
+#define G80_3000N_FL_RGB_EU_PID         0x00DE
+#define G80_3000N_FL_RGB_US_PID         0x00E1
+#define MX_BOARD_10_0N_FL_RGB_EU_PID    0x00DF
+#define MX_BOARD_10_0N_FL_RGB_US_PID    0x00E2
 
 
 enum
@@ -121,10 +124,11 @@ enum
 class CherryKeyboardController
 {
 public:
-    CherryKeyboardController(hid_device* dev_handle, const char* path);
+    CherryKeyboardController(hid_device* dev_handle, const char* path, std::string dev_name);
     ~CherryKeyboardController();
 
     std::string GetDeviceLocation();
+    std::string GetDeviceName();
     std::string GetSerialString();
 
     void        SetKeyboardColors
@@ -164,6 +168,7 @@ public:
 private:
     hid_device*             dev;
     std::string             location;
+    std::string             name;
 
     void        ComputeChecksum
                     (

@@ -6,15 +6,11 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      25 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
-#include <vector>
 #include "Detector.h"
-#include "RGBController.h"
 #include "RGBController_LinuxLED_Linux.h"
 #include "SettingsManager.h"
 
@@ -46,6 +42,7 @@ void DetectLinuxLEDControllers()
             std::string red_path;
             std::string green_path;
             std::string blue_path;
+            std::string rgb_path;
 
             if(linux_led_settings["devices"][device_idx].contains("name"))
             {
@@ -67,13 +64,18 @@ void DetectLinuxLEDControllers()
                 blue_path = linux_led_settings["devices"][device_idx]["blue_path"];
             }
 
-            LinuxLEDController*     controller     = new LinuxLEDController();
+            if(linux_led_settings["devices"][device_idx].contains("rgb_path"))
+            {
+                rgb_path = linux_led_settings["devices"][device_idx]["rgb_path"];
+            }
+
+            LinuxLEDController*     controller     = new LinuxLEDController(name);
             controller->OpenRedPath(red_path);
             controller->OpenGreenPath(green_path);
             controller->OpenBluePath(blue_path);
+            controller->OpenRgbPath(rgb_path);
 
             RGBController_LinuxLED* rgb_controller = new RGBController_LinuxLED(controller);
-            rgb_controller->name                   = name;
 
             ResourceManager::get()->RegisterRGBController(rgb_controller);
         }

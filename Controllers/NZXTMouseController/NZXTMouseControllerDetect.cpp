@@ -6,13 +6,12 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      13 Dec 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "Detector.h"
 #include "NZXTMouseController.h"
-#include "RGBController.h"
 #include "RGBController_NZXTMouse.h"
 
 /*-----------------------------------------------------*\
@@ -35,9 +34,8 @@ static void DetectNZXTMouseControllers(hid_device_info* info, const std::string&
 
     if(dev)
     {
-        NZXTMouseController*     controller     = new NZXTMouseController(dev, info->path);
+        NZXTMouseController*     controller     = new NZXTMouseController(dev, info->path, name);
         RGBController_NZXTMouse* rgb_controller = new RGBController_NZXTMouse(controller);
-        rgb_controller->name                    = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }

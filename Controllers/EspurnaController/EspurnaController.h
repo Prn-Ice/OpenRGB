@@ -6,7 +6,7 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      11 Sep 2020 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
@@ -39,9 +39,6 @@ public:
     void        SetLEDs(std::vector<RGBColor> colors);
 
 private:
-    int baud_rate;
-
-    char led_string[1024];
     std::string port_name;
     std::string client_name;
     char espurna_apikey[128];

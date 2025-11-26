@@ -6,14 +6,14 @@
 |   Cooper Knaak                                23 Jan 2022 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <array>
 #include <string>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 #define EVGA_PERIPHERAL_PACKET_SIZE 65
@@ -91,10 +91,10 @@ struct EVGAMouseControllerDeviceState
 class EVGAMouseController
 {
 public:
-    EVGAMouseController(hid_device* dev_handle, char *_path, int connection_type);
+    EVGAMouseController(hid_device* dev_handle, char * path, int connection_type, std::string dev_name);
     ~EVGAMouseController();
 
-    std::string GetDeviceName();
+    std::string GetName();
     std::string GetSerial();
     std::string GetLocation();
 
@@ -144,6 +144,12 @@ public:
     void SetAllLedsAndActivate(uint8_t brightness, uint8_t speed, const std::vector<RGBColor>& colors);
 
 private:
+    hid_device* dev;
+    std::string location;
+    std::string name;
+    int         connection_type;
+
+    std::vector<EVGAMouseControllerDeviceState> led_states;
 
     /*----------------------------------------------------------------------------------------------------------------*\
     | Sets the led to the given colors with the given brightness and speed. if activate is true, activates the current |
@@ -196,14 +202,5 @@ private:
     | read from the device should be retried at a later time.                        |
     \*------------------------------------------------------------------------------*/
     bool IsResponseNotReadyPacket(unsigned char *buffer);
-
-    std::string device_name;
-    std::string serial;
-    std::string location;
-    hid_device* dev;
-
-    int connection_type;
-
-    std::vector<EVGAMouseControllerDeviceState> led_states;
 };
 

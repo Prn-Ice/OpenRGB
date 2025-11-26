@@ -1,31 +1,35 @@
-/*-------------------------------------------------------------------*\
-|  RoccatVulcanKeyboardController.h                                   |
-|                                                                     |
-|  Driver for Roccat Vulcan Keyboard                                  |
-|                                                                     |
-|  Mola19 17/12/2021                                                  |
-|                                                                     |
-\*-------------------------------------------------------------------*/
+/*---------------------------------------------------------*\
+| RoccatVulcanKeyboardController.h                          |
+|                                                           |
+|   Driver for Roccat Vulcan keyboard                       |
+|                                                           |
+|   Mola19                                      17 Dec 2021 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #pragma once
 
+#include <string>
+#include <hidapi.h>
 #include "RGBController.h"
 #include "RoccatVulcanKeyboardLayouts.h"
-
-#include <string>
-#include <hidapi/hidapi.h>
 
 /*--------------------------------------------------------------------------------*\
 |  KEYBOARDS                                                                       |
 |  This section was used to be enum.                                               |
 \*--------------------------------------------------------------------------------*/
-#define ROCCAT_VULCAN_100_AIMO_PID  0x307A
-#define ROCCAT_VULCAN_120_AIMO_PID  0x3098
-#define ROCCAT_VULCAN_TKL_PID       0x2FEE
-#define ROCCAT_VULCAN_PRO_PID       0x30F7
-#define ROCCAT_PYRO_PID             0x314C
-#define ROCCAT_MAGMA_PID            0x3124
-#define ROCCAT_MAGMA_MINI_PID       0x69A0
+#define ROCCAT_VULCAN_100_AIMO_PID      0x307A
+#define ROCCAT_VULCAN_120_AIMO_PID      0x3098
+#define ROCCAT_VULCAN_TKL_PID           0x2FEE
+#define ROCCAT_VULCAN_PRO_PID           0x30F7
+#define ROCCAT_VULCAN_II_PID            0x2F4E
+#define ROCCAT_PYRO_PID                 0x314C
+#define ROCCAT_MAGMA_PID                0x3124
+#define ROCCAT_MAGMA_MINI_PID           0x69A0
+#define TURTLE_BEACH_VULCAN_II_PID      0x501B
+#define TURTLE_BEACH_VULCAN_II_TKL_PID  0x5023
 
 enum
 {
@@ -66,11 +70,12 @@ struct led_color
 class RoccatVulcanKeyboardController
 {
 public:
-    RoccatVulcanKeyboardController(hid_device* dev_ctrl_handle, hid_device* dev_led_handle, char *path, uint16_t pid);
+    RoccatVulcanKeyboardController(hid_device* dev_ctrl_handle, hid_device* dev_led_handle, char *path, uint16_t pid, std::string dev_name);
     ~RoccatVulcanKeyboardController();
 
     std::string     GetSerial();
     std::string     GetLocation();
+    std::string     GetName();
     device_info     InitDeviceInfo();
     device_info     GetDeviceInfo();
 
@@ -84,8 +89,9 @@ public:
     uint16_t        device_pid;
 
 private:
-    std::string     location;
     hid_device*     dev_ctrl;
     hid_device*     dev_led;
     device_info     dev_info;
+    std::string     location;
+    std::string     name;
 };

@@ -4,7 +4,7 @@
 |   RGBController for Colorful GPU                          |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <array>
@@ -24,7 +24,8 @@
 RGBController_ColorfulGPU::RGBController_ColorfulGPU(ColorfulGPUController * colorful_gpu_ptr)
 {
     controller  = colorful_gpu_ptr;
-    name        = "Colorful GPU Device";
+
+    name        = controller->GetDeviceName();
     vendor      = "Colorful";
     type        = DEVICE_TYPE_GPU;
     description = name;

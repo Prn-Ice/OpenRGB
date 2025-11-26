@@ -6,17 +6,21 @@
 |   Adam Honse (calcprogrammer1@gmail.com)      18 Jul 2023 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include "RGBController.h"
-#ifdef _WIN32
-#include "HYTEMousematController_Windows.h"
-#else
-#include "HYTEMousematController_Linux.h"
+
+#if defined(_WIN32) || defined(__APPLE__)
+#include "HYTEMousematController_Windows_MacOS.h"
 #endif
+
+#if defined(__FreeBSD__) || defined(__linux__)
+#include "HYTEMousematController_FreeBSD_Linux.h"
+#endif
+
 
 enum
 {

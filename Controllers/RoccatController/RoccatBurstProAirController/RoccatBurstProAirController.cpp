@@ -1,33 +1,23 @@
-/*-------------------------------------------------------------------*\
-|  RoccatBurstProAirController.cpp                                    |
-|                                                                     |
-|  Driver for Roccat Burst Pro Air Mouse                              |
-|                                                                     |
-|  Morgan Guimard (morg)          6/16/2022                           |
-\*-------------------------------------------------------------------*/
-
-#include "RoccatBurstProAirController.h"
+/*---------------------------------------------------------*\
+| RoccatBurstProAirController.cpp                           |
+|                                                           |
+|   Driver for Roccat Burst Pro Air                         |
+|                                                           |
+|   Morgan Guimard (morg)                       16 Jun 2022 |
+|                                                           |
+|   This file is part of the OpenRGB project                |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
+\*---------------------------------------------------------*/
 
 #include <cstring>
+#include "RoccatBurstProAirController.h"
+#include "StringUtils.h"
 
-RoccatBurstProAirController::RoccatBurstProAirController(hid_device* dev_handle, const hid_device_info& info)
+RoccatBurstProAirController::RoccatBurstProAirController(hid_device* dev_handle, const hid_device_info& info, std::string dev_name)
 {
     dev                 = dev_handle;
-    version             = "";
     location            = info.path;
-
-    wchar_t serial_string[128];
-    int ret = hid_get_serial_number_string(dev, serial_string, 128);
-
-    if(ret != 0)
-    {
-        serial_number = "";
-    }
-    else
-    {
-        std::wstring return_wstring = serial_string;
-        serial_number = std::string(return_wstring.begin(), return_wstring.end());
-    }
+    name                = dev_name;
 }
 
 RoccatBurstProAirController::~RoccatBurstProAirController()
@@ -35,19 +25,27 @@ RoccatBurstProAirController::~RoccatBurstProAirController()
     hid_close(dev);
 }
 
-std::string RoccatBurstProAirController::GetFirmwareVersion()
+std::string RoccatBurstProAirController::GetDeviceLocation()
 {
-    return version;
+    return("HID: " + location);
+}
+
+std::string RoccatBurstProAirController::GetNameString()
+{
+    return(name);
 }
 
 std::string RoccatBurstProAirController::GetSerialString()
 {
-    return serial_number;
-}
+    wchar_t serial_string[128];
+    int ret = hid_get_serial_number_string(dev, serial_string, 128);
 
-std::string RoccatBurstProAirController::GetDeviceLocation()
-{
-    return("HID: " + location);
+    if(ret != 0)
+    {
+        return("");
+    }
+
+    return(StringUtils::wstring_to_string(serial_string));
 }
 
 void RoccatBurstProAirController::SetColors(std::vector<RGBColor> colors)

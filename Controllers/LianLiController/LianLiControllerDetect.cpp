@@ -4,18 +4,12 @@
 |   Detector for Lian Li devices                            |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #include <string>
 #include <vector>
-
-#ifdef __FreeBSD__
 #include <libusb.h>
-#else
-#include <libusb-1.0/libusb.h>
-#endif
-
 #include "Detector.h"
 #include "ResourceManager.h"
 
@@ -213,7 +207,7 @@ void DetectLianLiUniHubSLInfinity(hid_device_info* info, const std::string& name
     }
 }   /* DetectLianLiUniHubSLInfinity() */
 
-void DetectLianLiStrimerControllers(hid_device_info* info, const std::string& name)
+void DetectLianLiStrimerControllers(hid_device_info* info, const std::string& /*name*/)
 {
     hid_device* dev = hid_open_path(info->path);
 
@@ -221,7 +215,6 @@ void DetectLianLiStrimerControllers(hid_device_info* info, const std::string& na
     {
         LianLiStrimerLConnectController*     controller       = new LianLiStrimerLConnectController(dev, info->path);
         RGBController_LianLiStrimerLConnect* rgb_controller   = new RGBController_LianLiStrimerLConnect(controller);
-        rgb_controller->name                            = name;
 
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
@@ -233,9 +226,9 @@ void DetectLianLiGAIITrinity(hid_device_info* info, const std::string& /*name*/)
 
     if(dev)
     {
-        LianLiGAIITrinityController*     controller     = new LianLiGAIITrinityController(dev);
+        LianLiGAIITrinityController*     controller     = new LianLiGAIITrinityController(dev, info->path);
         RGBController_LianLiGAIITrinity* rgb_controller = new RGBController_LianLiGAIITrinity(controller);
-        rgb_controller->location                        = "HID: " + std::string(info->path);
+
         ResourceManager::get()->RegisterRGBController(rgb_controller);
     }
 }
@@ -252,6 +245,6 @@ REGISTER_HID_DETECTOR_IPU("Lian Li Uni Hub - SL Infinity",      DetectLianLiUniH
 | DUMMY_DEVICE_DETECTOR("Lian Li Uni Hub", DetectLianLiUniHub, 0x0CF2, 0x7750 )                             |
 \*---------------------------------------------------------------------------------------------------------*/
 
-REGISTER_HID_DETECTOR_IPU("Strimer L Connect",                  DetectLianLiStrimerControllers, ENE_USB_VID,        STRIMER_L_CONNECT_PID,       1,   0xFF72, 0xA1);
+REGISTER_HID_DETECTOR_IPU("Lian Li Strimer L Connect",          DetectLianLiStrimerControllers, ENE_USB_VID,        STRIMER_L_CONNECT_PID,       1,   0xFF72, 0xA1);
 REGISTER_HID_DETECTOR_I("Lian Li GA II Trinity",                DetectLianLiGAIITrinity,        NUVOTON_USB_VID,    GAII_USB_PID,                             0x02);
 REGISTER_HID_DETECTOR_I("Lian Li GA II Trinity Performance",    DetectLianLiGAIITrinity,        NUVOTON_USB_VID,    GAII_Perf_USB_PID,                        0x02);

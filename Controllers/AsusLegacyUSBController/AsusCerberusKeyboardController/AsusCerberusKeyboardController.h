@@ -6,14 +6,14 @@
 |   Mola19                                      03 Mar 2021 |
 |                                                           |
 |   This file is part of the OpenRGB project                |
-|   SPDX-License-Identifier: GPL-2.0-only                   |
+|   SPDX-License-Identifier: GPL-2.0-or-later               |
 \*---------------------------------------------------------*/
 
 #pragma once
 
 #include <string>
 #include <vector>
-#include <hidapi/hidapi.h>
+#include <hidapi.h>
 #include "RGBController.h"
 
 enum
@@ -30,10 +30,11 @@ enum
 class AsusCerberusKeyboardController
 {
 public:
-    AsusCerberusKeyboardController(hid_device* dev_handle, const char* path, unsigned short rev_version);
+    AsusCerberusKeyboardController(hid_device* dev_handle, const char* path, unsigned short rev_version, std::string dev_name);
     ~AsusCerberusKeyboardController();
 
     std::string GetDeviceLocation();
+    std::string GetDeviceName();
     std::string GetSerialString();
     std::string GetVersion();
 
@@ -47,5 +48,6 @@ public:
 private:
     hid_device*                 dev;
     std::string                 location;
+    std::string                 name;
     unsigned short              version;
 };
